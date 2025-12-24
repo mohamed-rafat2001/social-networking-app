@@ -19,6 +19,7 @@ const Login = () => {
 	const {
 		register,
 		handleSubmit,
+		setError,
 		formState: { errors },
 	} = useForm({
 		resolver: zodResolver(loginSchema),
@@ -28,10 +29,27 @@ const Login = () => {
 		loginMutation(data, {
 			onSuccess: () => {
 				toast.success("Welcome back!");
-				navigate("/feed");
+				// Small delay to ensure token is stored and query invalidated
+				setTimeout(() => {
+					navigate("/feed");
+				}, 100);
 			},
 			onError: (error) => {
-				toast.error(error?.response?.data?.message || "Login failed");
+				const serverErrors = error?.response?.data?.validation;
+				if (serverErrors && Array.isArray(serverErrors)) {
+					serverErrors.forEach((err) => {
+						const fieldName = err.path || err.param;
+						if (fieldName) {
+							setError(fieldName, {
+								type: "server",
+								message: err.msg || err.message,
+							});
+						}
+					});
+					toast.error("Please fix the errors below");
+				} else {
+					toast.error(error?.response?.data?.message || "Login failed");
+				}
 			},
 		});
 	};

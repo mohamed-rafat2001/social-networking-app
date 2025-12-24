@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import Footer from "./Footer";
 
 const MainLayout = () => {
 	return (
@@ -65,7 +64,6 @@ const MainLayout = () => {
 					</div>
 				</aside>
 			</div>
-			<Footer />
 		</div>
 	);
 };

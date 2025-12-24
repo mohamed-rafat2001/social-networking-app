@@ -119,15 +119,20 @@ const resetPassword = errorHandler(
         res.status(200).json({ status: 'success', data: { user, token } })
     }
 )
-const user = errorHandler(
-    async (req, res, next) => {
-        if (!req.user) {
-            const error = appError.Error('no user', 'fail', 404)
-            return next(error)
-        }
-        res.status(200).json({ status: 'success', data: req.user })
-    }
-)
+const user = errorHandler(async (req, res, next) => {
+	const userId = req.params.userId;
+	let userData = req.user;
+
+	if (userId && userId !== "user") {
+		userData = await User.findById(userId);
+	}
+
+	if (!userData) {
+		const error = appError.Error("no user", "fail", 404);
+		return next(error);
+	}
+	res.status(200).json({ status: "success", data: userData });
+});
 module.exports = {
     singUp,
     profileImg,

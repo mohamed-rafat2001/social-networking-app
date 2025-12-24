@@ -6,7 +6,7 @@ const regestrationValidator = [
     body('password').isStrongPassword({ minlength: 8, minUppercase: 1, minLowercase: 1, minNumbers: 1, minSymbols: 1 })
         .withMessage(
             "in-valid password"),
-    body('idNumber').isInt().isLength({ min: 8, max: 8 })
+    body('idNumber').notEmpty().withMessage('ID Number is required').isLength({ min: 5, max: 15 }).withMessage('ID Number must be between 5 and 15 characters'),
 
 ]
 // 'must password have minlength: 8, minUppercase: 1, minLowercase: 1, minNumbers: 1, minSymbols: 1 '),

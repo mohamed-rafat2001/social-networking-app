@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import moment from "moment";
 import { useUser } from "../../../hooks/useUser.js";
 import {
@@ -19,22 +19,43 @@ import {
 	HiChatAlt2,
 	HiRefresh,
 	HiHeart,
-	HiChartBar,
-	HiUpload,
+	HiX,
 } from "react-icons/hi";
 
 function PostList() {
 	const [text, setText] = useState("");
-	const [file, setFile] = useState(null);
+	const [files, setFiles] = useState([]);
+	const [previewUrls, setPreviewUrls] = useState([]);
+	const fileInputRef = useRef(null);
 
 	const { user } = useUser();
 
-	const { data: postsData } = usePosts();
+	const { data: postsData, isLoading: isPostsLoading } = usePosts();
 	const { mutate: addPostMutation } = useAddPost();
 	const { mutate: likePostMutation } = useLikePost();
 	const { mutate: sharePostMutation } = useSharePost();
 
 	const posts = postsData?.data || [];
+
+	const handleFileChange = (e) => {
+		const selectedFiles = Array.from(e.target.files);
+		if (selectedFiles.length === 0) return;
+
+		setFiles((prev) => [...prev, ...selectedFiles]);
+
+		const newPreviewUrls = selectedFiles.map((file) =>
+			URL.createObjectURL(file)
+		);
+		setPreviewUrls((prev) => [...prev, ...newPreviewUrls]);
+	};
+
+	const removeFile = (index) => {
+		setFiles((prev) => prev.filter((_, i) => i !== index));
+		setPreviewUrls((prev) => {
+			URL.revokeObjectURL(prev[index]);
+			return prev.filter((_, i) => i !== index);
+		});
+	};
 
 	const likeOn = (id) => {
 		likePostMutation(id);
@@ -44,23 +65,24 @@ function PostList() {
 	};
 
 	const handleSubmit = (e) => {
-		e.preventDefault();
-		if (!text.trim() && !file) return;
+		if (e) e.preventDefault();
+		if (!text.trim() && files.length === 0) return;
 
-		if (!file) {
+		if (files.length === 0) {
 			addPostMutation({ text });
 			setText("");
 			return;
 		}
 
 		let data = new FormData();
-		file.forEach((f) => {
+		files.forEach((f) => {
 			data.append("filess", f);
 		});
 		data.append("text", text);
 		addPostMutation(data);
 		setText("");
-		setFile(null);
+		setFiles([]);
+		setPreviewUrls([]);
 	};
 
 	return (
@@ -92,52 +114,90 @@ function PostList() {
 				<div className="flex gap-4">
 					<Avatar src={user?.image?.secure_url} />
 					<form className="flex-1" onSubmit={handleSubmit}>
-						<div className="mb-2 dark:text-white">
+						<div className="mb-2">
 							<InputEmoji
 								value={text}
-								type="text"
-								placeholder="What is happening?!"
 								onChange={setText}
-								fontSize={18}
-								borderRadius={0}
+								cleanOnEnter
+								onEnter={handleSubmit}
+								placeholder="What's on your mind?"
+								fontSize={16}
+								fontFamily="inherit"
 								borderColor="transparent"
-								theme="auto"
+								theme={
+									document.documentElement.classList.contains("dark")
+										? "dark"
+										: "light"
+								}
 							/>
 						</div>
+
+						{/* Image Previews */}
+						{previewUrls.length > 0 && (
+							<div
+								className={`grid gap-2 mb-4 ${
+									previewUrls.length === 1 ? "grid-cols-1" : "grid-cols-2"
+								}`}
+							>
+								{previewUrls.map((url, index) => (
+									<div
+										key={url}
+										className="relative group rounded-2xl overflow-hidden border dark:border-gray-800 aspect-video bg-gray-100 dark:bg-gray-800"
+									>
+										<img
+											src={url}
+											alt=""
+											className="w-full h-full object-cover"
+										/>
+										<button
+											type="button"
+											onClick={() => removeFile(index)}
+											className="absolute top-2 right-2 p-1.5 bg-gray-900/60 hover:bg-gray-900/80 text-white rounded-full backdrop-blur-sm transition-all"
+										>
+											<HiX className="text-sm" />
+										</button>
+									</div>
+								))}
+							</div>
+						)}
+
 						<div className="flex justify-between items-center mt-2 pt-2 border-t dark:border-gray-800">
-							<div className="flex gap-1 text-primary">
+							<div className="flex gap-1">
 								<label
-									htmlFor="image"
-									className="cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-full transition-colors"
+									htmlFor="image-upload"
+									className="cursor-pointer hover:bg-primary/10 p-2 rounded-full transition-colors text-primary"
+									title="Add images"
 								>
 									<HiPhotograph className="text-xl" />
 								</label>
 								<input
+									ref={fileInputRef}
 									type="file"
+									id="image-upload"
 									className="hidden"
-									onChange={(e) =>
-										setFile((prev) => [...e.target.files, ...(prev || [])])
-									}
+									accept="image/*"
 									multiple
-									id="image"
+									onChange={handleFileChange}
 								/>
 								<button
 									type="button"
-									className="hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-full transition-colors"
+									className="hover:bg-primary/10 p-2 rounded-full transition-colors text-primary"
+									title="Add video"
 								>
 									<HiFilm className="text-xl" />
 								</button>
 								<button
 									type="button"
-									className="hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-full transition-colors"
+									className="hover:bg-primary/10 p-2 rounded-full transition-colors text-primary"
+									title="Add feeling"
 								>
 									<HiEmojiHappy className="text-xl" />
 								</button>
 							</div>
 							<Button
 								type="submit"
-								className="px-5 py-2"
-								disabled={!text.trim() && !file}
+								className="px-6 py-1.5 rounded-full font-bold"
+								disabled={!text.trim() && files.length === 0}
 							>
 								Post
 							</Button>
@@ -148,8 +208,12 @@ function PostList() {
 
 			{/* Posts List */}
 			<AnimatePresence initial={false}>
-				{posts?.data ? (
-					posts.data.map((post, index) => (
+				{isPostsLoading ? (
+					<div className="flex justify-center items-center p-12">
+						<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+					</div>
+				) : posts.length > 0 ? (
+					posts.map((post, index) => (
 						<motion.div
 							key={post._id}
 							className="border-b dark:border-gray-800 p-4 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] cursor-pointer transition-all"
@@ -159,15 +223,15 @@ function PostList() {
 							layout
 						>
 							<div className="flex gap-3">
-								<Avatar src={post.userId.image?.secure_url} />
+								<Avatar src={post.userId?.image?.secure_url} />
 								<div className="flex-1">
 									<div className="flex justify-between items-center">
 										<div className="flex items-center gap-1 flex-wrap">
 											<span className="font-bold text-black dark:text-white hover:underline">
-												{post.userId.firstName} {post.userId.lastName}
+												{post.userId?.firstName} {post.userId?.lastName}
 											</span>
 											<span className="text-gray-500 dark:text-gray-400">
-												@{post.userId.firstName.toLowerCase()}
+												@{post.userId?.firstName?.toLowerCase()}
 											</span>
 											<span className="text-gray-500 dark:text-gray-400">
 												·
@@ -272,8 +336,10 @@ function PostList() {
 						</motion.div>
 					))
 				) : (
-					<div className="flex justify-center items-center p-12">
-						<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+					<div className="flex flex-col items-center justify-center p-12 text-center">
+						<p className="text-gray-500 dark:text-gray-400 text-lg">
+							No posts yet. Be the first to share something!
+						</p>
 					</div>
 				)}
 			</AnimatePresence>

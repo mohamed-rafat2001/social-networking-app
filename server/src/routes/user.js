@@ -20,8 +20,8 @@ const {
 	resetPassword,
 	user,
 } = require("../controller/user");
-//singUp
-router.post("/singUp", regestrationValidator, handelValidation(), singUp);
+//signUp
+router.post("/signup", regestrationValidator, handelValidation(), singUp);
 // upload user image
 router.post(
 	"/profileImg",
@@ -51,4 +51,5 @@ router.post("/forgotPassword", forgotPass);
 //reset password
 router.patch("/resetPassword", resetPassword);
 router.get("/user", auth.user, user);
+router.get("/:userId", auth.user, user); // Add this line to handle specific user lookup
 module.exports = router;

@@ -1,7 +1,5 @@
 export const storeToken = (value) => {
-  if (!localStorage.getItem('token')) {
-    localStorage.setItem('token', JSON.stringify(value));
-  }
+	localStorage.setItem("token", JSON.stringify(value));
 };
 
 export const getToken = () => {

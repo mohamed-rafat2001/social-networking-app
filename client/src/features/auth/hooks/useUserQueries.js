@@ -14,11 +14,11 @@ export const useLogin = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: userService.login,
-		onSuccess: (data) => {
-			if (data.token) {
-				storeToken(data.token);
+		onSuccess: async (data) => {
+			if (data.data?.token) {
+				storeToken(data.data.token);
 			}
-			queryClient.invalidateQueries(["currentUser"]);
+			await queryClient.invalidateQueries(["currentUser"]);
 		},
 	});
 };
@@ -27,11 +27,11 @@ export const useSignUp = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: userService.signup,
-		onSuccess: (data) => {
-			if (data.token) {
-				storeToken(data.token);
+		onSuccess: async (data) => {
+			if (data.data?.token) {
+				storeToken(data.data.token);
 			}
-			queryClient.invalidateQueries(["currentUser"]);
+			await queryClient.invalidateQueries(["currentUser"]);
 		},
 	});
 };

@@ -43,7 +43,10 @@ const Header = () => {
 		<header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
 			<div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
 				{/* Logo */}
-				<Link to="/" className="flex items-center gap-2 shrink-0">
+				<Link
+					to={user ? "/feed" : "/"}
+					className="flex items-center gap-2 shrink-0"
+				>
 					<div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-blue-100 dark:shadow-none">
 						<svg
 							className="w-6 h-6 text-white"

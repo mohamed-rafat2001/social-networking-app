@@ -1,7 +1,7 @@
 import apiApp from "../api/apiApp";
 
 export const getCurrentUser = async () => {
-	const response = await apiApp.get("/user");
+	const response = await apiApp.get("/user/user");
 	return response.data;
 };
 

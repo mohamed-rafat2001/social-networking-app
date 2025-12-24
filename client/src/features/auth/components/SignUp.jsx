@@ -9,12 +9,21 @@ import toast from "react-hot-toast";
 
 const signUpSchema = z
 	.object({
-		firstName: z.string().min(2, "First name is too short"),
-		lastName: z.string().min(2, "Last name is too short"),
+		firstName: z.string().min(3, "First name must be at least 3 characters"),
+		lastName: z.string().min(3, "Last name must be at least 3 characters"),
 		email: z.string().email("Invalid email address"),
-		password: z.string().min(6, "Password must be at least 6 characters"),
+		password: z
+			.string()
+			.min(8, "Password must be at least 8 characters")
+			.regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+			.regex(/[a-z]/, "Password must contain at least one lowercase letter")
+			.regex(/[0-9]/, "Password must contain at least one number")
+			.regex(
+				/[^A-Za-z0-9]/,
+				"Password must contain at least one special character"
+			),
 		confirmPassword: z.string(),
-		idNumber: z.string().min(5, "ID Number must be at least 5 digits"),
+		idNumber: z.string().min(5, "ID Number must be at least 5 characters"),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		message: "Passwords don't match",
@@ -28,6 +37,7 @@ const SignUp = () => {
 	const {
 		register,
 		handleSubmit,
+		setError,
 		formState: { errors },
 	} = useForm({
 		resolver: zodResolver(signUpSchema),
@@ -39,10 +49,28 @@ const SignUp = () => {
 		signUpMutation(userData, {
 			onSuccess: () => {
 				toast.success("Account created successfully!");
-				navigate("/feed");
+				// Small delay to ensure token is stored and query invalidated
+				setTimeout(() => {
+					navigate("/feed");
+				}, 100);
 			},
 			onError: (error) => {
-				toast.error(error?.response?.data?.message || "Registration failed");
+				const serverErrors = error?.response?.data?.validation;
+				if (serverErrors && Array.isArray(serverErrors)) {
+					serverErrors.forEach((err) => {
+						// Map server field names to client field names if they differ
+						const fieldName = err.path || err.param;
+						if (fieldName) {
+							setError(fieldName, {
+								type: "server",
+								message: err.msg || err.message,
+							});
+						}
+					});
+					toast.error("Please fix the errors below");
+				} else {
+					toast.error(error?.response?.data?.message || "Registration failed");
+				}
 			},
 		});
 	};
