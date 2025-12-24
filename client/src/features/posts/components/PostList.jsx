@@ -8,9 +8,10 @@ import {
 	useLikePost,
 	useSharePost,
 } from "../hooks/usePostQueries.js";
+import { useSocket } from "../../../providers/SocketProvider";
 import InputEmoji from "react-input-emoji";
 import { motion, AnimatePresence } from "framer-motion";
-import { Avatar, Button } from "../../../ui";
+import { Avatar, Button, Spinner } from "../../../ui";
 
 import {
 	HiPhotograph,
@@ -34,6 +35,7 @@ function PostList() {
 	const fileInputRef = useRef(null);
 
 	const { user } = useUser();
+	const { onlineUsers } = useSocket();
 
 	const { data: postsData, isLoading: isPostsLoading } = usePosts();
 	const { mutate: addPostMutation } = useAddPost();
@@ -52,6 +54,9 @@ function PostList() {
 			URL.createObjectURL(file)
 		);
 		setPreviewUrls((prev) => [...prev, ...newPreviewUrls]);
+
+		// Reset the input value so the same file can be selected again if needed
+		e.target.value = "";
 	};
 
 	const removeFile = (index) => {
@@ -84,7 +89,7 @@ function PostList() {
 			files.forEach((f) => {
 				data.append("filess", f);
 			});
-			data.append("text", text);
+			if (text) data.append("text", text);
 			postData = data;
 		}
 
@@ -101,9 +106,15 @@ function PostList() {
 					setPreviewUrls([]);
 					setIsUploading(false);
 					setUploadProgress(0);
+					if (fileInputRef.current) fileInputRef.current.value = "";
 				},
 				onError: (error) => {
-					toast.error(error.response?.data?.message || "Failed to create post");
+					console.error("Post creation error:", error);
+					const message =
+						error.response?.data?.message ||
+						error.message ||
+						"Failed to create post";
+					toast.error(message);
 					setIsUploading(false);
 					setUploadProgress(0);
 				},
@@ -168,12 +179,18 @@ function PostList() {
 								{previewUrls.map((url, index) => (
 									<div
 										key={url}
-										className="relative group rounded-2xl overflow-hidden border dark:border-gray-800 aspect-video bg-gray-100 dark:bg-gray-800"
+										className={`relative group rounded-2xl overflow-hidden border dark:border-gray-800 bg-gray-100 dark:bg-gray-800 ${
+											previewUrls.length === 1 ? "" : "aspect-square"
+										}`}
 									>
 										<img
 											src={url}
 											alt=""
-											className="w-full h-full object-cover"
+											className={`w-full h-full ${
+												previewUrls.length === 1
+													? "object-contain max-h-[512px]"
+													: "object-cover"
+											}`}
 										/>
 										<button
 											type="button"
@@ -246,7 +263,7 @@ function PostList() {
 									</span>
 									{isUploading && (
 										<div className="absolute inset-0 flex items-center justify-center">
-											<div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+											<Spinner size="sm" variant="white" />
 										</div>
 									)}
 								</Button>
@@ -260,7 +277,7 @@ function PostList() {
 			<AnimatePresence initial={false}>
 				{isPostsLoading ? (
 					<div className="flex justify-center items-center p-12">
-						<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+						<Spinner size="lg" />
 					</div>
 				) : posts.length > 0 ? (
 					posts.map((post, index) => (
@@ -277,7 +294,7 @@ function PostList() {
 								<div className="flex-1">
 									<div className="flex justify-between items-center">
 										<div className="flex items-center gap-1 flex-wrap">
-											<span className="font-bold text-black dark:text-white hover:underline">
+											<span className="font-bold text-black dark:text-white hover:underline flex items-center gap-2">
 												{post.userId?.firstName} {post.userId?.lastName}
 											</span>
 											<span className="text-gray-500 dark:text-gray-400">
@@ -301,12 +318,12 @@ function PostList() {
 
 									{post.fileUp?.[0] && (
 										<motion.div
-											className="rounded-2xl overflow-hidden border dark:border-gray-800 mb-3"
+											className="rounded-2xl overflow-hidden border dark:border-gray-800 mb-3 bg-gray-50 dark:bg-gray-800/50"
 											initial={{ opacity: 0, scale: 0.98 }}
 											animate={{ opacity: 1, scale: 1 }}
 										>
 											<img
-												className="w-full object-cover max-h-[512px]"
+												className="w-full h-auto max-h-[600px] object-contain block mx-auto"
 												src={post.fileUp[0].secure_url}
 												alt="Post content"
 											/>

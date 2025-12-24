@@ -11,6 +11,7 @@ import {
 	HiSun,
 } from "react-icons/hi";
 import { useUser } from "../hooks/useUser";
+import { useSocket } from "../providers/SocketProvider";
 import { Avatar, Button } from "../ui";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +19,7 @@ import { useTheme } from "../providers/ThemeProvider";
 
 const Header = () => {
 	const { user } = useUser();
+	const { onlineUsers } = useSocket();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { darkMode, toggleDarkMode } = useTheme();
@@ -133,7 +135,11 @@ const Header = () => {
 											Student
 										</p>
 									</div>
-									<Avatar src={user.image?.secure_url} size="md" />
+									<Avatar
+										src={user.image?.secure_url}
+										size="md"
+										isActive={onlineUsers.some((u) => u.userId === user._id)}
+									/>
 								</button>
 
 								<AnimatePresence>

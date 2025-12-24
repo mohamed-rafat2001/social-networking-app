@@ -5,26 +5,37 @@ const appError = require('../utils/appError')
 
 const addPost = errorHandler(
     async (req, res, next) => {
-
-        if (req.files) {
-            const files = []
-            for (const file of req.files) {
-                const { public_id, secure_url } = await cloudinary.uploader.upload(file.path,
-                    { folder: `e-Learning/user/${req.user._id}/posts` })
-                files.push({ public_id, secure_url })
+        try {
+            let post;
+            if (req.files && req.files.length > 0) {
+                const files = []
+                for (const file of req.files) {
+                    try {
+                        const { public_id, secure_url } = await cloudinary.uploader.upload(file.path,
+                            { folder: `e-Learning/user/${req.user._id}/posts` })
+                        files.push({ public_id, secure_url })
+                    } catch (uploadError) {
+                        console.error('Cloudinary upload error:', uploadError);
+                        const error = appError.Error('Failed to upload image', 'fail', 500);
+                        return next(error);
+                    }
+                }
+                post = new Posts({ ...req.body, userId: req.user._id, fileUp: files })
+            } else {
+                post = new Posts({ ...req.body, userId: req.user._id })
             }
-            var post = new Posts({ ...req.body, userId: req.user._id, fileUp: files })
-        }
-        if (!req.files) {
-            var post = new Posts({ ...req.body, userId: req.user._id })
 
+            if (!post) {
+                const error = appError.Error('not add post', 'fail', 404)
+                return next(error)
+            }
+
+            await post.save()
+            res.status(200).json({ status: 'success', data: post })
+        } catch (err) {
+            console.error('Error in addPost:', err);
+            return next(err);
         }
-        if (!post) {
-            const error = appError.Error('not add post', 'fail', 404)
-            return next(error)
-        }
-        await post.save()
-        res.status(200).json({ status: 'success', data: post })
     }
 )
 const singlePost = errorHandler(

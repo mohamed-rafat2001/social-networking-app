@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { HiMail, HiLockClosed, HiUser, HiIdentification } from "react-icons/hi";
-import { Button, Input } from "../../../ui";
+import { Button, Input, Spinner } from "../../../ui";
 import { useSignUp } from "../hooks/useUserQueries";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -133,7 +133,7 @@ const SignUp = () => {
 				<Button type="submit" className="w-full py-3" disabled={isPending}>
 					{isPending ? (
 						<div className="flex items-center gap-2">
-							<div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+							<Spinner size="sm" variant="white" />
 							Creating account...
 						</div>
 					) : (

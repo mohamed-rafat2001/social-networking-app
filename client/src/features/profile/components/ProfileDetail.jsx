@@ -1,21 +1,36 @@
 import { useParams } from "react-router-dom";
 import { useUserProfile } from "../../auth/hooks/useUserQueries";
-import { Avatar, Button } from "../../../ui";
+import { useSocket } from "../../../providers/SocketProvider";
+import { usePosts } from "../../posts/hooks/usePostQueries";
+import { Avatar, Button, Spinner } from "../../../ui";
 import {
 	HiOutlineMail,
 	HiOutlineAcademicCap,
 	HiOutlineCalendar,
+	HiOutlineChatAlt2,
+	HiRefresh,
+	HiHeart,
+	HiDotsHorizontal,
 } from "react-icons/hi";
 import { format } from "date-fns";
+import { motion, AnimatePresence } from "framer-motion";
+import moment from "moment";
 
 const ProfileDetail = () => {
 	const { userId } = useParams();
-	const { data: profile, isLoading } = useUserProfile(userId);
+	const { onlineUsers } = useSocket();
+	const { data: profile, isLoading: profileLoading } = useUserProfile(userId);
+	const { data: postsResponse, isLoading: postsLoading } = usePosts();
 
-	if (isLoading) {
+	const allPosts = postsResponse?.data || [];
+	const userPosts = Array.isArray(allPosts)
+		? allPosts.filter((post) => post.userId?._id === userId)
+		: [];
+
+	if (profileLoading || postsLoading) {
 		return (
-			<div className="flex items-center justify-center h-full">
-				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+			<div className="flex items-center justify-center h-[calc(100vh-100px)]">
+				<Spinner size="lg" />
 			</div>
 		);
 	}
@@ -43,6 +58,9 @@ const ProfileDetail = () => {
 							src={user.image?.secure_url}
 							size="xl"
 							className="w-32 h-32 border-4 border-white dark:border-gray-900 shadow-lg"
+							isActive={onlineUsers?.some(
+								(u) => String(u.userId) === String(user._id)
+							)}
 						/>
 						<div className="flex gap-3">
 							<Button variant="secondary" className="rounded-xl">
@@ -57,10 +75,12 @@ const ProfileDetail = () => {
 							<h1 className="text-3xl font-black text-gray-900 dark:text-white">
 								{user.firstName} {user.lastName}
 							</h1>
-							<p className="text-gray-500 dark:text-gray-400 font-medium">
-								@{user.firstName.toLowerCase()}
-								{user.lastName.toLowerCase()}
-							</p>
+							<div className="flex items-center gap-3">
+								<p className="text-gray-500 dark:text-gray-400 font-medium">
+									@{user.firstName.toLowerCase()}
+									{user.lastName.toLowerCase()}
+								</p>
+							</div>
 						</div>
 
 						<p className="text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl">
@@ -105,7 +125,7 @@ const ProfileDetail = () => {
 							</div>
 							<div className="text-center">
 								<p className="text-xl font-black text-gray-900 dark:text-white">
-									{user.posts?.length || 0}
+									{userPosts.length}
 								</p>
 								<p className="text-xs text-gray-500 dark:text-gray-500 uppercase font-bold tracking-wider">
 									Posts
@@ -113,6 +133,107 @@ const ProfileDetail = () => {
 							</div>
 						</div>
 					</div>
+				</div>
+			</div>
+
+			{/* User Posts Section */}
+			<div className="space-y-4">
+				<h3 className="text-xl font-black text-gray-900 dark:text-white px-4">
+					Posts
+				</h3>
+				<div className="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm transition-colors duration-300">
+					<AnimatePresence initial={false}>
+						{userPosts.length > 0 ? (
+							userPosts.map((post, index) => (
+								<motion.div
+									key={post._id}
+									className="border-b dark:border-gray-800 p-6 hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-all"
+									initial={{ opacity: 0, y: 20 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{
+										duration: 0.3,
+										delay: Math.min(index * 0.05, 0.5),
+									}}
+									layout
+								>
+									<div className="flex gap-4">
+										<Avatar
+											src={user.image?.secure_url}
+											isActive={onlineUsers?.some(
+												(u) => String(u.userId) === String(user._id)
+											)}
+										/>
+										<div className="flex-1">
+											<div className="flex justify-between items-center">
+												<div className="flex items-center gap-2 flex-wrap">
+													<span className="font-bold text-gray-900 dark:text-white">
+														{user.firstName} {user.lastName}
+													</span>
+													<span className="text-gray-500 dark:text-gray-400 text-sm">
+														· {moment(post.createdAt).fromNow()}
+													</span>
+												</div>
+												<button className="text-gray-400 hover:text-primary p-2 rounded-full transition-colors">
+													<HiDotsHorizontal />
+												</button>
+											</div>
+
+											<p className="mt-2 mb-4 text-gray-800 dark:text-gray-200 leading-relaxed">
+												{post.text}
+											</p>
+
+											{post.fileUp?.[0] && (
+												<div className="rounded-2xl overflow-hidden border dark:border-gray-800 mb-4 bg-gray-50 dark:bg-gray-800/50">
+													<img
+														className="w-full h-auto max-h-[600px] object-contain block mx-auto"
+														src={post.fileUp[0].secure_url}
+														alt="Post content"
+													/>
+												</div>
+											)}
+
+											<div className="flex justify-between text-gray-500 dark:text-gray-400 max-w-md">
+												<button className="flex items-center gap-2 hover:text-primary transition-colors group">
+													<div className="p-2 rounded-full group-hover:bg-primary/10 transition-colors">
+														<HiOutlineChatAlt2 size={20} />
+													</div>
+													<span className="text-sm font-medium">0</span>
+												</button>
+												<button className="flex items-center gap-2 hover:text-green-500 transition-colors group">
+													<div className="p-2 rounded-full group-hover:bg-green-500/10 transition-colors">
+														<HiRefresh size={20} />
+													</div>
+													<span className="text-sm font-medium">
+														{post.shares?.length || 0}
+													</span>
+												</button>
+												<button className="flex items-center gap-2 hover:text-pink-500 transition-colors group">
+													<div className="p-2 rounded-full group-hover:bg-pink-500/10 transition-colors">
+														<HiHeart size={20} />
+													</div>
+													<span className="text-sm font-medium">
+														{post.likes?.length || 0}
+													</span>
+												</button>
+											</div>
+										</div>
+									</div>
+								</motion.div>
+							))
+						) : (
+							<div className="py-20 text-center">
+								<div className="bg-gray-50 dark:bg-gray-800/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+									<HiOutlineChatAlt2
+										size={40}
+										className="text-gray-300 dark:text-gray-600"
+									/>
+								</div>
+								<p className="text-gray-500 dark:text-gray-400 font-medium">
+									No posts yet
+								</p>
+							</div>
+						)}
+					</AnimatePresence>
 				</div>
 			</div>
 		</div>

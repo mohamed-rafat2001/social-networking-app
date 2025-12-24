@@ -2,6 +2,7 @@ import { useNotifications } from "../hooks/useNotifications";
 import { Avatar } from "../../../ui";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from "react-router-dom";
+import { useSocket } from "../../../providers/SocketProvider";
 import {
 	HiOutlineBell,
 	HiOutlineChatAlt2,
@@ -11,6 +12,7 @@ import {
 
 const NotificationList = () => {
 	const { notifications, isLoading, markAsRead } = useNotifications();
+	const { onlineUsers } = useSocket();
 
 	const getIcon = (type) => {
 		switch (type) {
@@ -68,7 +70,13 @@ const NotificationList = () => {
 					}`}
 				>
 					<div className="relative">
-						<Avatar src={notification.sender.image?.secure_url} size="md" />
+						<Avatar
+							src={notification.sender.image?.secure_url}
+							size="md"
+							isActive={onlineUsers?.some(
+								(u) => String(u.userId) === String(notification.sender._id)
+							)}
+						/>
 						<div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center shadow-sm border border-gray-100 dark:border-gray-800">
 							{getIcon(notification.type)}
 						</div>

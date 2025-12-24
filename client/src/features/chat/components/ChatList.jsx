@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 import { Avatar } from "../../../ui";
 import { formatDistanceToNow } from "date-fns";
 import { useUser } from "../../../hooks/useUser";
+import { useSocket } from "../../../providers/SocketProvider";
 import { HiOutlineChatAlt2 } from "react-icons/hi";
 
 const ChatList = () => {
 	const { data: chats, isLoading } = useChats();
 	const { user: currentUser } = useUser();
+	const { onlineUsers } = useSocket();
 
 	if (isLoading) {
 		return (
@@ -54,7 +56,13 @@ const ChatList = () => {
 						to={`/messages/${chat._id}`}
 						className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
 					>
-						<Avatar src={otherUser?.image?.secure_url} size="lg" />
+						<Avatar
+							src={otherUser?.image?.secure_url}
+							size="lg"
+							isActive={onlineUsers?.some(
+								(u) => String(u.userId) === String(otherUser?._id)
+							)}
+						/>
 						<div className="flex-1 min-w-0">
 							<div className="flex justify-between items-baseline mb-1">
 								<h4 className="font-bold text-gray-900 dark:text-white truncate">

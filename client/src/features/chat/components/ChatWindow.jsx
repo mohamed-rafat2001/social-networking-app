@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useMessages, useCreateMessage } from "../hooks/useMessageQueries";
 import { useSingleChat } from "../hooks/useChatQueries";
 import { useState, useEffect, useRef } from "react";
-import { Avatar, Button } from "../../../ui";
+import { Avatar, Button, Spinner } from "../../../ui";
 import { useUser } from "../../../hooks/useUser";
 import { HiOutlineArrowLeft, HiOutlinePaperAirplane } from "react-icons/hi";
 import { useSocket } from "../../../providers/SocketProvider";
@@ -11,13 +11,18 @@ const ChatWindow = () => {
 	const { chatId } = useParams();
 	const navigate = useNavigate();
 	const { user: currentUser } = useUser();
-	const socket = useSocket();
+	const { socket, onlineUsers } = useSocket();
 	const [text, setText] = useState("");
 	const messagesEndRef = useRef(null);
 
 	const { data: chat, isLoading: chatLoading } = useSingleChat(chatId);
 	const { data: messages, isLoading: messagesLoading } = useMessages(chatId);
 	const { mutate: sendMessage } = useCreateMessage();
+
+	const otherUser = chat?.users?.find((u) => u._id !== currentUser?._id);
+	const isOnline = onlineUsers?.some(
+		(u) => String(u.userId) === String(otherUser?._id)
+	);
 
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -38,12 +43,10 @@ const ChatWindow = () => {
 	if (chatLoading || messagesLoading) {
 		return (
 			<div className="flex items-center justify-center h-full">
-				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+				<Spinner size="lg" />
 			</div>
 		);
 	}
-
-	const otherUser = chat?.users.find((u) => u._id !== currentUser?._id);
 
 	return (
 		<div className="flex flex-col h-full bg-white dark:bg-gray-900">
@@ -55,12 +58,15 @@ const ChatWindow = () => {
 				>
 					<HiOutlineArrowLeft size={20} />
 				</button>
-				<Avatar src={otherUser?.image?.secure_url} size="md" />
+				<Avatar
+					src={otherUser?.image?.secure_url}
+					size="md"
+					isActive={isOnline}
+				/>
 				<div className="flex-1 min-w-0">
 					<h4 className="font-bold text-gray-900 dark:text-white truncate">
 						{otherUser?.firstName} {otherUser?.lastName}
 					</h4>
-					<p className="text-xs text-green-500 font-medium">Online</p>
 				</div>
 			</div>
 

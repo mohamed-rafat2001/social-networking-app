@@ -19,19 +19,19 @@ function App() {
 		<BrowserRouter>
 			<ScrollToTop />
 			<Toaster
-				position="top-center"
+				position="bottom-right"
 				gutter={8}
-				containerStyle={{ margin: "8px" }}
+				containerStyle={{ margin: "16px" }}
 				toastOptions={{
 					success: { duration: 3000 },
 					error: { duration: 5000 },
 					style: {
-						fontSize: "16px",
-						maxWidth: "500px",
-						padding: "16px 24px",
+						fontSize: "14px",
+						maxWidth: "400px",
+						padding: "12px 20px",
 						backgroundColor: darkMode ? "#1f2937" : "#fff",
 						color: darkMode ? "#f3f4f6" : "#374151",
-						borderRadius: "16px",
+						borderRadius: "12px",
 						border: darkMode ? "1px solid #374151" : "none",
 						boxShadow: darkMode
 							? "0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4)"

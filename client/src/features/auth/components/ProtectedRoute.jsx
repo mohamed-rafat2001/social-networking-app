@@ -1,13 +1,28 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useUser } from "../../../hooks/useUser";
+import { Spinner } from "../../../ui";
+import { motion } from "framer-motion";
 
 const ProtectedRoute = () => {
 	const { user, isLoading } = useUser();
 
 	if (isLoading) {
 		return (
-			<div className="flex h-screen w-full items-center justify-center bg-white dark:bg-gray-950 transition-colors">
-				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+			<div className="flex flex-col h-screen w-full items-center justify-center bg-white dark:bg-gray-950 transition-colors duration-500">
+				<div className="relative flex items-center justify-center">
+					<div className="absolute w-24 h-24 bg-primary/10 rounded-full animate-ping"></div>
+					<Spinner size="xl" />
+				</div>
+				<motion.div
+					initial={{ opacity: 0, y: 10 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ delay: 0.5 }}
+					className="mt-8 text-center"
+				>
+					<p className="text-gray-500 dark:text-gray-400 font-medium">
+						Verifying your session...
+					</p>
+				</motion.div>
 			</div>
 		);
 	}

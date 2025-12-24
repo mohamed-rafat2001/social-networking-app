@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useUser } from "../hooks/useUser";
 
-const SocketContext = createContext(null);
+export const SocketContext = createContext(null);
 
 export const useSocket = () => {
 	const context = useContext(SocketContext);
@@ -14,12 +14,17 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
 	const [socket, setSocket] = useState(null);
+	const [onlineUsers, setOnlineUsers] = useState([]);
 	const { user } = useUser();
 
 	useEffect(() => {
 		if (user?._id) {
-			const newSocket = io("http://localhost:5000", {
-				query: { userId: user._id },
+			const newSocket = io("http://localhost:5000");
+
+			newSocket.emit("addUser", user._id);
+
+			newSocket.on("getUsersOnLine", (users) => {
+				setOnlineUsers(users);
 			});
 
 			setSocket(newSocket);
@@ -31,6 +36,8 @@ export const SocketProvider = ({ children }) => {
 	}, [user?._id]);
 
 	return (
-		<SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
+		<SocketContext.Provider value={{ socket, onlineUsers }}>
+			{children}
+		</SocketContext.Provider>
 	);
 };

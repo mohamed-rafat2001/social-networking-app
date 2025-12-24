@@ -15,6 +15,8 @@ export const useAddPost = () => {
 		mutationFn: postService.addPost,
 		onSuccess: () => {
 			queryClient.invalidateQueries(["posts"]);
+			queryClient.invalidateQueries(["userProfile"]);
+			queryClient.invalidateQueries(["currentUser"]);
 		},
 	});
 };
