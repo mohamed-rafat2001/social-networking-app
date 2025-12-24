@@ -31,7 +31,7 @@ app.all("*", (req, res, next) => {
 });
 app.use((error, req, res, next) => {
 	if (process.env.MODE == "DEV") {
-		return res.status(500).json({
+		return res.status(error.code || 500).json({
 			status: "error",
 			message: error.message,
 			code: error.code,
@@ -41,7 +41,6 @@ app.use((error, req, res, next) => {
 	res
 		.status(error.code || 500)
 		.json({ status: "error", message: error.message, code: error.code });
-	next();
 });
 require("./src/db/mongoose.js");
 
