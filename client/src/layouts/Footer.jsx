@@ -41,14 +41,20 @@ const Footer = () => {
 				{/* Social Links Right */}
 				<div className="flex gap-4">
 					{[
-						{ icon: FaGithub, href: "#" },
-						{ icon: FaTwitter, href: "#" },
-						{ icon: FaLinkedin, href: "#" },
-						{ icon: FaDiscord, href: "#" },
+						{
+							icon: FaGithub,
+							href: "https://github.com/mohamed-rafat2001",
+						},
+						{
+							icon: FaLinkedin,
+							href: "https://www.linkedin.com/in/mohamed-rafat-19046b229/",
+						},
 					].map((social, idx) => (
 						<a
 							key={idx}
 							href={social.href}
+							target="_blank"
+							rel="noopener noreferrer"
 							className="text-gray-400 hover:text-primary transition-colors"
 						>
 							<social.icon size={20} />

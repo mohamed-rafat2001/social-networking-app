@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Login from "./Login";
 import SignUp from "./SignUp";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,7 +7,16 @@ import Header from "../../../layouts/Header";
 import Footer from "../../../layouts/Footer";
 
 const Register = () => {
+	const location = useLocation();
 	const [isLogin, setIsLogin] = useState(true);
+
+	useEffect(() => {
+		if (location.state?.mode === "signup") {
+			setIsLogin(false);
+		} else if (location.state?.mode === "login") {
+			setIsLogin(true);
+		}
+	}, [location.state]);
 
 	return (
 		<div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors duration-300">

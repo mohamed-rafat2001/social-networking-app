@@ -1,12 +1,13 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../../ui";
 
 const Hero = () => {
+	const navigate = useNavigate();
 	return (
 		<section
 			id="hero"
-			className="pt-32 pb-20 overflow-hidden relative transition-colors duration-500"
+			className="pt-20 pb-20 overflow-hidden relative transition-colors duration-500"
 		>
 			{/* Decorative elements */}
 			<div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 pointer-events-none">
@@ -50,11 +51,14 @@ const Hero = () => {
 									whileTap={{ scale: 0.95 }}
 									className="w-full sm:w-auto"
 								>
-									<Link to="/welcome">
-										<Button className="px-10 py-4 text-lg w-full sm:w-auto rounded-2xl shadow-xl shadow-primary/20 dark:shadow-none bg-primary hover:bg-primary/90 transition-all duration-300">
-											Get Started Free
-										</Button>
-									</Link>
+									<Button
+										onClick={() =>
+											navigate("/welcome", { state: { mode: "signup" } })
+										}
+										className="px-10 py-4 text-lg w-full sm:w-auto rounded-2xl shadow-xl shadow-primary/20 dark:shadow-none bg-primary hover:bg-primary/90 transition-all duration-300"
+									>
+										Get Started Free
+									</Button>
 								</motion.div>
 								<motion.div
 									whileHover={{ scale: 1.05, y: -2 }}

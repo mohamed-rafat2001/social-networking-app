@@ -168,17 +168,23 @@ const Header = () => {
 						</>
 					) : (
 						<div className="flex items-center gap-3">
-							<Link to="/welcome" className="hidden sm:block">
-								<Button
-									variant="ghost"
-									className="font-bold dark:text-gray-300 dark:hover:text-white"
-								>
-									Log In
-								</Button>
-							</Link>
-							<Link to="/welcome">
-								<Button className="rounded-xl px-6">Join Now</Button>
-							</Link>
+							<Button
+								variant="ghost"
+								onClick={() =>
+									navigate("/welcome", { state: { mode: "login" } })
+								}
+								className="hidden sm:block font-bold dark:text-gray-300 dark:hover:text-white"
+							>
+								Log In
+							</Button>
+							<Button
+								onClick={() =>
+									navigate("/welcome", { state: { mode: "signup" } })
+								}
+								className="rounded-xl px-6"
+							>
+								Join Now
+							</Button>
 							{/* Mobile Menu Toggle */}
 							{isLandingPage && (
 								<button
@@ -214,9 +220,15 @@ const Header = () => {
 								</a>
 							))}
 							<hr className="border-gray-100 dark:border-gray-800 my-2" />
-							<Link to="/welcome" onClick={() => setShowMobileMenu(false)}>
-								<Button className="w-full rounded-xl py-4">Get Started</Button>
-							</Link>
+							<Button
+								onClick={() => {
+									setShowMobileMenu(false);
+									navigate("/welcome", { state: { mode: "signup" } });
+								}}
+								className="w-full rounded-xl py-4"
+							>
+								Get Started
+							</Button>
 						</div>
 					</motion.div>
 				)}
