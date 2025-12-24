@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import moment from "moment";
+import { toast } from "react-hot-toast";
 import { useUser } from "../../../hooks/useUser.js";
 import {
 	usePosts,
@@ -20,12 +21,16 @@ import {
 	HiRefresh,
 	HiHeart,
 	HiX,
+	HiChartBar,
+	HiUpload,
 } from "react-icons/hi";
 
 function PostList() {
 	const [text, setText] = useState("");
 	const [files, setFiles] = useState([]);
 	const [previewUrls, setPreviewUrls] = useState([]);
+	const [uploadProgress, setUploadProgress] = useState(0);
+	const [isUploading, setIsUploading] = useState(false);
 	const fileInputRef = useRef(null);
 
 	const { user } = useUser();
@@ -68,21 +73,42 @@ function PostList() {
 		if (e) e.preventDefault();
 		if (!text.trim() && files.length === 0) return;
 
+		setIsUploading(true);
+		setUploadProgress(0);
+
+		let postData;
 		if (files.length === 0) {
-			addPostMutation({ text });
-			setText("");
-			return;
+			postData = { text };
+		} else {
+			const data = new FormData();
+			files.forEach((f) => {
+				data.append("filess", f);
+			});
+			data.append("text", text);
+			postData = data;
 		}
 
-		let data = new FormData();
-		files.forEach((f) => {
-			data.append("filess", f);
-		});
-		data.append("text", text);
-		addPostMutation(data);
-		setText("");
-		setFiles([]);
-		setPreviewUrls([]);
+		addPostMutation(
+			{
+				postData,
+				onUploadProgress: (progress) => setUploadProgress(progress),
+			},
+			{
+				onSuccess: () => {
+					toast.success("Post created successfully!");
+					setText("");
+					setFiles([]);
+					setPreviewUrls([]);
+					setIsUploading(false);
+					setUploadProgress(0);
+				},
+				onError: (error) => {
+					toast.error(error.response?.data?.message || "Failed to create post");
+					setIsUploading(false);
+					setUploadProgress(0);
+				},
+			}
+		);
 	};
 
 	return (
@@ -194,13 +220,37 @@ function PostList() {
 									<HiEmojiHappy className="text-xl" />
 								</button>
 							</div>
-							<Button
-								type="submit"
-								className="px-6 py-1.5 rounded-full font-bold"
-								disabled={!text.trim() && files.length === 0}
-							>
-								Post
-							</Button>
+
+							<div className="flex items-center gap-4">
+								{isUploading && (
+									<div className="flex items-center gap-2">
+										<div className="w-20 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+											<motion.div
+												className="h-full bg-primary"
+												initial={{ width: 0 }}
+												animate={{ width: `${uploadProgress}%` }}
+											/>
+										</div>
+										<span className="text-xs font-bold text-gray-500 dark:text-gray-400">
+											{uploadProgress}%
+										</span>
+									</div>
+								)}
+								<Button
+									type="submit"
+									className="px-6 py-1.5 rounded-full font-bold relative overflow-hidden"
+									disabled={(!text.trim() && files.length === 0) || isUploading}
+								>
+									<span className={isUploading ? "opacity-0" : "opacity-100"}>
+										Post
+									</span>
+									{isUploading && (
+										<div className="absolute inset-0 flex items-center justify-center">
+											<div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+										</div>
+									)}
+								</Button>
+							</div>
 						</div>
 					</form>
 				</div>

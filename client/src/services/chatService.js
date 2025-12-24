@@ -7,6 +7,6 @@ export const getChats = async () => {
 
 export const getSingleChat = async (chatId) => {
 	if (!chatId) return null;
-	const response = await apiApp.get(`/chats/${chatId}`);
+	const response = await apiApp.get(`/chat/${chatId}`);
 	return response.data;
 };

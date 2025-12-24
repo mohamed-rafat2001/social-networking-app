@@ -5,8 +5,17 @@ export const getPosts = async () => {
 	return response.data;
 };
 
-export const addPost = async (postData) => {
-	const response = await apiApp.post("/post", postData);
+export const addPost = async ({ postData, onUploadProgress }) => {
+	const response = await apiApp.post("/post", postData, {
+		onUploadProgress: (progressEvent) => {
+			if (onUploadProgress) {
+				const percentCompleted = Math.round(
+					(progressEvent.loaded * 100) / progressEvent.total
+				);
+				onUploadProgress(percentCompleted);
+			}
+		},
+	});
 	return response.data;
 };
 

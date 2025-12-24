@@ -18,13 +18,13 @@ const messageRouter = require("./src/routes/message.js");
 
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
-app.use("/posts", postsRouter);
+app.use("/", postsRouter);
 app.use("/youtube", youtubeRouter);
-app.use("/comment", commentRouter);
-app.use("/replay", replayRouter);
-app.use("/share", shareRouter);
-app.use("/chat", chatRouter);
-app.use("/message", messageRouter);
+app.use("/", commentRouter);
+app.use("/", replayRouter);
+app.use("/", shareRouter);
+app.use("/", chatRouter);
+app.use("/", messageRouter);
 
 app.all("*", (req, res, next) => {
 	res.status(404).json({ status: "fail", message: "this route not defined" });
