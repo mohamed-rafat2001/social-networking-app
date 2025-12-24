@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	body {
+		@apply m-0 p-0 font-sans antialiased bg-white text-[#0f1419];
+	}
+
+	* {
+		@apply box-border;
+	}
+
+	a {
+		@apply no-underline text-inherit;
+	}
+}
+
+@layer components {
+	.backdrop-blur {
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+	}
+
+	.hover-bg-light {
+		@apply hover:bg-black hover:bg-opacity-[0.03] transition-colors duration-200;
+	}
+
+	.porfile-image {
+		@apply rounded-full object-cover;
+		width: 40px;
+		height: 40px;
+	}
+
+	/* Keep scrollbar styles but using tailwind if possible, or just standard CSS */
+	::-webkit-scrollbar {
+		width: 8px;
+	}
+	::-webkit-scrollbar-track {
+		background: #f1f1f1;
+	}
+	::-webkit-scrollbar-thumb {
+		background: #ccc;
+		border-radius: 4px;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background: #bbb;
+	}
+}
