@@ -17,7 +17,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../providers/ThemeProvider";
 
-const Header = () => {
+const Header = ({ onMenuClick }) => {
 	const { user } = useUser();
 	const { onlineUsers } = useSocket();
 	const navigate = useNavigate();
@@ -44,31 +44,40 @@ const Header = () => {
 	return (
 		<header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
 			<div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
-				{/* Logo */}
-				<Link
-					to={user ? "/feed" : "/"}
-					className="flex items-center gap-2 shrink-0"
-				>
-					<div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-blue-100 dark:shadow-none">
-						<svg
-							className="w-6 h-6 text-white"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
+				{/* Left Section: Mobile Menu & Logo */}
+				<div className="flex items-center gap-2 sm:gap-4 shrink-0">
+					{user && (
+						<button
+							onClick={onMenuClick}
+							className="lg:hidden p-2 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all active:scale-95"
+							aria-label="Open Menu"
 						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2.5"
-								d="M13 10V3L4 14h7v7l9-11h-7z"
-							></path>
-						</svg>
-					</div>
-					<span className="text-xl font-black tracking-tight text-gray-900 dark:text-white hidden sm:block">
-						Engi<span className="text-primary">Connect</span>
-					</span>
-				</Link>
+							<HiMenu size={24} />
+						</button>
+					)}
+
+					<Link to={user ? "/feed" : "/"} className="flex items-center gap-2">
+						<div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-blue-100 dark:shadow-none">
+							<svg
+								className="w-6 h-6 text-white"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth="2.5"
+									d="M13 10V3L4 14h7v7l9-11h-7z"
+								></path>
+							</svg>
+						</div>
+						<span className="text-xl font-black tracking-tight text-gray-900 dark:text-white hidden md:block">
+							Engi<span className="text-primary">Connect</span>
+						</span>
+					</Link>
+				</div>
 
 				{/* Landing Page Navigation */}
 				{isLandingPage && !user && (

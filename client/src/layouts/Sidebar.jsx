@@ -9,7 +9,7 @@ import {
 } from "react-icons/hi";
 import { useUser } from "../hooks/useUser";
 
-const Sidebar = () => {
+const Sidebar = ({ onMobileItemClick }) => {
 	const { user } = useUser();
 
 	const navItems = [
@@ -27,6 +27,7 @@ const Sidebar = () => {
 				<NavLink
 					key={item.name}
 					to={item.path}
+					onClick={() => onMobileItemClick && onMobileItemClick()}
 					className={({ isActive }) =>
 						`flex items-center gap-4 px-4 py-3 text-lg font-semibold rounded-2xl transition-all duration-200 group ${
 							isActive
@@ -37,9 +38,9 @@ const Sidebar = () => {
 				>
 					<item.icon
 						size={26}
-						className="group-hover:scale-110 transition-transform duration-200"
+						className="group-hover:scale-110 transition-transform duration-200 shrink-0"
 					/>
-					<span className="hidden lg:block">{item.name}</span>
+					<span className="lg:block">{item.name}</span>
 				</NavLink>
 			))}
 

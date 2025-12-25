@@ -1,15 +1,60 @@
 import { Outlet } from "react-router-dom";
+import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import { motion, AnimatePresence } from "framer-motion";
+import { HiX } from "react-icons/hi";
 
 const MainLayout = () => {
+	const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
 	return (
 		<div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col transition-colors duration-300">
-			<Header />
+			<Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
+
+			{/* Mobile Sidebar Overlay */}
+			<AnimatePresence>
+				{isMobileSidebarOpen && (
+					<>
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							onClick={() => setIsMobileSidebarOpen(false)}
+							className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] lg:hidden"
+						/>
+						<motion.div
+							initial={{ x: "-100%" }}
+							animate={{ x: 0 }}
+							exit={{ x: "-100%" }}
+							transition={{ type: "spring", damping: 25, stiffness: 200 }}
+							className="fixed inset-y-0 left-0 w-72 bg-white dark:bg-gray-900 z-[70] lg:hidden shadow-2xl p-4 flex flex-col"
+						>
+							<div className="flex items-center justify-between mb-6 px-2">
+								<span className="text-xl font-black tracking-tight text-gray-900 dark:text-white">
+									Engi<span className="text-primary">Connect</span>
+								</span>
+								<button
+									onClick={() => setIsMobileSidebarOpen(false)}
+									className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+								>
+									<HiX size={24} />
+								</button>
+							</div>
+							<div className="flex-1 overflow-y-auto">
+								<Sidebar
+									onMobileItemClick={() => setIsMobileSidebarOpen(false)}
+								/>
+							</div>
+						</motion.div>
+					</>
+				)}
+			</AnimatePresence>
+
 			<div className="flex-1 container mx-auto px-4 py-6 flex gap-6">
 				<aside className="hidden lg:block w-64 shrink-0">
 					<div className="sticky top-24">
-						<Sidebar />
+						<Sidebar onMobileItemClick={null} />
 					</div>
 				</aside>
 				<main className="flex-1 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
