@@ -1,12 +1,27 @@
 import axios from "axios";
-import { getToken } from "../utils";
+import { getToken, removeToken } from "../utils";
+
 const apiApp = axios.create({
 	baseURL: "http://localhost:4000",
 });
+
 apiApp.interceptors.request.use((req) => {
-	if (JSON.parse(localStorage.getItem("token"))) {
-		req.headers.Authorization = `Bearer ${getToken()}`;
+	const token = getToken();
+	if (token) {
+		req.headers.Authorization = `Bearer ${token}`;
 	}
 	return req;
 });
+
+apiApp.interceptors.response.use(
+	(response) => response,
+	(error) => {
+		if (error.response?.status === 401) {
+			removeToken();
+			// Optional: window.location.href = '/welcome';
+		}
+		return Promise.reject(error);
+	}
+);
+
 export default apiApp;

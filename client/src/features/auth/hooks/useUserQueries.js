@@ -7,6 +7,7 @@ export const useCurrentUser = () => {
 		queryKey: ["currentUser"],
 		queryFn: userService.getCurrentUser,
 		retry: false,
+		enabled: !!localStorage.getItem("token"),
 	});
 };
 
