@@ -9,6 +9,7 @@ import { useUser } from "../../../shared/hooks/useUser";
 import { usePosts } from "../../posts/hooks/usePostQueries";
 import { PostItem } from "../../posts";
 import { Avatar, Button, Spinner } from "../../../shared/components/UI";
+import FollowsModal from "./FollowsModal";
 import {
 	HiOutlineMail,
 	HiOutlineAcademicCap,

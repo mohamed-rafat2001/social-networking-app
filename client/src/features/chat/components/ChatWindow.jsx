@@ -4,9 +4,16 @@ import { useSingleChat } from "../hooks/useChatQueries";
 import { useState, useEffect, useRef } from "react";
 import { Avatar, Button, Spinner } from "../../../shared/components/UI";
 import { useUser } from "../../../shared/hooks/useUser";
-import { HiOutlineArrowLeft, HiOutlinePaperAirplane } from "react-icons/hi";
+import {
+	HiOutlineArrowLeft,
+	HiOutlinePaperAirplane,
+	HiOutlineEmojiHappy,
+	HiOutlinePaperClip,
+	HiOutlineX,
+} from "react-icons/hi";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useQueryClient } from "@tanstack/react-query";
+import InputEmoji from "react-input-emoji";
 
 const ChatWindow = () => {
 	const { chatId } = useParams();
@@ -15,13 +22,16 @@ const ChatWindow = () => {
 	const { socket, onlineUsers } = useSocket();
 	const queryClient = useQueryClient();
 	const [text, setText] = useState("");
+	const [selectedFiles, setSelectedFiles] = useState([]);
+	const [previewUrls, setPreviewUrls] = useState([]);
 	const messagesEndRef = useRef(null);
+	const fileInputRef = useRef(null);
 
 	const { data: chat, isLoading: chatLoading } = useSingleChat(chatId);
 	const { data: messagesData, isLoading: messagesLoading } =
 		useMessages(chatId);
 	const messages = messagesData?.data || [];
-	const { mutate: sendMessage } = useCreateMessage();
+	const { mutate: sendMessage, isLoading: isSending } = useCreateMessage();
 
 	const otherUser = chat?.users?.find((u) => u._id !== currentUser?._id);
 	const isOnline = onlineUsers?.some(
@@ -54,13 +64,32 @@ const ChatWindow = () => {
 		};
 	}, [socket, chatId, queryClient]);
 
-	const handleSend = (e) => {
-		e.preventDefault();
-		if (!text.trim()) return;
+	const handleFileSelect = (e) => {
+		const files = Array.from(e.target.files);
+		if (files.length > 0) {
+			setSelectedFiles((prev) => [...prev, ...files]);
+			const urls = files.map((file) => URL.createObjectURL(file));
+			setPreviewUrls((prev) => [...prev, ...urls]);
+		}
+	};
 
-		const messageData = { content: text };
+	const removeFile = (index) => {
+		setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+		URL.revokeObjectURL(previewUrls[index]);
+		setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+	};
+
+	const handleSend = () => {
+		if (!text.trim() && selectedFiles.length === 0) return;
+
+		const formData = new FormData();
+		if (text.trim()) formData.append("content", text);
+		selectedFiles.forEach((file) => {
+			formData.append("file", file);
+		});
+
 		sendMessage(
-			{ chatId, data: messageData },
+			{ chatId, data: formData },
 			{
 				onSuccess: (response) => {
 					if (socket && otherUser?._id) {
@@ -69,10 +98,12 @@ const ChatWindow = () => {
 							userId: otherUser._id,
 						});
 					}
+					setText("");
+					setSelectedFiles([]);
+					setPreviewUrls([]);
 				},
 			}
 		);
-		setText("");
 	};
 
 	if (chatLoading || messagesLoading) {
@@ -123,13 +154,33 @@ const ChatWindow = () => {
 							className={`flex ${isMe ? "justify-end" : "justify-start"}`}
 						>
 							<div
-								className={`max-w-[70%] p-3 rounded-2xl text-sm ${
-									isMe
-										? "bg-primary text-white rounded-tr-none shadow-sm shadow-blue-100 dark:shadow-none"
-										: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-none"
+								className={`max-w-[70%] space-y-2 ${
+									isMe ? "flex flex-col items-end" : "flex flex-col items-start"
 								}`}
 							>
-								{msg.content}
+								{msg.file && msg.file.length > 0 && (
+									<div className="grid grid-cols-1 gap-2">
+										{msg.file.map((file, idx) => (
+											<img
+												key={idx}
+												src={file.secure_url}
+												alt="attachment"
+												className="rounded-xl max-h-60 object-cover border border-gray-100 dark:border-gray-800"
+											/>
+										))}
+									</div>
+								)}
+								{msg.content && (
+									<div
+										className={`p-3 rounded-2xl text-sm ${
+											isMe
+												? "bg-primary text-white rounded-tr-none shadow-sm shadow-blue-100 dark:shadow-none"
+												: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-none"
+										}`}
+									>
+										{msg.content}
+									</div>
+								)}
 							</div>
 						</div>
 					);
@@ -137,24 +188,73 @@ const ChatWindow = () => {
 				<div ref={messagesEndRef} />
 			</div>
 
+			{/* File Previews */}
+			{previewUrls.length > 0 && (
+				<div className="px-4 py-2 flex gap-2 overflow-x-auto bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800">
+					{previewUrls.map((url, index) => (
+						<div key={index} className="relative shrink-0">
+							<img
+								src={url}
+								alt="preview"
+								className="w-20 h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
+							/>
+							<button
+								onClick={() => removeFile(index)}
+								className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-sm"
+							>
+								<HiOutlineX size={12} />
+							</button>
+						</div>
+					))}
+				</div>
+			)}
+
 			{/* Input */}
-			<form
-				onSubmit={handleSend}
-				className="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900"
-			>
-				<div className="flex gap-2">
+			<div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+				<div className="flex items-end gap-2">
+					<button
+						type="button"
+						onClick={() => fileInputRef.current?.click()}
+						className="p-3 text-gray-500 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+					>
+						<HiOutlinePaperClip size={22} />
+					</button>
 					<input
-						type="text"
-						value={text}
-						onChange={(e) => setText(e.target.value)}
-						placeholder="Type a message..."
-						className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-800 border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all dark:text-white dark:placeholder-gray-500"
+						type="file"
+						ref={fileInputRef}
+						onChange={handleFileSelect}
+						multiple
+						accept="image/*"
+						className="hidden"
 					/>
-					<Button type="submit" className="shrink-0 p-3 rounded-xl">
-						<HiOutlinePaperAirplane className="rotate-90" size={20} />
+
+					<div className="flex-1 min-h-[46px] relative">
+						<InputEmoji
+							value={text}
+							onChange={setText}
+							cleanOnEnter
+							onEnter={handleSend}
+							placeholder="Type a message..."
+							theme="auto"
+							borderRadius={12}
+							fontSize={14}
+							fontFamily="inherit"
+						/>
+					</div>
+
+					<Button
+						onClick={handleSend}
+						disabled={isSending || (!text.trim() && selectedFiles.length === 0)}
+						className="shrink-0 p-3 rounded-xl h-[46px] w-[46px] flex items-center justify-center"
+					>
+						{isSending ? (
+							<Spinner size="sm" color="white" />
+						) : (
+							<HiOutlinePaperAirplane className="rotate-90" size={20} />
+						)}
 					</Button>
 				</div>
-			</form>
+			</div>
 		</div>
 	);
 };

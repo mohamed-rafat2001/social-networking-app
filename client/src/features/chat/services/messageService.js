@@ -7,6 +7,11 @@ export const getMessages = async (chatId) => {
 };
 
 export const createMessage = async ({ chatId, data }) => {
-	const response = await apiApp.post(`/messages/${chatId}`, data);
+	const response = await apiApp.post(`/messages/${chatId}`, data, {
+		headers: {
+			"Content-Type":
+				data instanceof FormData ? "multipart/form-data" : "application/json",
+		},
+	});
 	return response.data;
 };
