@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import NotificationManager from "../../../features/notifications/components/NotificationManager";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiX } from "react-icons/hi";
 
@@ -13,6 +14,7 @@ const MainLayout = () => {
 
 	return (
 		<div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col transition-colors duration-300">
+			<NotificationManager />
 			<Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
 
 			{/* Mobile Sidebar Overlay */}

@@ -42,15 +42,20 @@ export const useLikePost = () => {
 			queryClient.invalidateQueries(["posts"]);
 			queryClient.invalidateQueries(["post", postId]);
 
-			// Emit socket event for notification
 			const post = response.data;
-			if (socket && post && post.userId?._id !== currentUser?._id) {
+			// If it's a new like (not an unlike) and not our own post
+			if (
+				socket &&
+				post &&
+				post.userId !== currentUser?._id &&
+				post.likes.includes(currentUser?._id)
+			) {
 				socket.emit("sendNotification", {
-					recipientId: post.userId?._id || post.userId,
+					recipientId: post.userId,
 					notification: {
 						type: "like",
 						sender: currentUser,
-						post: post,
+						post: { _id: postId },
 						createdAt: new Date(),
 						read: false,
 					},
@@ -71,13 +76,13 @@ export const useSharePost = () => {
 			queryClient.invalidateQueries(["posts"]);
 			queryClient.invalidateQueries(["post", postId]);
 
-			// We need to fetch the original post to get the recipientId
-			// For simplicity, we'll assume the API response includes enough info or we can handle it via the server emitting the event
-			// But since we're doing it client-side for now:
-			const sharedPost = response.data;
-			if (socket && sharedPost && sharedPost.userId !== currentUser?._id) {
-				// Note: In a real app, the server should probably emit this to be more reliable
-				// But we'll try to get the recipient from the query cache or wait for server integration
+			const shareData = response.data;
+			if (socket && shareData && shareData.userId !== currentUser?._id) {
+				// We need the original post author ID.
+				// Since we don't have it easily here, we'll assume the server
+				// already created the notification and we just need to notify the UI if possible.
+				// However, for the toast to show up for the OTHER user, we MUST have their recipientId.
+				// For now, let's just trigger the invalidation.
 			}
 		},
 	});

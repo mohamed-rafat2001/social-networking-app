@@ -6,6 +6,7 @@ import errorHandler from "../../shared/middlewares/errorHandler.js";
 import appError from "../../shared/utils/appError.js";
 import Email from "../../shared/utils/sendEmail.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
+import { createNotification } from "../notifications/notification.controller.js";
 import apiFeatures from "../../shared/utils/apiFeatures.js";
 
 const signUp = errorHandler(async (req, res, next) => {
@@ -172,6 +173,13 @@ const followUser = errorHandler(async (req, res, next) => {
 
 	await currentUser.save();
 	await userToFollow.save();
+
+	// Create notification
+	await createNotification({
+		recipient: userToFollow._id,
+		sender: currentUser._id,
+		type: "follow",
+	});
 
 	res.status(200).json({ status: "success", data: currentUser });
 });

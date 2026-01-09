@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { storeToken } from "../../../shared/utils/helpers";
 import * as userService from "../../profile/services/userService";
+import { useSocket } from "../../../shared/hooks/useSocket";
+import { useUser } from "../../../shared/hooks/useUser";
 
 export const useCurrentUser = () => {
 	return useQuery({
@@ -47,11 +49,26 @@ export const useUserProfile = (userId) => {
 
 export const useFollowUser = () => {
 	const queryClient = useQueryClient();
+	const { socket } = useSocket();
+	const { user: currentUser } = useUser();
+
 	return useMutation({
 		mutationFn: userService.followUser,
 		onSuccess: (_, userId) => {
 			queryClient.invalidateQueries(["userProfile", userId]);
 			queryClient.invalidateQueries(["currentUser"]);
+
+			if (socket && userId && userId !== currentUser?._id) {
+				socket.emit("sendNotification", {
+					recipientId: userId,
+					notification: {
+						type: "follow",
+						sender: currentUser,
+						createdAt: new Date(),
+						read: false,
+					},
+				});
+			}
 		},
 	});
 };

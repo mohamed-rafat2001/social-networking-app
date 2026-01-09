@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSocket } from "../shared/hooks/useSocket";
+import { useSocket } from "../../../shared/hooks/useSocket";
 import { useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 
