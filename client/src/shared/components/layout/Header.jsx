@@ -12,6 +12,8 @@ import {
 } from "react-icons/hi";
 import { useUser } from "../../hooks/useUser";
 import { useSocket } from "../../hooks/useSocket";
+import { useNotifications } from "../../../features/notifications/hooks/useNotifications";
+import { useChats } from "../../../features/chat/hooks/useChatQueries";
 import { Avatar, Button } from "../UI";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,7 +22,14 @@ import { useTheme } from "../../../providers/ThemeProvider";
 const Header = ({ onMenuClick }) => {
 	const { user } = useUser();
 	const { onlineUsers } = useSocket();
+	const { notifications } = useNotifications();
+	const { data: chats } = useChats();
 	const navigate = useNavigate();
+
+	const unreadNotificationsCount =
+		notifications?.filter((n) => !n.isRead && !n.read)?.length || 0;
+	const unreadMessagesCount =
+		chats?.filter((c) => c.unreadCount > 0)?.length || 0;
 	const location = useLocation();
 	const { darkMode, toggleDarkMode } = useTheme();
 	const [showUserMenu, setShowUserMenu] = useState(false);
@@ -120,16 +129,33 @@ const Header = ({ onMenuClick }) => {
 
 					{user ? (
 						<>
-							<button className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-gray-800 rounded-xl transition-colors relative">
-								<HiBell size={24} />
-								<span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-gray-900"></span>
-							</button>
-							<Link
-								to="/messages"
-								className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
-							>
-								<HiChatAlt size={24} />
-							</Link>
+							{/* Messages & Notifications */}
+							<div className="flex items-center gap-1 sm:gap-2">
+								<Link
+									to="/messages"
+									className="relative p-2.5 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all active:scale-95"
+								>
+									<HiChatAlt size={22} />
+									{unreadMessagesCount > 0 && (
+										<span className="absolute top-1.5 right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900">
+											{unreadMessagesCount > 9 ? "9+" : unreadMessagesCount}
+										</span>
+									)}
+								</Link>
+								<Link
+									to="/notifications"
+									className="relative p-2.5 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all active:scale-95"
+								>
+									<HiBell size={22} />
+									{unreadNotificationsCount > 0 && (
+										<span className="absolute top-1.5 right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900">
+											{unreadNotificationsCount > 9
+												? "9+"
+												: unreadNotificationsCount}
+										</span>
+									)}
+								</Link>
+							</div>
 
 							<div className="relative">
 								<button

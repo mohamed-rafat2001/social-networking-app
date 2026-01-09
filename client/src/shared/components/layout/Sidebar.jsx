@@ -6,16 +6,37 @@ import {
 	HiHashtag,
 	HiCollection,
 	HiBookmark,
+	HiBell,
 } from "react-icons/hi";
 import { useUser } from "../../hooks/useUser";
+import { useNotifications } from "../../../features/notifications/hooks/useNotifications";
+import { useChats } from "../../../features/chat/hooks/useChatQueries";
 
 const Sidebar = ({ onMobileItemClick }) => {
 	const { user } = useUser();
+	const { notifications } = useNotifications();
+	const { data: chats } = useChats();
+
+	const unreadNotificationsCount =
+		notifications?.filter((n) => !n.isRead && !n.read)?.length || 0;
+	const unreadMessagesCount =
+		chats?.filter((c) => c.unreadCount > 0)?.length || 0;
 
 	const navItems = [
 		{ name: "Home Feed", icon: HiHome, path: "/feed" },
 		{ name: "Explore Topics", icon: HiHashtag, path: "/explore" },
-		{ name: "Messages", icon: HiChatAlt, path: "/messages" },
+		{
+			name: "Notifications",
+			icon: HiBell,
+			path: "/notifications",
+			badge: unreadNotificationsCount,
+		},
+		{
+			name: "Messages",
+			icon: HiChatAlt,
+			path: "/messages",
+			badge: unreadMessagesCount,
+		},
 		{ name: "Projects", icon: HiCollection, path: "/projects" },
 		{ name: "Bookmarks", icon: HiBookmark, path: "/bookmarks" },
 		{ name: "My Profile", icon: HiUser, path: `/profile/${user?._id}` },
@@ -36,10 +57,17 @@ const Sidebar = ({ onMobileItemClick }) => {
 						}`
 					}
 				>
-					<item.icon
-						size={26}
-						className="group-hover:scale-110 transition-transform duration-200 shrink-0"
-					/>
+					<div className="relative">
+						<item.icon
+							size={26}
+							className="group-hover:scale-110 transition-transform duration-200 shrink-0"
+						/>
+						{item.badge > 0 && (
+							<span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900">
+								{item.badge > 9 ? "9+" : item.badge}
+							</span>
+						)}
+					</div>
 					<span className="lg:block">{item.name}</span>
 				</NavLink>
 			))}
