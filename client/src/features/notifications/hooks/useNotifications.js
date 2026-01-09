@@ -1,7 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
 import apiApp from "../../../shared/api/apiApp";
-import { useSocket } from "../../../shared/hooks/useSocket";
 
 const getNotifications = async () => {
 	const response = await apiApp.get("/notifications");
@@ -15,27 +13,11 @@ const markAsRead = async (id) => {
 
 export const useNotifications = () => {
 	const queryClient = useQueryClient();
-	const { socket } = useSocket();
 
 	const { data: notifications, isLoading } = useQuery({
 		queryKey: ["notifications"],
 		queryFn: getNotifications,
 	});
-
-	useEffect(() => {
-		if (!socket) return;
-
-		socket.on("getNotification", (notification) => {
-			queryClient.setQueryData(["notifications"], (old) => {
-				if (!old) return [notification];
-				return [notification, ...old];
-			});
-		});
-
-		return () => {
-			socket.off("getNotification");
-		};
-	}, [socket, queryClient]);
 
 	const markAsReadMutation = useMutation({
 		mutationFn: markAsRead,

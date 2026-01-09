@@ -13,6 +13,7 @@ import {
 import { useUser } from "../../hooks/useUser";
 import { useSocket } from "../../hooks/useSocket";
 import { useNotifications } from "../../../features/notifications/hooks/useNotifications";
+import NotificationList from "../../../features/notifications/components/NotificationList";
 import { useChats } from "../../../features/chat/hooks/useChatQueries";
 import { Avatar, Button } from "../UI";
 import { useState } from "react";
@@ -33,6 +34,7 @@ const Header = ({ onMenuClick }) => {
 	const location = useLocation();
 	const { darkMode, toggleDarkMode } = useTheme();
 	const [showUserMenu, setShowUserMenu] = useState(false);
+	const [showNotifications, setShowNotifications] = useState(false);
 	const [showMobileMenu, setShowMobileMenu] = useState(false);
 
 	const isLandingPage = location.pathname === "/";
@@ -142,19 +144,57 @@ const Header = ({ onMenuClick }) => {
 										</span>
 									)}
 								</Link>
-								<Link
-									to="/notifications"
-									className="relative p-2.5 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all active:scale-95"
-								>
-									<HiBell size={22} />
-									{unreadNotificationsCount > 0 && (
-										<span className="absolute top-1.5 right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900">
-											{unreadNotificationsCount > 9
-												? "9+"
-												: unreadNotificationsCount}
-										</span>
-									)}
-								</Link>
+								<div className="relative">
+									<button
+										onClick={() => setShowNotifications(!showNotifications)}
+										className={cn(
+											"relative p-2.5 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all active:scale-95",
+											showNotifications && "text-primary bg-primary/5"
+										)}
+									>
+										<HiBell size={22} />
+										{unreadNotificationsCount > 0 && (
+											<span className="absolute top-1.5 right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900">
+												{unreadNotificationsCount > 9
+													? "9+"
+													: unreadNotificationsCount}
+											</span>
+										)}
+									</button>
+
+									<AnimatePresence>
+										{showNotifications && (
+											<>
+												<div
+													className="fixed inset-0 z-10"
+													onClick={() => setShowNotifications(false)}
+												></div>
+												<motion.div
+													initial={{ opacity: 0, y: 10, scale: 0.95 }}
+													animate={{ opacity: 1, y: 0, scale: 1 }}
+													exit={{ opacity: 0, y: 10, scale: 0.95 }}
+													className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 z-20 overflow-hidden"
+												>
+													<div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
+														<h3 className="font-bold text-gray-900 dark:text-white">
+															Notifications
+														</h3>
+														<Link
+															to="/notifications"
+															onClick={() => setShowNotifications(false)}
+															className="text-xs font-bold text-primary hover:underline"
+														>
+															View All
+														</Link>
+													</div>
+													<div className="max-h-[400px] overflow-y-auto">
+														<NotificationList />
+													</div>
+												</motion.div>
+											</>
+										)}
+									</AnimatePresence>
+								</div>
 							</div>
 
 							<div className="relative">

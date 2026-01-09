@@ -6,6 +6,7 @@ import MessagesPage from "../pages/MessagesPage";
 import ChatDetailPage from "../pages/ChatDetailPage";
 import ProfilePage from "../pages/ProfilePage";
 import PostDetailPage from "../pages/PostDetailPage";
+import NotificationsPage from "../pages/NotificationsPage";
 import MainLayout from "../shared/components/layout/MainLayout";
 import { ProtectedRoute } from "../features/auth";
 
@@ -27,6 +28,10 @@ export const router = createBrowserRouter([
 					{
 						path: "/feed",
 						element: <FeedPage />,
+					},
+					{
+						path: "/notifications",
+						element: <NotificationsPage />,
 					},
 					{
 						path: "/messages",

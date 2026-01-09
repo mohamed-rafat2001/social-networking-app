@@ -7,6 +7,7 @@ import { store } from "./store";
 import { router } from "./routing/Router";
 import { SocketProvider } from "./providers/SocketProvider";
 import { ThemeProvider, useTheme } from "./providers/ThemeProvider";
+import NotificationManager from "./features/notifications/components/NotificationManager";
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -22,6 +23,7 @@ function AppContent() {
 
 	return (
 		<>
+			<NotificationManager />
 			<Toaster
 				position="bottom-right"
 				gutter={8}
