@@ -62,6 +62,7 @@ export const Avatar = ({ src, alt, className, size = "md", isActive }) => {
 		md: "w-10 h-10",
 		lg: "w-12 h-12",
 		xl: "w-20 h-20",
+		"2xl": "w-32 h-32",
 	};
 
 	const statusSizes = {
@@ -70,6 +71,7 @@ export const Avatar = ({ src, alt, className, size = "md", isActive }) => {
 		md: "w-3 h-3",
 		lg: "w-3.5 h-3.5",
 		xl: "w-5 h-5",
+		"2xl": "w-6 h-6",
 	};
 
 	const currentSize = sizes[size] || sizes.md;

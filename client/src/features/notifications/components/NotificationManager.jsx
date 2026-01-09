@@ -71,23 +71,10 @@ const NotificationManager = () => {
 
 		socket.on("getNotification", handleNotification);
 		socket.on("getMessage", handleMessage);
-		socket.on("notification", (msgNotification) => {
-			// This is for real-time message toasts if getMessage isn't enough
-			// or if we want to handle the specific 'notification' event from socket server
-			if (location.pathname !== `/messages/${msgNotification.chatId}`) {
-				toast.success(
-					`New message: ${msgNotification.content.substring(0, 30)}...`,
-					{
-						icon: "💬",
-					}
-				);
-			}
-		});
 
 		return () => {
 			socket.off("getNotification", handleNotification);
 			socket.off("getMessage", handleMessage);
-			socket.off("notification");
 		};
 	}, [socket, queryClient, location.pathname]);
 

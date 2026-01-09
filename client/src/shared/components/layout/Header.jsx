@@ -15,7 +15,7 @@ import { useSocket } from "../../hooks/useSocket";
 import { useNotifications } from "../../../features/notifications/hooks/useNotifications";
 import NotificationList from "../../../features/notifications/components/NotificationList";
 import { useChats } from "../../../features/chat/hooks/useChatQueries";
-import { Avatar, Button } from "../UI";
+import { Avatar, Button, cn } from "../UI";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../../../providers/ThemeProvider";
