@@ -18,7 +18,13 @@ import {
 	useIncrementView,
 } from "../features/posts/hooks/usePostQueries";
 import { useUser } from "../shared/hooks/useUser";
-import { Avatar, Spinner, Button } from "../shared/components/UI";
+import {
+	Avatar,
+	Spinner,
+	Button,
+	ImageGallery,
+	cn,
+} from "../shared/components/UI";
 import CommentList from "../features/posts/components/CommentList";
 
 function PostDetailPage() {
@@ -84,46 +90,39 @@ function PostDetailPage() {
 
 			{/* Post Content */}
 			<div className="p-4">
-				<div className="flex gap-3 mb-4">
-					<Avatar src={post.userId?.image?.secure_url} size="lg" />
+				<div className="flex gap-4 mb-4">
+					<Link to={`/profile/${post.userId?._id}`} className="shrink-0">
+						<Avatar src={post.userId?.image?.secure_url} size="lg" />
+					</Link>
 					<div className="flex-1 min-w-0">
 						<div className="flex justify-between items-start">
 							<div>
 								<Link
 									to={`/profile/${post.userId?._id}`}
-									className="font-bold text-lg hover:underline cursor-pointer block"
+									className="font-bold text-[17px] hover:underline cursor-pointer block leading-tight text-gray-900 dark:text-white"
 								>
 									{post.userId?.firstName} {post.userId?.lastName}
 								</Link>
-								<p className="text-gray-500 dark:text-gray-400">
+								<p className="text-[15px] text-gray-500 dark:text-gray-400">
 									@{post.userId?.firstName?.toLowerCase()}
 								</p>
 							</div>
-							<button className="text-gray-500 hover:text-primary p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20">
-								<HiDotsHorizontal />
+							<button className="text-gray-500 hover:text-primary p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+								<HiDotsHorizontal size={18} />
 							</button>
 						</div>
 					</div>
 				</div>
 
-				<p className="text-xl text-black dark:text-gray-100 leading-relaxed break-words mb-4">
+				<p className="text-xl md:text-[22px] text-gray-900 dark:text-gray-100 leading-normal break-words mb-4 whitespace-pre-wrap">
 					{post.text}
 				</p>
 
-				{post.fileUp?.map((file) => (
-					<div
-						key={file.public_id}
-						className="rounded-2xl overflow-hidden border dark:border-gray-800 mb-4 bg-gray-50 dark:bg-gray-800/50"
-					>
-						<img
-							src={file.secure_url}
-							alt="Post content"
-							className="w-full h-auto object-contain"
-						/>
-					</div>
-				))}
+				{post.fileUp && post.fileUp.length > 0 && (
+					<ImageGallery images={post.fileUp} className="mb-4 shadow-sm" />
+				)}
 
-				<div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 text-sm mb-4 pb-4 border-b dark:border-gray-800">
+				<div className="flex flex-wrap items-center gap-1 text-[15px] text-gray-500 dark:text-gray-400 mb-4 pb-4 border-b dark:border-gray-800">
 					<span>
 						{post.createdAt && !isNaN(new Date(post.createdAt).getTime())
 							? new Date(post.createdAt).toLocaleTimeString([], {
@@ -132,7 +131,7 @@ function PostDetailPage() {
 							  })
 							: ""}
 					</span>
-					<span>·</span>
+					<span className="mx-1">·</span>
 					<span>
 						{post.createdAt && !isNaN(new Date(post.createdAt).getTime())
 							? new Date(post.createdAt).toLocaleDateString([], {
@@ -142,57 +141,61 @@ function PostDetailPage() {
 							  })
 							: ""}
 					</span>
-					<span>·</span>
-					<span className="font-bold text-black dark:text-white">
-						{post.views || 0}
-					</span>
-					<span>Views</span>
+					<span className="mx-1">·</span>
+					<div className="flex items-center gap-1">
+						<span className="font-bold text-gray-900 dark:text-white">
+							{post.views || 0}
+						</span>
+						<span>Views</span>
+					</div>
 				</div>
 
-				<div className="flex justify-around py-1 border-b dark:border-gray-800 text-gray-500 dark:text-gray-400">
-					<button className="flex items-center gap-2 hover:text-primary group transition-colors flex-1 justify-center">
+				<div className="flex items-center gap-6 py-1 border-b dark:border-gray-800 text-gray-500 dark:text-gray-400">
+					<button className="flex items-center gap-2 hover:text-primary group transition-colors">
 						<div className="p-2 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20">
-							<HiChatAlt2 className="text-xl" />
+							<HiChatAlt2 className="text-[22px]" />
 						</div>
-						<span className="text-sm font-medium">
+						<span className="text-[15px] font-medium">
 							{post.comments?.length || 0}
 						</span>
 					</button>
 					<button
 						onClick={handleShare}
-						className={`flex items-center gap-2 hover:text-green-500 group transition-colors flex-1 justify-center ${
+						className={cn(
+							"flex items-center gap-2 hover:text-green-500 group transition-colors",
 							post.shares?.some(
 								(s) => (s.userId?._id || s.userId) === user?._id?.toString()
-							)
-								? "text-green-500"
-								: ""
-						}`}
+							) && "text-green-500"
+						)}
 					>
 						<div className="p-2 rounded-full group-hover:bg-green-50 dark:group-hover:bg-green-900/20">
-							<HiRefresh className="text-xl" />
+							<HiRefresh className="text-[22px]" />
 						</div>
-						<span className="text-sm font-medium">
+						<span className="text-[15px] font-medium">
 							{post.shares?.length || 0}
 						</span>
 					</button>
 					<button
 						onClick={handleLike}
-						className={`flex items-center gap-2 hover:text-pink-500 group transition-colors flex-1 justify-center ${
-							post.likes?.includes(user?._id) ? "text-pink-500" : ""
-						}`}
+						className={cn(
+							"flex items-center gap-2 hover:text-pink-500 group transition-colors",
+							post.likes?.includes(user?._id) && "text-pink-500"
+						)}
 					>
 						<div className="p-2 rounded-full group-hover:bg-pink-50 dark:group-hover:bg-pink-900/20">
 							{post.likes?.includes(user?._id) ? (
-								<HiHeart className="text-xl text-pink-500" />
+								<HiHeart className="text-[22px] text-pink-500" />
 							) : (
-								<HiHeart className="text-xl" />
+								<HiHeart className="text-[22px]" />
 							)}
 						</div>
-						<span className="text-sm font-medium">{post.likesNumber || 0}</span>
+						<span className="text-[15px] font-medium">
+							{post.likesNumber || 0}
+						</span>
 					</button>
-					<button className="flex items-center gap-2 hover:text-primary group transition-colors flex-1 justify-center">
+					<button className="flex items-center gap-2 hover:text-primary group transition-colors ml-auto">
 						<div className="p-2 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20">
-							<HiUpload className="text-xl" />
+							<HiUpload className="text-[22px]" />
 						</div>
 					</button>
 				</div>

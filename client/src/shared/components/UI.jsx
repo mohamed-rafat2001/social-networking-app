@@ -318,7 +318,7 @@ export const ImageGallery = ({ images = [], className }) => {
 				className={cn(
 					"grid gap-1 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50",
 					getGridClass(),
-					count === 1 ? "max-h-[500px]" : "aspect-[16/9]",
+					count === 1 ? "max-h-[512px]" : "aspect-square md:aspect-[16/9]",
 					className
 				)}
 				onClick={(e) => e.stopPropagation()}

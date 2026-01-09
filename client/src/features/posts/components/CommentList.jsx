@@ -2,14 +2,16 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import InputEmoji from "react-input-emoji";
-import { Avatar, Button, Spinner } from "../../../shared/components/UI";
+import { Avatar, Button, Spinner, cn } from "../../../shared/components/UI";
 import { useUser } from "../../../shared/hooks/useUser";
+import { useTheme } from "../../../providers/ThemeProvider";
 import { useAddComment } from "../hooks/useCommentQueries";
 import CommentItem from "./CommentItem";
 
 function CommentList({ comments, postId }) {
 	const [text, setText] = useState("");
 	const { user } = useUser();
+	const { darkMode } = useTheme();
 	const { mutate: addComment, isLoading } = useAddComment();
 
 	const handleSubmit = () => {
@@ -48,11 +50,7 @@ function CommentList({ comments, postId }) {
 							fontSize={15}
 							fontFamily="inherit"
 							borderColor="transparent"
-							theme={
-								document.documentElement.classList.contains("dark")
-									? "dark"
-									: "light"
-							}
+							theme={darkMode ? "dark" : "light"}
 						/>
 						<div className="flex justify-end mt-2">
 							<Button

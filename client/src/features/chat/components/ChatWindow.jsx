@@ -36,6 +36,7 @@ const ChatWindow = () => {
 	const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 	const [selectedPreviewIndex, setSelectedPreviewIndex] = useState(0);
 	const messagesEndRef = useRef(null);
+	const previewScrollRef = useRef(null);
 	const fileInputRef = useRef(null);
 
 	const { data: chat, isLoading: chatLoading } = useSingleChat(chatId);
@@ -74,6 +75,15 @@ const ChatWindow = () => {
 			socket?.off("getMessage");
 		};
 	}, [socket, chatId, queryClient]);
+
+	useEffect(() => {
+		if (previewUrls.length > 0 && previewScrollRef.current) {
+			previewScrollRef.current.scrollTo({
+				left: previewScrollRef.current.scrollWidth,
+				behavior: "smooth",
+			});
+		}
+	}, [previewUrls.length]);
 
 	const handleFileSelect = (e) => {
 		const files = Array.from(e.target.files);
@@ -182,13 +192,20 @@ const ChatWindow = () => {
 								}`}
 							>
 								{msg.file && msg.file.length > 0 && (
-									<ImageGallery
-										images={msg.file}
+									<div
 										className={cn(
-											"w-[300px] md:w-[400px]",
-											isMe ? "rounded-tr-none" : "rounded-tl-none"
+											"w-full max-w-[280px] sm:max-w-[320px] md:max-w-[400px]",
+											isMe ? "ml-auto" : "mr-auto"
 										)}
-									/>
+									>
+										<ImageGallery
+											images={msg.file}
+											className={cn(
+												"shadow-sm",
+												isMe ? "rounded-tr-none" : "rounded-tl-none"
+											)}
+										/>
+									</div>
 								)}
 								{msg.content && (
 									<div
@@ -211,53 +228,57 @@ const ChatWindow = () => {
 			{/* File Previews */}
 			{previewUrls.length > 0 && (
 				<div className="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800">
+					<div className="flex items-center justify-between mb-2">
+						<span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+							{previewUrls.length} image{previewUrls.length > 1 ? "s" : ""}{" "}
+							selected
+						</span>
+						<button
+							onClick={() => {
+								previewUrls.forEach((url) => URL.revokeObjectURL(url));
+								setPreviewUrls([]);
+								setSelectedFiles([]);
+							}}
+							className="text-xs font-medium text-red-500 hover:text-red-600 transition-colors"
+						>
+							Clear all
+						</button>
+					</div>
 					<div
-						className={cn(
-							"grid gap-2 max-w-[400px]",
-							previewUrls.length === 1 ? "grid-cols-1" : "grid-cols-2"
-						)}
+						ref={previewScrollRef}
+						className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"
 					>
-						{previewUrls.slice(0, 4).map((url, index) => (
-							<div
-								key={index}
-								className={cn(
-									"relative group rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-pointer",
-									previewUrls.length === 1 ? "" : "aspect-square"
-								)}
-								onClick={() => {
-									setSelectedPreviewIndex(index);
-									setIsPreviewModalOpen(true);
-								}}
-							>
-								<img
-									src={url}
-									alt="preview"
-									className={cn(
-										"w-full h-full object-cover",
-										previewUrls.length === 1 && "max-h-[200px] object-contain"
-									)}
-								/>
-								<button
-									onClick={(e) => {
-										e.stopPropagation();
-										removeFile(index);
+						<AnimatePresence>
+							{previewUrls.map((url, index) => (
+								<motion.div
+									key={url}
+									initial={{ opacity: 0, scale: 0.8, x: -20 }}
+									animate={{ opacity: 1, scale: 1, x: 0 }}
+									exit={{ opacity: 0, scale: 0.8, x: -20 }}
+									className="relative shrink-0 w-24 h-24 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-pointer group shadow-sm"
+									onClick={() => {
+										setSelectedPreviewIndex(index);
+										setIsPreviewModalOpen(true);
 									}}
-									className="absolute top-1.5 right-1.5 p-1 bg-gray-900/60 hover:bg-gray-900/80 text-white rounded-full backdrop-blur-sm transition-all z-10"
 								>
-									<HiOutlineX size={14} />
-								</button>
-								{previewUrls.length > 4 && index === 3 && (
-									<div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center backdrop-blur-[2px] group-hover:bg-black/40 transition-colors">
-										<span className="text-white text-lg font-bold">
-											+{previewUrls.length - 4}
-										</span>
-										<span className="text-white/80 text-[10px] font-medium uppercase tracking-wider">
-											more
-										</span>
-									</div>
-								)}
-							</div>
-						))}
+									<img
+										src={url}
+										alt="preview"
+										className="w-full h-full object-cover transition-transform group-hover:scale-110"
+									/>
+									<button
+										onClick={(e) => {
+											e.stopPropagation();
+											removeFile(index);
+										}}
+										className="absolute top-1 right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition-colors z-10"
+									>
+										<HiOutlineX size={12} />
+									</button>
+									<div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+								</motion.div>
+							))}
+						</AnimatePresence>
 					</div>
 					<ImageModal
 						isOpen={isPreviewModalOpen}

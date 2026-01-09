@@ -87,16 +87,16 @@ function PostItem({ post, index }) {
 						<div className="flex items-center gap-1 flex-wrap">
 							<Link
 								to={`/profile/${post.userId?._id}`}
-								className="font-bold text-black dark:text-white hover:underline flex items-center gap-2"
+								className="font-bold text-[15px] text-gray-900 dark:text-white hover:underline flex items-center gap-2 leading-tight"
 								onClick={(e) => e.stopPropagation()}
 							>
 								{post.userId?.firstName} {post.userId?.lastName}
 							</Link>
-							<span className="text-gray-500 dark:text-gray-400">
+							<span className="text-gray-500 dark:text-gray-400 text-[14px]">
 								@{post.userId?.firstName?.toLowerCase()}
 							</span>
 							<span className="text-gray-500 dark:text-gray-400">·</span>
-							<span className="text-gray-500 dark:text-gray-400 text-sm">
+							<span className="text-gray-500 dark:text-gray-400 text-[14px]">
 								{post.createdAt && !isNaN(new Date(post.createdAt).getTime())
 									? formatDistanceToNow(new Date(post.createdAt), {
 											addSuffix: true,
@@ -112,17 +112,17 @@ function PostItem({ post, index }) {
 						</button>
 					</div>
 
-					<p className="mt-1 mb-3 text-black dark:text-gray-200 leading-normal break-words">
+					<p className="mt-1 mb-3 text-[15px] text-gray-900 dark:text-gray-200 leading-normal break-words whitespace-pre-wrap">
 						{post.text}
 					</p>
 
 					{post.fileUp && post.fileUp.length > 0 && (
-						<ImageGallery images={post.fileUp} className="mb-3" />
+						<ImageGallery images={post.fileUp} className="mb-3 shadow-sm" />
 					)}
 
 					<div className="flex justify-between text-gray-500 dark:text-gray-400 max-w-md mt-2">
 						<motion.button
-							className="flex items-center gap-2 hover:text-primary group transition-colors"
+							className="flex items-center gap-1.5 hover:text-primary group transition-colors"
 							whileHover={{ scale: 1.05 }}
 							onClick={(e) => {
 								e.stopPropagation();
@@ -130,52 +130,59 @@ function PostItem({ post, index }) {
 							}}
 						>
 							<div className="p-2 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
-								<HiChatAlt2 />
+								<HiChatAlt2 size={18} />
 							</div>
-							<span className="text-sm">{post.comments?.length || 0}</span>
+							<span className="text-[13px] font-medium">
+								{post.comments?.length || 0}
+							</span>
 						</motion.button>
 
 						<motion.button
-							className={`flex items-center gap-2 hover:text-green-500 group transition-colors ${
+							className={cn(
+								"flex items-center gap-1.5 hover:text-green-500 group transition-colors",
 								post.shares?.some(
 									(s) => (s.userId?._id || s.userId) === user?._id?.toString()
-								)
-									? "text-green-500"
-									: ""
-							}`}
+								) && "text-green-500"
+							)}
 							onClick={handleShare}
 							whileHover={{ scale: 1.05 }}
 						>
 							<div className="p-2 rounded-full group-hover:bg-green-50 dark:group-hover:bg-green-900/20 transition-colors">
-								<HiRefresh />
+								<HiRefresh size={18} />
 							</div>
-							<span className="text-sm">{post.shares?.length || 0}</span>
+							<span className="text-[13px] font-medium">
+								{post.shares?.length || 0}
+							</span>
 						</motion.button>
 
 						<motion.button
-							className={`flex items-center gap-2 hover:text-pink-500 group transition-colors ${
-								post.likes?.includes(user?._id) ? "text-pink-500" : ""
-							}`}
+							className={cn(
+								"flex items-center gap-1.5 hover:pink-pink-500 group transition-colors",
+								post.likes?.includes(user?._id) && "text-pink-500"
+							)}
 							onClick={handleLike}
 							whileHover={{ scale: 1.05 }}
 						>
 							<div className="p-2 rounded-full group-hover:bg-pink-50 dark:group-hover:bg-pink-900/20 transition-colors">
 								<HiHeart
-									className={
+									size={18}
+									className={cn(
 										post.likes?.includes(user?._id)
 											? "text-pink-500"
 											: "text-gray-500 dark:text-gray-400"
-									}
+									)}
 								/>
 							</div>
-							<span className="text-sm">{post.likesNumber || 0}</span>
+							<span className="text-[13px] font-medium">
+								{post.likesNumber || 0}
+							</span>
 						</motion.button>
 
-						<div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+						<div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
 							<div className="p-2 rounded-full">
-								<HiChartBar />
+								<HiChartBar size={18} />
 							</div>
-							<span className="text-sm">{post.views || 0}</span>
+							<span className="text-[13px] font-medium">{post.views || 0}</span>
 						</div>
 
 						<motion.button
@@ -183,8 +190,8 @@ function PostItem({ post, index }) {
 							whileHover={{ scale: 1.05 }}
 							onClick={(e) => e.stopPropagation()}
 						>
-							<div className="p-2 rounded-full group-hover:bg-blue-50 transition-colors">
-								<HiUpload />
+							<div className="p-2 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
+								<HiUpload size={18} />
 							</div>
 						</motion.button>
 					</div>

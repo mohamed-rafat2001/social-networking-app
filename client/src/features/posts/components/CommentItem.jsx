@@ -3,8 +3,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { HiHeart, HiDotsHorizontal, HiChatAlt2 } from "react-icons/hi";
 import { useState } from "react";
-import { Avatar, Button, Spinner } from "../../../shared/components/UI";
+import {
+	Avatar,
+	Button,
+	Spinner,
+	ImageGallery,
+	cn,
+} from "../../../shared/components/UI";
 import { useUser } from "../../../shared/hooks/useUser";
+import { useTheme } from "../../../providers/ThemeProvider";
 import {
 	useLikeComment,
 	useAddReply,
@@ -15,6 +22,7 @@ import { toast } from "react-hot-toast";
 
 function CommentItem({ comment, postId }) {
 	const { user } = useUser();
+	const { darkMode } = useTheme();
 	const [showReplyInput, setShowReplyInput] = useState(false);
 	const [replyText, setReplyText] = useState("");
 	const { mutate: likeComment } = useLikeComment();
@@ -58,21 +66,21 @@ function CommentItem({ comment, postId }) {
 					<Avatar src={comment.userId?.image?.secure_url} size="sm" />
 				</Link>
 				<div className="flex-1 min-w-0">
-					<div className="flex justify-between items-center mb-1">
+					<div className="flex justify-between items-center mb-0.5">
 						<div className="flex items-center gap-1 flex-wrap">
 							<Link
 								to={`/profile/${comment.userId?._id}`}
-								className="font-bold text-sm text-black dark:text-white hover:underline cursor-pointer"
+								className="font-bold text-[15px] text-gray-900 dark:text-white hover:underline cursor-pointer leading-tight"
 							>
 								{comment.userId?.firstName} {comment.userId?.lastName}
 							</Link>
-							<span className="text-gray-500 dark:text-gray-400 text-xs">
+							<span className="text-gray-500 dark:text-gray-400 text-[14px]">
 								@{comment.userId?.firstName?.toLowerCase()}
 							</span>
-							<span className="text-gray-500 dark:text-gray-400 text-xs">
+							<span className="text-gray-500 dark:text-gray-400 text-[14px]">
 								·
 							</span>
-							<span className="text-gray-500 dark:text-gray-400 text-xs">
+							<span className="text-gray-500 dark:text-gray-400 text-[14px]">
 								{comment.createdAt &&
 								!isNaN(new Date(comment.createdAt).getTime())
 									? formatDistanceToNow(new Date(comment.createdAt), {
@@ -81,57 +89,61 @@ function CommentItem({ comment, postId }) {
 									: "just now"}
 							</span>
 						</div>
-						<button className="text-gray-500 hover:text-primary p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20">
-							<HiDotsHorizontal className="text-sm" />
+						<button className="text-gray-500 hover:text-primary p-1.5 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+							<HiDotsHorizontal size={16} />
 						</button>
 					</div>
 
-					<p className="text-sm text-black dark:text-gray-200 break-words mb-3">
+					<p className="text-[15px] text-gray-900 dark:text-gray-200 leading-normal break-words mb-3 whitespace-pre-wrap">
 						{comment.commentBody}
 					</p>
 
 					{comment.image?.secure_url && (
-						<div className="rounded-xl overflow-hidden border dark:border-gray-800 mb-3 max-w-sm">
-							<img
-								src={comment.image.secure_url}
-								alt="Comment"
-								className="w-full h-auto"
-							/>
-						</div>
+						<ImageGallery
+							images={[comment.image.secure_url]}
+							className="mb-3 max-w-md shadow-sm"
+						/>
 					)}
 
 					<div className="flex gap-6 text-gray-500 dark:text-gray-400">
 						<button
 							onClick={() => setShowReplyInput(!showReplyInput)}
-							className={`flex items-center gap-1.5 hover:text-primary group transition-colors ${
-								showReplyInput ? "text-primary" : ""
-							}`}
+							className={cn(
+								"flex items-center gap-1.5 hover:text-primary group transition-colors",
+								showReplyInput && "text-primary"
+							)}
 						>
 							<div className="p-1.5 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20">
-								<HiChatAlt2 className="text-base" />
+								<HiChatAlt2 size={18} />
 							</div>
-							<span className="text-xs">{comment.replies?.length || 0}</span>
+							<span className="text-xs font-medium">
+								{comment.replies?.length || 0}
+							</span>
 						</button>
 						<button
 							onClick={handleLike}
-							className={`flex items-center gap-1.5 hover:text-pink-500 group transition-colors ${
-								comment.like?.includes(user?._id) ? "text-pink-500" : ""
-							}`}
+							className={cn(
+								"flex items-center gap-1.5 hover:text-pink-500 group transition-colors",
+								comment.like?.includes(user?._id) && "text-pink-500"
+							)}
 						>
 							<div className="p-1.5 rounded-full group-hover:bg-pink-50 dark:group-hover:bg-pink-900/20">
 								<HiHeart
-									className={`text-base ${
+									size={18}
+									className={cn(
 										comment.like?.includes(user?._id) ? "text-pink-500" : ""
-									}`}
+									)}
 								/>
 							</div>
-							<span className="text-xs">{comment.likeNum || 0}</span>
+							<span className="text-xs font-medium">
+								{comment.likeNum || 0}
+							</span>
 						</button>
 					</div>
 
 					{/* Replies List */}
 					{comment.replies?.length > 0 && (
-						<div className="mt-4 space-y-4 ml-2 pl-4 border-l-2 border-gray-100 dark:border-gray-800/50">
+						<div className="mt-4 space-y-4 ml-1 pl-4 border-l dark:border-gray-800">
 							{comment.replies.map((reply) => (
 								<div key={reply._id} className="flex gap-3">
 									<Link
@@ -141,15 +153,15 @@ function CommentItem({ comment, postId }) {
 										<Avatar src={reply.userId?.image?.secure_url} size="xs" />
 									</Link>
 									<div className="flex-1 min-w-0">
-										<div className="flex items-center justify-between mb-1">
+										<div className="flex items-center justify-between mb-0.5">
 											<div className="flex items-center gap-1">
 												<Link
 													to={`/profile/${reply.userId?._id}`}
-													className="font-bold text-xs text-black dark:text-white hover:underline"
+													className="font-bold text-[13px] text-gray-900 dark:text-white hover:underline leading-tight"
 												>
 													{reply.userId?.firstName} {reply.userId?.lastName}
 												</Link>
-												<span className="text-gray-500 dark:text-gray-400 text-[10px]">
+												<span className="text-gray-500 dark:text-gray-400 text-[12px]">
 													·{" "}
 													{reply.createdAt &&
 													!isNaN(new Date(reply.createdAt).getTime())
@@ -159,11 +171,11 @@ function CommentItem({ comment, postId }) {
 														: "just now"}
 												</span>
 											</div>
-											<button className="text-gray-500 hover:text-primary p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20">
-												<HiDotsHorizontal className="text-[10px]" />
+											<button className="text-gray-500 hover:text-primary p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+												<HiDotsHorizontal size={14} />
 											</button>
 										</div>
-										<p className="text-xs text-black dark:text-gray-200 break-words mb-2">
+										<p className="text-[14px] text-gray-900 dark:text-gray-200 leading-normal break-words mb-2 whitespace-pre-wrap">
 											{reply.replayBody}
 										</p>
 										<div className="flex gap-4 text-gray-500 dark:text-gray-400">
@@ -171,20 +183,22 @@ function CommentItem({ comment, postId }) {
 												onClick={() =>
 													likeReply({ replyId: reply._id, postId })
 												}
-												className={`flex items-center gap-1 hover:text-pink-500 transition-colors ${
-													reply.like?.includes(user?._id) ? "text-pink-500" : ""
-												}`}
+												className={cn(
+													"flex items-center gap-1 hover:text-pink-500 group transition-colors",
+													reply.like?.includes(user?._id) && "text-pink-500"
+												)}
 											>
-												<div className="p-1 rounded-full hover:bg-pink-50 dark:hover:bg-pink-900/20">
+												<div className="p-1 rounded-full group-hover:bg-pink-50 dark:group-hover:bg-pink-900/20 transition-colors">
 													<HiHeart
-														className={`text-xs ${
+														size={14}
+														className={cn(
 															reply.like?.includes(user?._id)
 																? "text-pink-500"
 																: ""
-														}`}
+														)}
 													/>
 												</div>
-												<span className="text-[10px]">
+												<span className="text-[11px] font-medium">
 													{reply.likeNum || 0}
 												</span>
 											</button>
@@ -214,11 +228,7 @@ function CommentItem({ comment, postId }) {
 											onEnter={handleReplySubmit}
 											placeholder="Post your reply"
 											fontSize={13}
-											theme={
-												document.documentElement.classList.contains("dark")
-													? "dark"
-													: "light"
-											}
+											theme={darkMode ? "dark" : "light"}
 										/>
 										<div className="flex justify-end mt-1">
 											<Button
