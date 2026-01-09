@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 
 // Features
 import userRouter from "./src/features/auth/auth.routes.js";
+import followRouter from "./src/features/auth/follow.routes.js";
 import adminRouter from "./src/features/admin/admin.routes.js";
 import postsRouter from "./src/features/posts/posts.routes.js";
 import youtubeRouter from "./src/features/youtube/youtube.routes.js";
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use(cors({ origin: "*" })); // Allow all for development, refine later
 
 app.use("/user", userRouter);
+app.use("/follows", followRouter);
 app.use("/admin", adminRouter);
 app.use("/posts", postsRouter); // Changed from / to /posts for clarity
 app.use("/youtube", youtubeRouter);

@@ -60,3 +60,53 @@ export const useLikeReply = () => {
 		},
 	});
 };
+
+export const useUpdateComment = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: commentService.updateComment,
+		onSuccess: (data, { postId }) => {
+			if (postId) {
+				queryClient.invalidateQueries(["post", postId]);
+			}
+			queryClient.invalidateQueries(["posts"]);
+		},
+	});
+};
+
+export const useDeleteComment = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: commentService.deleteComment,
+		onSuccess: (data, { postId }) => {
+			if (postId) {
+				queryClient.invalidateQueries(["post", postId]);
+			}
+			queryClient.invalidateQueries(["posts"]);
+		},
+	});
+};
+
+export const useUpdateReply = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: commentService.updateReply,
+		onSuccess: (data, { postId }) => {
+			if (postId) {
+				queryClient.invalidateQueries(["post", postId]);
+			}
+		},
+	});
+};
+
+export const useDeleteReply = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: commentService.deleteReply,
+		onSuccess: (data, { postId }) => {
+			if (postId) {
+				queryClient.invalidateQueries(["post", postId]);
+			}
+		},
+	});
+};

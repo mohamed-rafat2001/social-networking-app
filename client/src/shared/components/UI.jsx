@@ -163,6 +163,37 @@ export const Input = React.forwardRef(
 Input.displayName = "Input";
 
 /**
+ * Textarea Component
+ */
+export const Textarea = React.forwardRef(
+	({ label, error, className, ...props }, ref) => {
+		return (
+			<div className="w-full space-y-1.5">
+				{label && (
+					<label className="text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">
+						{label}
+					</label>
+				)}
+				<textarea
+					ref={ref}
+					className={cn(
+						"flex min-h-[120px] w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm dark:text-white ring-offset-white dark:ring-offset-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all disabled:cursor-not-allowed disabled:opacity-50 resize-none",
+						error &&
+							"border-red-500 focus-visible:ring-red-500/20 focus-visible:border-red-500",
+						className
+					)}
+					{...props}
+				/>
+				{error && (
+					<p className="text-xs font-medium text-red-500 ml-1">{error}</p>
+				)}
+			</div>
+		);
+	}
+);
+Textarea.displayName = "Textarea";
+
+/**
  * ImageModal Component
  * Full-screen modal for viewing images
  */
@@ -368,6 +399,172 @@ export const ImageGallery = ({ images = [], className }) => {
 };
 
 /**
+ * Dropdown Component
+ */
+export const Dropdown = ({
+	trigger,
+	children,
+	align = "right",
+	position = "bottom",
+	className,
+}) => {
+	const [isOpen, setIsOpen] = useState(false);
+
+	const positions = {
+		bottom: "mt-2",
+		top: "bottom-full mb-2",
+	};
+
+	return (
+		<div className="relative inline-block text-left">
+			<div onClick={() => setIsOpen(!isOpen)}>{trigger}</div>
+			<AnimatePresence>
+				{isOpen && (
+					<>
+						<div
+							className="fixed inset-0 z-40"
+							onClick={() => setIsOpen(false)}
+						/>
+						<motion.div
+							initial={{
+								opacity: 0,
+								scale: 0.95,
+								y: position === "bottom" ? -10 : 10,
+							}}
+							animate={{ opacity: 1, scale: 1, y: 0 }}
+							exit={{
+								opacity: 0,
+								scale: 0.95,
+								y: position === "bottom" ? -10 : 10,
+							}}
+							transition={{ duration: 0.1 }}
+							className={cn(
+								"absolute z-50 w-48 rounded-xl bg-white dark:bg-gray-800 shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden",
+								align === "right" ? "right-0" : "left-0",
+								positions[position],
+								className
+							)}
+							onClick={() => setIsOpen(false)}
+						>
+							<div className="py-1">{children}</div>
+						</motion.div>
+					</>
+				)}
+			</AnimatePresence>
+		</div>
+	);
+};
+
+export const DropdownItem = ({
+	children,
+	onClick,
+	variant = "default",
+	icon: Icon,
+	className,
+}) => {
+	const variants = {
+		default:
+			"text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50",
+		danger: "text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10",
+	};
+
+	return (
+		<button
+			onClick={onClick}
+			className={cn(
+				"flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors",
+				variants[variant],
+				className
+			)}
+		>
+			{Icon && <Icon size={18} className="shrink-0" />}
+			{children}
+		</button>
+	);
+};
+
+/**
+ * Modal Component
+ */
+export const Modal = ({ isOpen, onClose, title, children, className }) => {
+	return (
+		<AnimatePresence>
+			{isOpen && (
+				<div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+						onClick={onClose}
+					/>
+					<motion.div
+						initial={{ opacity: 0, scale: 0.9, y: 20 }}
+						animate={{ opacity: 1, scale: 1, y: 0 }}
+						exit={{ opacity: 0, scale: 0.9, y: 20 }}
+						className={cn(
+							"relative w-full max-w-lg rounded-2xl bg-white dark:bg-gray-800 shadow-2xl overflow-hidden",
+							className
+						)}
+					>
+						<div className="flex items-center justify-between border-b dark:border-gray-700 px-6 py-4">
+							<h3 className="text-lg font-bold text-gray-900 dark:text-white">
+								{title}
+							</h3>
+							<button
+								onClick={onClose}
+								className="rounded-full p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+							>
+								<HiOutlineX size={20} />
+							</button>
+						</div>
+						<div className="p-6">{children}</div>
+					</motion.div>
+				</div>
+			)}
+		</AnimatePresence>
+	);
+};
+
+/**
+ * ConfirmModal Component
+ */
+export const ConfirmModal = ({
+	isOpen,
+	onClose,
+	onConfirm,
+	title = "Are you sure?",
+	message = "This action cannot be undone.",
+	confirmText = "Delete",
+	cancelText = "Cancel",
+	variant = "danger",
+	isLoading = false,
+}) => {
+	return (
+		<Modal isOpen={isOpen} onClose={onClose} title={title}>
+			<div className="space-y-4">
+				<p className="text-gray-600 dark:text-gray-400">{message}</p>
+				<div className="flex justify-end gap-3 pt-2">
+					<Button variant="secondary" onClick={onClose} disabled={isLoading}>
+						{cancelText}
+					</Button>
+					<Button
+						variant={variant}
+						onClick={() => {
+							onConfirm();
+							onClose();
+						}}
+						disabled={isLoading}
+					>
+						{isLoading ? <Spinner size="sm" variant="white" /> : confirmText}
+					</Button>
+				</div>
+			</div>
+		</Modal>
+	);
+};
+
+/**
  * Spinner Component
  */
 export const Spinner = ({ className, size = "md", variant = "primary" }) => {
@@ -393,5 +590,31 @@ export const Spinner = ({ className, size = "md", variant = "primary" }) => {
 				className
 			)}
 		/>
+	);
+};
+
+/**
+ * ProgressBar Component
+ */
+export const ProgressBar = ({ progress, className }) => {
+	const safeProgress = Math.min(Math.max(0, progress), 100);
+
+	return (
+		<div
+			className={cn(
+				"w-full bg-gray-200/20 dark:bg-gray-700/50 rounded-full h-2.5 overflow-hidden backdrop-blur-sm",
+				className
+			)}
+		>
+			<motion.div
+				initial={{ width: 0 }}
+				animate={{ width: `${safeProgress}%` }}
+				transition={{ type: "spring", bounce: 0, duration: 0.5 }}
+				className={cn(
+					"bg-primary h-full transition-all duration-300 shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]",
+					safeProgress === 100 && "bg-green-500"
+				)}
+			/>
+		</div>
 	);
 };

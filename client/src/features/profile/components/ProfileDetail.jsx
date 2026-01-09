@@ -3,13 +3,24 @@ import {
 	useUserProfile,
 	useFollowUser,
 	useUnfollowUser,
+	useDeleteProfileImage,
 } from "../../auth/hooks/useUserQueries";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useUser } from "../../../shared/hooks/useUser";
 import { usePosts } from "../../posts/hooks/usePostQueries";
+import { useCreateChat } from "../../chat/hooks/useChatQueries";
 import { PostItem } from "../../posts";
-import { Avatar, Button, Spinner, cn } from "../../../shared/components/UI";
+import {
+	Avatar,
+	Button,
+	Spinner,
+	cn,
+	Dropdown,
+	DropdownItem,
+	ConfirmModal,
+} from "../../../shared/components/UI";
 import FollowsModal from "./FollowsModal";
+import ImageUploadModal from "./ImageUploadModal";
 import {
 	HiOutlineMail,
 	HiOutlineAcademicCap,
@@ -19,10 +30,12 @@ import {
 	HiOutlineChatAlt2,
 	HiUserAdd,
 	HiUserRemove,
+	HiOutlinePencil,
+	HiOutlineTrash,
 } from "react-icons/hi";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const ProfileDetail = () => {
 	const { userId } = useParams();
@@ -33,10 +46,18 @@ const ProfileDetail = () => {
 	const { data: postsResponse, isLoading: postsLoading } = usePosts();
 	const { mutate: followUser } = useFollowUser();
 	const { mutate: unfollowUser } = useUnfollowUser();
+	const { mutate: createChat, isLoading: isCreatingChat } = useCreateChat();
+	const { mutate: deleteImage } = useDeleteProfileImage();
 
 	const [activeTab, setActiveTab] = useState("posts"); // posts, followers, following
 	const [isFollowsModalOpen, setIsFollowsModalOpen] = useState(false);
+	const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [modalType, setModalType] = useState("followers"); // followers or following
+
+	useEffect(() => {
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	}, [userId]);
 
 	const isCurrentUser =
 		currentUser?._id === userId || !userId || userId === "user";
@@ -86,8 +107,9 @@ const ProfileDetail = () => {
 	};
 
 	const handleMessage = () => {
-		// Logic to open or create a chat
-		navigate("/messages");
+		if (user?._id) {
+			createChat(user._id);
+		}
 	};
 
 	const handleFollowsClick = (type) => {
@@ -104,6 +126,11 @@ const ProfileDetail = () => {
 				users={modalType === "followers" ? user.followers : user.following}
 				currentUser={currentUser}
 			/>
+			<ImageUploadModal
+				isOpen={isUploadModalOpen}
+				onClose={() => setIsUploadModalOpen(false)}
+				user={user}
+			/>
 			{/* Cover & Profile Info */}
 			<div className="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm mb-6 transition-colors duration-300">
 				<div className="h-48 bg-gradient-to-br from-primary/20 via-primary/5 to-purple-200 dark:from-primary/30 dark:via-gray-800 dark:to-purple-900/40 relative">
@@ -112,15 +139,65 @@ const ProfileDetail = () => {
 				<div className="px-8 pb-8">
 					<div className="relative flex flex-col md:flex-row justify-between items-center md:items-end -mt-16 mb-8 gap-6">
 						<div className="relative group">
-							<Avatar
-								src={user.image?.secure_url}
-								size="2xl"
-								className="ring-4 ring-white dark:ring-gray-900 shadow-2xl transition-transform duration-300 group-hover:scale-105"
-								isActive={onlineUsers?.some(
-									(u) => String(u.userId) === String(user._id)
-								)}
-							/>
+							{isCurrentUser ? (
+								<Dropdown
+									trigger={
+										<div className="cursor-pointer">
+											<Avatar
+												src={user.image?.secure_url}
+												size="2xl"
+												className="ring-4 ring-white dark:ring-gray-900 shadow-2xl transition-transform duration-300 group-hover:scale-105"
+												isActive={onlineUsers?.some(
+													(u) => String(u.userId) === String(user._id)
+												)}
+											/>
+											<div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+												<HiOutlinePencil className="text-white" size={24} />
+											</div>
+										</div>
+									}
+									align="left"
+								>
+									<DropdownItem
+										icon={HiOutlinePencil}
+										onClick={() => setIsUploadModalOpen(true)}
+									>
+										Upload Photo
+									</DropdownItem>
+									{user.image?.secure_url && (
+										<DropdownItem
+											icon={HiOutlineTrash}
+											variant="danger"
+											onClick={() => setIsDeleteModalOpen(true)}
+										>
+											Delete Photo
+										</DropdownItem>
+									)}
+								</Dropdown>
+							) : (
+								<Avatar
+									src={user.image?.secure_url}
+									size="2xl"
+									className="ring-4 ring-white dark:ring-gray-900 shadow-2xl transition-transform duration-300 group-hover:scale-105"
+									isActive={onlineUsers?.some(
+										(u) => String(u.userId) === String(user._id)
+									)}
+								/>
+							)}
 						</div>
+
+						<ConfirmModal
+							isOpen={isDeleteModalOpen}
+							onClose={() => setIsDeleteModalOpen(false)}
+							onConfirm={() => {
+								deleteImage();
+								setIsDeleteModalOpen(false);
+							}}
+							title="Delete Profile Photo"
+							message="Are you sure you want to remove your profile photo? This action cannot be undone."
+							confirmText="Remove Photo"
+							variant="danger"
+						/>
 
 						<div className="flex flex-col md:flex-row items-center gap-6">
 							{!isCurrentUser && (
@@ -129,9 +206,16 @@ const ProfileDetail = () => {
 										variant="secondary"
 										className="rounded-2xl flex items-center gap-2 px-6 h-12 font-bold"
 										onClick={handleMessage}
+										disabled={isCreatingChat}
 									>
-										<HiOutlineChatAlt2 size={20} />
-										Message
+										{isCreatingChat ? (
+											<Spinner size="sm" />
+										) : (
+											<>
+												<HiOutlineChatAlt2 size={20} />
+												Message
+											</>
+										)}
 									</Button>
 									<Button
 										className={cn(

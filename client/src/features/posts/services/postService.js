@@ -39,3 +39,13 @@ export const incrementView = async (postId) => {
 	const response = await apiApp.patch(`/posts/${postId}/increment-view`);
 	return response.data;
 };
+
+export const updatePost = async ({ postId, postData }) => {
+	const response = await apiApp.patch(`/posts/${postId}`, postData);
+	return response.data;
+};
+
+export const deletePost = async (postId) => {
+	const response = await apiApp.delete(`/posts/${postId}`);
+	return response.data;
+};

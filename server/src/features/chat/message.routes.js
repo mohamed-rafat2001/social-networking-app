@@ -18,5 +18,6 @@ router
 	.delete(messageController.deleteAllMessagesFromChat);
 
 router.delete("/delete/:id", messageController.deleteMessage);
+router.patch("/update/:id", messageController.updateMessage);
 
 export default router;

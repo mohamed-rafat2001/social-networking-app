@@ -1,12 +1,29 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { HiOutlineSearch, HiOutlineX } from "react-icons/hi";
+import {
+	HiOutlineSearch,
+	HiOutlineX,
+	HiUserAdd,
+	HiUserRemove,
+} from "react-icons/hi";
 import { useState } from "react";
-import { Avatar, Button } from "../../../shared/components/UI";
+import { Avatar, Button, cn } from "../../../shared/components/UI";
 import { useNavigate } from "react-router-dom";
+import {
+	useFollowUser,
+	useUnfollowUser,
+} from "../../auth/hooks/useUserQueries";
 
 const FollowsModal = ({ isOpen, onClose, title, users = [], currentUser }) => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const navigate = useNavigate();
+	const { mutate: followUser } = useFollowUser();
+	const { mutate: unfollowUser } = useUnfollowUser();
+
+	const isFollowing = (userId) => {
+		return currentUser?.following?.some(
+			(u) => String(u._id || u) === String(userId)
+		);
+	};
 
 	const filteredUsers = users.filter((user) => {
 		const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
@@ -61,43 +78,68 @@ const FollowsModal = ({ isOpen, onClose, title, users = [], currentUser }) => {
 					{/* User List */}
 					<div className="max-h-[400px] overflow-y-auto p-2 space-y-1">
 						{filteredUsers.length > 0 ? (
-							filteredUsers.map((user) => (
-								<div
-									key={user._id}
-									className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl transition-all group"
-								>
+							filteredUsers.map((user) => {
+								const following = isFollowing(user._id);
+								const isMe = currentUser?._id === user._id;
+
+								return (
 									<div
-										className="flex items-center gap-3 cursor-pointer flex-1"
-										onClick={() => {
-											navigate(`/profile/${user._id}`);
-											onClose();
-										}}
+										key={user._id}
+										className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl transition-all group"
 									>
-										<Avatar src={user.image?.secure_url} size="md" />
-										<div className="min-w-0">
-											<p className="font-bold text-gray-900 dark:text-white truncate group-hover:text-primary transition-colors">
-												{user.firstName} {user.lastName}
-											</p>
-											<p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-												@{user.username}
-											</p>
-										</div>
-									</div>
-									{currentUser?._id !== user._id && (
-										<Button
-											variant="secondary"
-											size="sm"
-											className="rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
+										<div
+											className="flex items-center gap-3 cursor-pointer flex-1"
 											onClick={() => {
 												navigate(`/profile/${user._id}`);
 												onClose();
 											}}
 										>
-											View
-										</Button>
-									)}
-								</div>
-							))
+											<Avatar src={user.image?.secure_url} size="md" />
+											<div className="min-w-0">
+												<p className="font-bold text-gray-900 dark:text-white truncate group-hover:text-primary transition-colors">
+													{user.firstName} {user.lastName}
+												</p>
+												<p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+													@{user.username}
+												</p>
+											</div>
+										</div>
+										{!isMe && (
+											<div className="flex items-center gap-2">
+												<Button
+													variant={following ? "outline" : "primary"}
+													size="sm"
+													className={cn(
+														"rounded-xl h-9 px-4 font-bold transition-all",
+														following
+															? "bg-red-50 text-red-600 hover:bg-red-100 border-red-100 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/20"
+															: ""
+													)}
+													onClick={() => {
+														if (following) {
+															unfollowUser(user._id);
+														} else {
+															followUser(user._id);
+														}
+													}}
+												>
+													{following ? (
+														<span className="flex items-center gap-1">
+															<HiUserRemove size={16} />
+															Unfollow
+														</span>
+													) : (
+														<span className="flex items-center gap-1">
+															<HiUserAdd size={16} />
+															Follow
+														</span>
+													)}
+												</Button>
+											</div>
+										)}
+									</div>
+								);
+							})
 						) : (
 							<div className="py-12 text-center">
 								<p className="text-gray-500 dark:text-gray-400 text-sm font-medium">

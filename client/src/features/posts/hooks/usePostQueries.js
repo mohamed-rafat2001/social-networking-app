@@ -98,10 +98,8 @@ export const useIncrementView = () => {
 				if (!old) return old;
 				return {
 					...old,
-					data: old.data.map((post) =>
-						post._id === postId
-							? { ...post, views: (post.views || 0) + 1 }
-							: post
+					data: old.data.map((p) =>
+						p._id === postId ? { ...p, views: (p.views || 0) + 1 } : p
 					),
 				};
 			});
@@ -112,6 +110,28 @@ export const useIncrementView = () => {
 					data: { ...old.data, views: (old.data.views || 0) + 1 },
 				};
 			});
+		},
+	});
+};
+
+export const useUpdatePost = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: postService.updatePost,
+		onSuccess: (response, { postId }) => {
+			queryClient.invalidateQueries(["posts"]);
+			queryClient.invalidateQueries(["post", postId]);
+		},
+	});
+};
+
+export const useDeletePost = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: postService.deletePost,
+		onSuccess: () => {
+			queryClient.invalidateQueries(["posts"]);
+			queryClient.invalidateQueries(["userProfile"]);
 		},
 	});
 };

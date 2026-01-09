@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import {
 	HiArrowLeft,
@@ -9,6 +9,8 @@ import {
 	HiHeart,
 	HiChartBar,
 	HiUpload,
+	HiOutlinePencil,
+	HiOutlineTrash,
 } from "react-icons/hi";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -16,16 +18,23 @@ import {
 	useLikePost,
 	useSharePost,
 	useIncrementView,
+	useDeletePost,
+	useUpdatePost,
 } from "../features/posts/hooks/usePostQueries";
 import { useUser } from "../shared/hooks/useUser";
 import {
 	Avatar,
 	Spinner,
-	Button,
 	ImageGallery,
 	cn,
+	Dropdown,
+	DropdownItem,
+	Modal,
+	ConfirmModal,
+	Button,
 } from "../shared/components/UI";
 import CommentList from "../features/posts/components/CommentList";
+import { toast } from "react-hot-toast";
 
 function PostDetailPage() {
 	const { postId } = useParams();
@@ -35,6 +44,12 @@ function PostDetailPage() {
 	const { mutate: likePost } = useLikePost();
 	const { mutate: sharePost } = useSharePost();
 	const { mutate: incrementView } = useIncrementView();
+	const { mutate: deletePost } = useDeletePost();
+	const { mutate: updatePost } = useUpdatePost();
+
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [editContent, setEditContent] = useState("");
 
 	const viewIncremented = useRef(false);
 
@@ -42,6 +57,9 @@ function PostDetailPage() {
 		if (postData?.data && !viewIncremented.current) {
 			incrementView(postId);
 			viewIncremented.current = true;
+		}
+		if (postData?.data) {
+			setEditContent(postData.data.text || "");
 		}
 	}, [postId, postData, incrementView]);
 
@@ -63,6 +81,7 @@ function PostDetailPage() {
 	}
 
 	const post = postData.data;
+	const isOwner = user?._id === post.userId?._id;
 
 	const handleLike = () => {
 		likePost(post._id);
@@ -70,6 +89,28 @@ function PostDetailPage() {
 
 	const handleShare = () => {
 		sharePost(post._id);
+	};
+
+	const handleDelete = () => {
+		deletePost(post._id, {
+			onSuccess: () => {
+				toast.success("Post deleted");
+				navigate("/feed");
+			},
+		});
+	};
+
+	const handleUpdate = () => {
+		if (!editContent.trim()) return;
+		updatePost(
+			{ postId: post._id, postData: { text: editContent } },
+			{
+				onSuccess: () => {
+					setIsEditModalOpen(false);
+					toast.success("Post updated");
+				},
+			}
+		);
 	};
 
 	return (
@@ -109,14 +150,37 @@ function PostDetailPage() {
 									@{post.userId?.firstName?.toLowerCase()}
 								</p>
 							</div>
-							<button className="text-gray-500 hover:text-primary p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors -mt-2">
-								<HiDotsHorizontal size={18} />
-							</button>
+
+							{isOwner && (
+								<div className="ml-auto">
+									<Dropdown
+										trigger={
+											<button className="text-gray-500 hover:text-primary p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+												<HiDotsHorizontal size={18} />
+											</button>
+										}
+									>
+										<DropdownItem
+											icon={HiOutlinePencil}
+											onClick={() => setIsEditModalOpen(true)}
+										>
+											Edit Post
+										</DropdownItem>
+										<DropdownItem
+											variant="danger"
+											icon={HiOutlineTrash}
+											onClick={() => setIsDeleteModalOpen(true)}
+										>
+											Delete Post
+										</DropdownItem>
+									</Dropdown>
+								</div>
+							)}
 						</div>
 					</div>
 				</div>
 
-				<p className="text-xl md:text-[22px] text-gray-900 dark:text-gray-100 leading-normal break-words mb-4 whitespace-pre-wrap">
+				<p className="text-[18px] md:text-[20px] text-gray-900 dark:text-gray-100 leading-normal break-words mb-4 whitespace-pre-wrap">
 					{post.text}
 				</p>
 
@@ -151,6 +215,14 @@ function PostDetailPage() {
 						<span>Views</span>
 					</div>
 				</div>
+
+				<ConfirmModal
+					isOpen={isDeleteModalOpen}
+					onClose={() => setIsDeleteModalOpen(false)}
+					onConfirm={handleDelete}
+					title="Delete Post"
+					message="Are you sure you want to delete this post? This action cannot be undone."
+				/>
 
 				<div className="flex items-center gap-6 py-1 border-b dark:border-gray-800 text-gray-500 dark:text-gray-400">
 					<button className="flex items-center gap-2 hover:text-primary group transition-colors">
@@ -213,6 +285,27 @@ function PostDetailPage() {
 					/>
 				)}
 			</div>
+
+			<Modal
+				isOpen={isEditModalOpen}
+				onClose={() => setIsEditModalOpen(false)}
+				title="Edit Post"
+			>
+				<div className="space-y-4">
+					<textarea
+						className="w-full h-32 p-3 border rounded-lg dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-2 focus:ring-primary outline-none resize-none"
+						value={editContent}
+						onChange={(e) => setEditContent(e.target.value)}
+						placeholder="What's happening?"
+					/>
+					<div className="flex justify-end gap-3">
+						<Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
+							Cancel
+						</Button>
+						<Button onClick={handleUpdate}>Update Post</Button>
+					</div>
+				</div>
+			</Modal>
 		</div>
 	);
 }

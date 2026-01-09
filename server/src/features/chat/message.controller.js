@@ -80,15 +80,63 @@ const ChatMessages = errorHandler(async (req, res, next) => {
 
 const deleteMessage = errorHandler(async (req, res, next) => {
 	const messageId = req.params.id;
-	const message = await Message.findByIdAndDelete(messageId);
+	const userId = req.user._id;
+
+	const message = await Message.findOne({ _id: messageId, senderId: userId });
+
 	if (!message) {
 		const error = appError.Error(
-			"message not deleted or not founded",
+			"Message not found or you don't have permission to delete it",
 			"fail",
 			404
 		);
 		return next(error);
 	}
+
+	// Delete from Cloudinary if there are files
+	if (message.file && message.file.length > 0) {
+		const deletePromises = message.file.map((file) =>
+			cloudinary.uploader.destroy(file.public_id)
+		);
+		await Promise.all(deletePromises);
+	}
+
+	const chatId = message.chatId;
+	await message.deleteOne();
+
+	// Update latest message in chat
+	const latestMessage = await Message.findOne({ chatId }).sort({
+		createdAt: -1,
+	});
+	await Chat.findByIdAndUpdate(chatId, {
+		latestMessage: latestMessage ? latestMessage._id : null,
+	});
+
+	res
+		.status(200)
+		.json({ status: "success", message: "Message deleted successfully" });
+});
+
+const updateMessage = errorHandler(async (req, res, next) => {
+	const messageId = req.params.id;
+	const userId = req.user._id;
+	const { content } = req.body;
+
+	const message = await Message.findOneAndUpdate(
+		{ _id: messageId, senderId: userId },
+		{ content },
+		{ new: true }
+	);
+
+	if (!message) {
+		const error = appError.Error(
+			"Message not found or you don't have permission to update it",
+			"fail",
+			404
+		);
+		return next(error);
+	}
+
 	res.status(200).json({ status: "success", data: message });
 });
 
@@ -110,6 +158,7 @@ const deleteAllMessagesFromChat = errorHandler(async (req, res, next) => {
 export {
 	createMessage,
 	deleteMessage,
+	updateMessage,
 	deleteAllMessagesFromChat,
 	ChatMessages,
 };

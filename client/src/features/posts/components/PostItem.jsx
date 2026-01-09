@@ -1,13 +1,24 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Avatar, ImageGallery, cn } from "../../../shared/components/UI";
+import {
+	Avatar,
+	ImageGallery,
+	cn,
+	Dropdown,
+	DropdownItem,
+	Modal,
+	ConfirmModal,
+	Button,
+} from "../../../shared/components/UI";
 import { useUser } from "../../../shared/hooks/useUser";
 import {
 	useLikePost,
 	useSharePost,
 	useIncrementView,
+	useDeletePost,
+	useUpdatePost,
 } from "../hooks/usePostQueries";
 import {
 	HiDotsHorizontal,
@@ -16,6 +27,8 @@ import {
 	HiHeart,
 	HiChartBar,
 	HiUpload,
+	HiOutlineTrash,
+	HiOutlinePencil,
 } from "react-icons/hi";
 
 function PostItem({ post, index }) {
@@ -24,9 +37,32 @@ function PostItem({ post, index }) {
 	const { mutate: likePost } = useLikePost();
 	const { mutate: sharePost } = useSharePost();
 	const { mutate: incrementView } = useIncrementView();
+	const { mutate: deletePost } = useDeletePost();
+	const { mutate: updatePost } = useUpdatePost();
+
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+	const [editContent, setEditContent] = useState(post.text || "");
+
+	const isOwner = user?._id === post.userId?._id;
 
 	const postRef = useRef(null);
 	const viewIncremented = useRef(false);
+
+	const handleDelete = () => {
+		deletePost(post._id);
+	};
+
+	const handleUpdate = (e) => {
+		e.stopPropagation();
+		if (!editContent.trim()) return;
+		updatePost(
+			{ postId: post._id, postData: { text: editContent } },
+			{
+				onSuccess: () => setIsEditModalOpen(false),
+			}
+		);
+	};
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(
@@ -104,12 +140,32 @@ function PostItem({ post, index }) {
 									: "just now"}
 							</span>
 						</div>
-						<button
-							className="text-gray-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-full transition-colors"
-							onClick={(e) => e.stopPropagation()}
-						>
-							<HiDotsHorizontal />
-						</button>
+
+						{isOwner && (
+							<div onClick={(e) => e.stopPropagation()}>
+								<Dropdown
+									trigger={
+										<button className="text-gray-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-full transition-colors">
+											<HiDotsHorizontal size={18} />
+										</button>
+									}
+								>
+									<DropdownItem
+										icon={HiOutlinePencil}
+										onClick={() => setIsEditModalOpen(true)}
+									>
+										Edit Post
+									</DropdownItem>
+									<DropdownItem
+										variant="danger"
+										icon={HiOutlineTrash}
+										onClick={() => setIsDeleteModalOpen(true)}
+									>
+										Delete Post
+									</DropdownItem>
+								</Dropdown>
+							</div>
+						)}
 					</div>
 
 					<p className="mt-1 mb-3 text-[15px] text-gray-900 dark:text-gray-200 leading-normal break-words whitespace-pre-wrap">
@@ -197,6 +253,38 @@ function PostItem({ post, index }) {
 					</div>
 				</div>
 			</div>
+
+			<ConfirmModal
+				isOpen={isDeleteModalOpen}
+				onClose={() => setIsDeleteModalOpen(false)}
+				onConfirm={handleDelete}
+				title="Delete Post"
+				message="Are you sure you want to delete this post? This action cannot be undone."
+			/>
+
+			<Modal
+				isOpen={isEditModalOpen}
+				onClose={() => setIsEditModalOpen(false)}
+				title="Edit Post"
+			>
+				<div className="space-y-4">
+					<textarea
+						className="w-full min-h-[150px] p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
+						placeholder="What's on your mind?"
+						value={editContent}
+						onChange={(e) => setEditContent(e.target.value)}
+					/>
+					<div className="flex justify-end gap-3">
+						<Button
+							variant="secondary"
+							onClick={() => setIsEditModalOpen(false)}
+						>
+							Cancel
+						</Button>
+						<Button onClick={handleUpdate}>Save Changes</Button>
+					</div>
+				</div>
+			</Modal>
 		</motion.div>
 	);
 }

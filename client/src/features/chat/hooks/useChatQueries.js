@@ -46,3 +46,16 @@ export const useCreateChat = () => {
 		},
 	});
 };
+
+export const useDeleteChat = () => {
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+
+	return useMutation({
+		mutationFn: chatService.deleteChat,
+		onSuccess: () => {
+			queryClient.invalidateQueries(["chats"]);
+			navigate("/messages");
+		},
+	});
+};

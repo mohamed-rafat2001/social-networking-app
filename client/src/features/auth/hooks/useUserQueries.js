@@ -83,3 +83,24 @@ export const useUnfollowUser = () => {
 		},
 	});
 };
+
+export const useUpdateProfileImage = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({ formData, onProgress }) =>
+			userService.updateProfileImage(formData, onProgress),
+		onSuccess: () => {
+			queryClient.invalidateQueries(["currentUser"]);
+		},
+	});
+};
+
+export const useDeleteProfileImage = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: userService.deleteProfileImage,
+		onSuccess: () => {
+			queryClient.invalidateQueries(["currentUser"]);
+		},
+	});
+};

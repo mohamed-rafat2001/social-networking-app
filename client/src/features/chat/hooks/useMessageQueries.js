@@ -16,6 +16,29 @@ export const useCreateMessage = () => {
 		mutationFn: messageService.createMessage,
 		onSuccess: (data, variables) => {
 			queryClient.invalidateQueries(["messages", variables.chatId]);
+			queryClient.invalidateQueries(["chats"]);
+		},
+	});
+};
+
+export const useUpdateMessage = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: messageService.updateMessage,
+		onSuccess: (data, variables) => {
+			queryClient.invalidateQueries(["messages"]);
+			queryClient.invalidateQueries(["chats"]);
+		},
+	});
+};
+
+export const useDeleteMessage = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: messageService.deleteMessage,
+		onSuccess: () => {
+			queryClient.invalidateQueries(["messages"]);
+			queryClient.invalidateQueries(["chats"]);
 		},
 	});
 };

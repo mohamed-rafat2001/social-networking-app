@@ -24,3 +24,15 @@ export const createMessage = async ({ chatId, data, onUploadProgress }) => {
 	});
 	return response.data;
 };
+
+export const updateMessage = async ({ messageId, content }) => {
+	const response = await apiApp.patch(`/messages/update/${messageId}`, {
+		content,
+	});
+	return response.data;
+};
+
+export const deleteMessage = async (messageId) => {
+	const response = await apiApp.delete(`/messages/delete/${messageId}`);
+	return response.data;
+};

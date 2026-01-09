@@ -35,3 +35,28 @@ export const unfollowUser = async (userId) => {
 	const response = await apiApp.post(`/user/unfollow/${userId}`);
 	return response.data;
 };
+
+export const updateProfileImage = async (formData, onProgress) => {
+	const response = await apiApp.post("/user/profileImg", formData, {
+		headers: {
+			"Content-Type": "multipart/form-data",
+		},
+		onUploadProgress: (progressEvent) => {
+			if (progressEvent.total) {
+				const percentCompleted = Math.round(
+					(progressEvent.loaded * 100) / progressEvent.total
+				);
+				if (onProgress) onProgress(percentCompleted);
+			} else {
+				// If total is unknown, just send back the loaded amount or a fallback
+				if (onProgress) onProgress(0);
+			}
+		},
+	});
+	return response.data;
+};
+
+export const deleteProfileImage = async () => {
+	const response = await apiApp.delete("/user/profileImg");
+	return response.data;
+};

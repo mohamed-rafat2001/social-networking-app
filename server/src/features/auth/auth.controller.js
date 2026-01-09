@@ -1,4 +1,5 @@
 import User from "./user.model.js";
+import Follow from "./follow.model.js";
 import Posts from "../posts/posts.model.js";
 import Share from "../posts/sharePost.model.js";
 import bcryptjs from "bcryptjs";
@@ -17,11 +18,43 @@ const signUp = errorHandler(async (req, res, next) => {
 });
 
 const profileImg = errorHandler(async (req, res, next) => {
-	const { public_id, secure_url } = await cloudinary.uploader.upload(
-		req.file.path,
-		{ folder: `e-Learning/user/id_${req.user._id}/profileImg` }
-	);
-	req.user.image = { public_id, secure_url };
+	let newImageData = null;
+
+	// Update image if file is uploaded
+	if (req.file) {
+		// Delete old image from cloudinary if it exists
+		if (req.user.image?.public_id) {
+			await cloudinary.uploader.destroy(req.user.image.public_id);
+		}
+
+		const { public_id, secure_url } = await cloudinary.uploader.upload(
+			req.file.path,
+			{ folder: `social-app/user/id_${req.user._id}/profileImg` }
+		);
+		newImageData = { public_id, secure_url };
+		req.user.image = newImageData;
+	}
+
+	await req.user.save();
+
+	// Create a post for the profile update if an image was uploaded
+	if (newImageData) {
+		await Posts.create({
+			userId: req.user._id,
+			text: req.body.bio || "Updated profile picture",
+			fileUp: [newImageData],
+			isProfileUpdate: true,
+		});
+	}
+
+	res.status(200).json({ status: "success", data: req.user });
+});
+
+const deleteProfileImg = errorHandler(async (req, res, next) => {
+	if (req.user.image?.public_id) {
+		await cloudinary.uploader.destroy(req.user.image.public_id);
+	}
+	req.user.image = undefined;
 	await req.user.save();
 	res.status(200).json({ status: "success", data: req.user });
 });
@@ -111,28 +144,41 @@ const resetPassword = errorHandler(async (req, res, next) => {
 });
 
 const user = errorHandler(async (req, res, next) => {
-	const userId = req.params.userId;
-	let userData;
+	const userId =
+		req.params.userId &&
+		req.params.userId !== "user" &&
+		req.params.userId !== "undefined"
+			? req.params.userId
+			: req.user._id;
 
-	if (userId && userId !== "user" && userId !== "undefined") {
-		userData = await User.findById(userId)
-			.populate("followers", "firstName lastName username image")
-			.populate("following", "firstName lastName username image");
-	} else {
-		userData = await User.findById(req.user._id)
-			.populate("followers", "firstName lastName username image")
-			.populate("following", "firstName lastName username image");
-	}
+	const userData = await User.findById(userId);
 
 	if (!userData) {
 		const error = appError.Error("no user", "fail", 404);
 		return next(error);
 	}
 
-	// Fetch posts for this user to update the post count in profile
-	const posts = await Posts.find({ userId: userData._id });
+	// Fetch followers and following from the Follow model
+	const [followers, following, posts] = await Promise.all([
+		Follow.find({ following: userId }).populate(
+			"follower",
+			"firstName lastName username image"
+		),
+		Follow.find({ follower: userId }).populate(
+			"following",
+			"firstName lastName username image"
+		),
+		Posts.find({ userId: userData._id }),
+	]);
+
 	const userObj = userData.toObject();
+	userObj.followers = followers.map((f) => f.follower);
+	userObj.following = following.map((f) => f.following);
 	userObj.posts = posts;
+
+	userObj.isFollowing = followers.some(
+		(f) => f.follower._id.toString() === req.user._id.toString()
+	);
 
 	res.status(200).json({ status: "success", data: userObj });
 });
@@ -156,55 +202,6 @@ const searchUsers = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: users });
 });
 
-const followUser = errorHandler(async (req, res, next) => {
-	const userToFollow = await User.findById(req.params.userId);
-	const currentUser = await User.findById(req.user._id);
-
-	if (!userToFollow) {
-		return next(appError.Error("User not found", "fail", 404));
-	}
-
-	if (currentUser.following.includes(userToFollow._id)) {
-		return next(appError.Error("Already following this user", "fail", 400));
-	}
-
-	currentUser.following.push(userToFollow._id);
-	userToFollow.followers.push(currentUser._id);
-
-	await currentUser.save();
-	await userToFollow.save();
-
-	// Create notification
-	await createNotification({
-		recipient: userToFollow._id,
-		sender: currentUser._id,
-		type: "follow",
-	});
-
-	res.status(200).json({ status: "success", data: currentUser });
-});
-
-const unfollowUser = errorHandler(async (req, res, next) => {
-	const userToUnfollow = await User.findById(req.params.userId);
-	const currentUser = await User.findById(req.user._id);
-
-	if (!userToUnfollow) {
-		return next(appError.Error("User not found", "fail", 404));
-	}
-
-	currentUser.following = currentUser.following.filter(
-		(id) => id.toString() !== userToUnfollow._id.toString()
-	);
-	userToUnfollow.followers = userToUnfollow.followers.filter(
-		(id) => id.toString() !== currentUser._id.toString()
-	);
-
-	await currentUser.save();
-	await userToUnfollow.save();
-
-	res.status(200).json({ status: "success", data: currentUser });
-});
-
 export {
 	signUp,
 	profileImg,
@@ -216,6 +213,5 @@ export {
 	resetPassword,
 	user,
 	searchUsers,
-	followUser,
-	unfollowUser,
+	deleteProfileImg,
 };

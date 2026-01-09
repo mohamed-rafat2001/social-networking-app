@@ -85,21 +85,32 @@ const userSchema = new mongoose.Schema(
 		passwordResetToken: {
 			type: String,
 		},
-		followers: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: "User",
-			},
-		],
-		following: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: "User",
-			},
-		],
+		followId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Follow",
+		},
 	},
-	{ timestamps: true }
+	{
+		timestamps: true,
+		toJSON: { virtuals: true },
+		toObject: { virtuals: true },
+	}
 );
+
+// Virtuals for followers and following count
+userSchema.virtual("followersCount", {
+	ref: "Follow",
+	localField: "_id",
+	foreignField: "following",
+	count: true,
+});
+
+userSchema.virtual("followingCount", {
+	ref: "Follow",
+	localField: "_id",
+	foreignField: "follower",
+	count: true,
+});
 
 userSchema.methods.creatToken = function () {
 	const token = jwt.sign(

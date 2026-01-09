@@ -1,6 +1,11 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useMessages, useCreateMessage } from "../hooks/useMessageQueries";
-import { useSingleChat } from "../hooks/useChatQueries";
+import {
+	useMessages,
+	useCreateMessage,
+	useDeleteMessage,
+	useUpdateMessage,
+} from "../hooks/useMessageQueries";
+import { useSingleChat, useDeleteChat } from "../hooks/useChatQueries";
 import { useState, useEffect, useRef } from "react";
 import {
 	Avatar,
@@ -9,6 +14,10 @@ import {
 	ImageGallery,
 	cn,
 	ImageModal,
+	Dropdown,
+	DropdownItem,
+	Modal,
+	ConfirmModal,
 } from "../../../shared/components/UI";
 import { useUser } from "../../../shared/hooks/useUser";
 import { useTheme } from "../../../providers/ThemeProvider";
@@ -18,11 +27,16 @@ import {
 	HiOutlineEmojiHappy,
 	HiOutlinePaperClip,
 	HiOutlineX,
+	HiOutlineDotsVertical,
+	HiOutlineTrash,
+	HiOutlinePencil,
+	HiOutlineChatAlt2,
 } from "react-icons/hi";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useQueryClient } from "@tanstack/react-query";
 import InputEmoji from "react-input-emoji";
 import { motion, AnimatePresence } from "framer-motion";
+import { formatDistanceToNow } from "date-fns";
 
 const ChatWindow = () => {
 	const { chatId } = useParams();
@@ -41,13 +55,45 @@ const ChatWindow = () => {
 	const previewScrollRef = useRef(null);
 	const fileInputRef = useRef(null);
 
+	const [editingMessage, setEditingMessage] = useState(null);
+	const [editContent, setEditContent] = useState("");
+	const [isDeleteChatModalOpen, setIsDeleteChatModalOpen] = useState(false);
+	const [messageToDelete, setMessageToDelete] = useState(null);
+
 	const { data: chat, isLoading: chatLoading } = useSingleChat(chatId);
 	const { data: messagesData, isLoading: messagesLoading } =
 		useMessages(chatId);
 	const messages = messagesData?.data || [];
 	const { mutate: sendMessage, isLoading: isSending } = useCreateMessage();
+	const { mutate: deleteMessage } = useDeleteMessage();
+	const { mutate: updateMessage } = useUpdateMessage();
+	const { mutate: deleteChat } = useDeleteChat();
 
 	const otherUser = chat?.users?.find((u) => u._id !== currentUser?._id);
+
+	const handleDeleteChat = () => {
+		deleteChat(chatId);
+	};
+
+	const handleDeleteMessage = () => {
+		if (messageToDelete) {
+			deleteMessage(messageToDelete);
+			setMessageToDelete(null);
+		}
+	};
+
+	const handleUpdateMessage = () => {
+		if (!editContent.trim()) return;
+		updateMessage(
+			{ messageId: editingMessage._id, content: editContent },
+			{
+				onSuccess: () => {
+					setEditingMessage(null);
+					setEditContent("");
+				},
+			}
+		);
+	};
 	const isOnline = onlineUsers?.some(
 		(u) => String(u.userId) === String(otherUser?._id)
 	);
@@ -63,6 +109,9 @@ const ChatWindow = () => {
 	useEffect(() => {
 		if (socket && chatId) {
 			socket.on("getMessage", (newMessage) => {
+				// Update chats list to show latest message
+				queryClient.invalidateQueries(["chats"]);
+
 				if (newMessage.chatId === chatId) {
 					queryClient.setQueryData(["messages", chatId], (old) => {
 						const oldData = old?.data || [];
@@ -177,55 +226,157 @@ const ChatWindow = () => {
 						</p>
 					</div>
 				</Link>
+
+				<div className="ml-auto">
+					<Dropdown
+						trigger={
+							<button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-500">
+								<HiOutlineDotsVertical size={20} />
+							</button>
+						}
+					>
+						<DropdownItem
+							variant="danger"
+							icon={HiOutlineTrash}
+							onClick={() => setIsDeleteChatModalOpen(true)}
+						>
+							Delete Chat
+						</DropdownItem>
+					</Dropdown>
+				</div>
 			</div>
 
 			{/* Messages */}
 			<div className="flex-1 overflow-y-auto p-4 space-y-4">
-				{messages?.map((msg) => {
-					const isMe = msg.sender === currentUser?._id;
-					return (
-						<div
-							key={msg._id}
-							className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-						>
+				{messages.length === 0 ? (
+					<div className="h-full flex flex-col items-center justify-center text-center p-8">
+						<div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4 text-gray-400">
+							<HiOutlineChatAlt2 size={32} />
+						</div>
+						<h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+							No messages yet
+						</h3>
+						<p className="text-sm text-gray-500 dark:text-gray-400 max-w-[240px]">
+							Send a message to start the conversation with{" "}
+							{otherUser?.firstName}
+						</p>
+					</div>
+				) : (
+					messages.map((msg) => {
+						const isMe = msg.sender === currentUser?._id;
+						return (
 							<div
-								className={`max-w-[70%] space-y-2 ${
-									isMe ? "flex flex-col items-end" : "flex flex-col items-start"
-								}`}
+								key={msg._id}
+								className={`flex ${isMe ? "justify-end" : "justify-start"}`}
 							>
-								{msg.file && msg.file.length > 0 && (
+								<div
+									className={`max-w-[70%] space-y-2 ${
+										isMe
+											? "flex flex-col items-end"
+											: "flex flex-col items-start"
+									}`}
+								>
 									<div
 										className={cn(
-											"w-full max-w-[280px] sm:max-w-[320px] md:max-w-[400px]",
-											isMe ? "ml-auto" : "mr-auto"
+											"group relative flex items-center gap-2",
+											isMe ? "flex-row-reverse" : "flex-row"
 										)}
 									>
-										<ImageGallery
-											images={msg.file}
+										<div
 											className={cn(
-												"shadow-sm",
-												isMe ? "rounded-tr-none" : "rounded-tl-none"
+												"flex flex-col gap-2",
+												isMe ? "items-end" : "items-start"
 											)}
-										/>
+										>
+											{msg.file && msg.file.length > 0 && (
+												<div
+													className={cn(
+														"w-full max-w-[280px] sm:max-w-[320px] md:max-w-[400px]"
+													)}
+												>
+													<ImageGallery
+														images={msg.file}
+														className={cn(
+															"shadow-sm",
+															isMe ? "rounded-tr-none" : "rounded-tl-none"
+														)}
+													/>
+												</div>
+											)}
+											{msg.content && (
+												<div
+													className={cn(
+														"p-3 rounded-2xl text-sm",
+														isMe
+															? "bg-primary text-white rounded-tr-none shadow-sm shadow-blue-100 dark:shadow-none"
+															: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-none"
+													)}
+												>
+													{msg.content}
+												</div>
+											)}
+										</div>
+
+										{isMe && (
+											<div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+												<Dropdown
+													position="top"
+													trigger={
+														<button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-400 transition-colors">
+															<HiOutlineDotsVertical size={16} />
+														</button>
+													}
+												>
+													<DropdownItem
+														icon={HiOutlinePencil}
+														onClick={() => {
+															setEditingMessage(msg);
+															setEditContent(msg.content || "");
+														}}
+													>
+														Edit
+													</DropdownItem>
+													<DropdownItem
+														variant="danger"
+														icon={HiOutlineTrash}
+														onClick={() => setMessageToDelete(msg._id)}
+													>
+														Delete
+													</DropdownItem>
+												</Dropdown>
+											</div>
+										)}
 									</div>
-								)}
-								{msg.content && (
-									<div
-										className={`p-3 rounded-2xl text-sm ${
-											isMe
-												? "bg-primary text-white rounded-tr-none shadow-sm shadow-blue-100 dark:shadow-none"
-												: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-none"
-										}`}
-									>
-										{msg.content}
-									</div>
-								)}
+
+									<span className="text-[10px] text-gray-400 mt-1 px-1">
+										{msg.createdAt &&
+											formatDistanceToNow(new Date(msg.createdAt), {
+												addSuffix: true,
+											})}
+									</span>
+								</div>
 							</div>
-						</div>
-					);
-				})}
+						);
+					})
+				)}
 				<div ref={messagesEndRef} />
 			</div>
+
+			<ConfirmModal
+				isOpen={isDeleteChatModalOpen}
+				onClose={() => setIsDeleteChatModalOpen(false)}
+				onConfirm={handleDeleteChat}
+				title="Delete Chat"
+				message="Are you sure you want to delete this entire chat? This action cannot be undone."
+			/>
+
+			<ConfirmModal
+				isOpen={!!messageToDelete}
+				onClose={() => setMessageToDelete(null)}
+				onConfirm={handleDeleteMessage}
+				title="Delete Message"
+				message="Are you sure you want to delete this message? This action cannot be undone."
+			/>
 
 			{/* File Previews */}
 			{previewUrls.length > 0 && (
@@ -371,6 +522,28 @@ const ChatWindow = () => {
 					</Button>
 				</div>
 			</div>
+
+			{/* Edit Message Modal */}
+			<Modal
+				isOpen={!!editingMessage}
+				onClose={() => setEditingMessage(null)}
+				title="Edit Message"
+			>
+				<div className="space-y-4">
+					<textarea
+						className="w-full min-h-[100px] p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
+						placeholder="Edit your message..."
+						value={editContent}
+						onChange={(e) => setEditContent(e.target.value)}
+					/>
+					<div className="flex justify-end gap-3">
+						<Button variant="secondary" onClick={() => setEditingMessage(null)}>
+							Cancel
+						</Button>
+						<Button onClick={handleUpdateMessage}>Update Message</Button>
+					</div>
+				</div>
+			</Modal>
 		</div>
 	);
 };

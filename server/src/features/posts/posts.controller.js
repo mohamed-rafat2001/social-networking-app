@@ -94,13 +94,27 @@ const updatePost = errorHandler(async (req, res, next) => {
 
 const deletePost = errorHandler(async (req, res, next) => {
 	const _id = req.params.id; // id for post
-	const posts = await Posts.findOne({ userId: req.user, _id });
-	if (!posts) {
-		const error = appError.Error("post not found", "fail", 404);
+	const post = await Posts.findOne({ userId: req.user._id, _id });
+
+	if (!post) {
+		const error = appError.Error(
+			"Post not found or you don't have permission to delete it",
+			"fail",
+			404
+		);
 		return next(error);
 	}
-	await posts.deleteOne();
-	res.status(200).json({ status: "success", data: posts });
+
+	// Delete from Cloudinary if there are files
+	if (post.fileUp && post.fileUp.length > 0) {
+		const deletePromises = post.fileUp.map((file) =>
+			cloudinary.uploader.destroy(file.public_id)
+		);
+		await Promise.all(deletePromises);
+	}
+
+	await post.deleteOne();
+	res.status(200).json({ status: "success", data: post });
 });
 
 const allPosts = errorHandler(async (req, res, next) => {
