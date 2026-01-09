@@ -131,7 +131,7 @@ function CommentItem({ comment, postId }) {
 
 					{/* Replies List */}
 					{comment.replies?.length > 0 && (
-						<div className="mt-4 space-y-4 ml-2 pl-4 border-l-2 border-gray-100 dark:border-gray-800">
+						<div className="mt-4 space-y-4 ml-2 pl-4 border-l-2 border-gray-100 dark:border-gray-800/50">
 							{comment.replies.map((reply) => (
 								<div key={reply._id} className="flex gap-3">
 									<Link
@@ -141,22 +141,27 @@ function CommentItem({ comment, postId }) {
 										<Avatar src={reply.userId?.image?.secure_url} size="xs" />
 									</Link>
 									<div className="flex-1 min-w-0">
-										<div className="flex items-center gap-1 mb-1">
-											<Link
-												to={`/profile/${reply.userId?._id}`}
-												className="font-bold text-xs text-black dark:text-white hover:underline"
-											>
-												{reply.userId?.firstName} {reply.userId?.lastName}
-											</Link>
-											<span className="text-gray-500 dark:text-gray-400 text-[10px]">
-												·{" "}
-												{reply.createdAt &&
-												!isNaN(new Date(reply.createdAt).getTime())
-													? formatDistanceToNow(new Date(reply.createdAt), {
-															addSuffix: true,
-													  })
-													: "just now"}
-											</span>
+										<div className="flex items-center justify-between mb-1">
+											<div className="flex items-center gap-1">
+												<Link
+													to={`/profile/${reply.userId?._id}`}
+													className="font-bold text-xs text-black dark:text-white hover:underline"
+												>
+													{reply.userId?.firstName} {reply.userId?.lastName}
+												</Link>
+												<span className="text-gray-500 dark:text-gray-400 text-[10px]">
+													·{" "}
+													{reply.createdAt &&
+													!isNaN(new Date(reply.createdAt).getTime())
+														? formatDistanceToNow(new Date(reply.createdAt), {
+																addSuffix: true,
+														  })
+														: "just now"}
+												</span>
+											</div>
+											<button className="text-gray-500 hover:text-primary p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20">
+												<HiDotsHorizontal className="text-[10px]" />
+											</button>
 										</div>
 										<p className="text-xs text-black dark:text-gray-200 break-words mb-2">
 											{reply.replayBody}
@@ -170,7 +175,15 @@ function CommentItem({ comment, postId }) {
 													reply.like?.includes(user?._id) ? "text-pink-500" : ""
 												}`}
 											>
-												<HiHeart className="text-xs" />
+												<div className="p-1 rounded-full hover:bg-pink-50 dark:hover:bg-pink-900/20">
+													<HiHeart
+														className={`text-xs ${
+															reply.like?.includes(user?._id)
+																? "text-pink-500"
+																: ""
+														}`}
+													/>
+												</div>
 												<span className="text-[10px]">
 													{reply.likeNum || 0}
 												</span>

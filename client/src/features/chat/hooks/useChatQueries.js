@@ -7,7 +7,10 @@ import * as chatService from "../services/chatService";
 export const useChats = () => {
 	return useQuery({
 		queryKey: ["chats"],
-		queryFn: chatService.getChats,
+		queryFn: async () => {
+			const response = await chatService.getChats();
+			return response.data; // Return only the data array
+		},
 		staleTime: 30000,
 	});
 };
@@ -16,7 +19,10 @@ export const useSingleChat = (chatId) => {
 	const dispatch = useDispatch();
 	return useQuery({
 		queryKey: ["chat", chatId],
-		queryFn: () => chatService.getSingleChat(chatId),
+		queryFn: async () => {
+			const response = await chatService.getSingleChat(chatId);
+			return response?.data;
+		},
 		enabled: !!chatId,
 		onSuccess: (data) => {
 			if (data) {

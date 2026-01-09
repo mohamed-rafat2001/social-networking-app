@@ -35,6 +35,8 @@ const ProfileDetail = () => {
 	const { mutate: unfollowUser } = useUnfollowUser();
 
 	const [activeTab, setActiveTab] = useState("posts"); // posts, followers, following
+	const [isFollowsModalOpen, setIsFollowsModalOpen] = useState(false);
+	const [modalType, setModalType] = useState("followers"); // followers or following
 
 	const isCurrentUser =
 		currentUser?._id === userId || !userId || userId === "user";
@@ -88,8 +90,20 @@ const ProfileDetail = () => {
 		navigate("/messages");
 	};
 
+	const handleFollowsClick = (type) => {
+		setModalType(type);
+		setIsFollowsModalOpen(true);
+	};
+
 	return (
 		<div className="max-w-4xl mx-auto p-4 md:p-8">
+			<FollowsModal
+				isOpen={isFollowsModalOpen}
+				onClose={() => setIsFollowsModalOpen(false)}
+				title={modalType === "followers" ? "Followers" : "Following"}
+				users={modalType === "followers" ? user.followers : user.following}
+				currentUser={currentUser}
+			/>
 			{/* Cover & Profile Info */}
 			<div className="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm mb-8 transition-colors duration-300">
 				<div className="h-40 bg-gradient-to-r from-primary/20 to-purple-200 dark:from-primary/30 dark:to-purple-900/40"></div>
@@ -107,7 +121,7 @@ const ProfileDetail = () => {
 							<div className="flex gap-4">
 								<div
 									className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-xl transition-colors"
-									onClick={() => setActiveTab("followers")}
+									onClick={() => handleFollowsClick("followers")}
 								>
 									<p className="text-xl font-black text-gray-900 dark:text-white">
 										{user.followers?.length || 0}
@@ -118,7 +132,7 @@ const ProfileDetail = () => {
 								</div>
 								<div
 									className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-xl transition-colors"
-									onClick={() => setActiveTab("following")}
+									onClick={() => handleFollowsClick("following")}
 								>
 									<p className="text-xl font-black text-gray-900 dark:text-white">
 										{user.following?.length || 0}
@@ -202,12 +216,8 @@ const ProfileDetail = () => {
 
 						<div className="flex gap-8 pt-4 border-t border-gray-100 dark:border-gray-800">
 							<div
-								className={`text-center cursor-pointer p-2 rounded-xl transition-colors ${
-									activeTab === "followers"
-										? "bg-primary/5 text-primary"
-										: "hover:bg-gray-50 dark:hover:bg-gray-800"
-								}`}
-								onClick={() => setActiveTab("followers")}
+								className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-xl transition-colors"
+								onClick={() => handleFollowsClick("followers")}
 							>
 								<p className="text-xl font-black text-gray-900 dark:text-white">
 									{user.followers?.length || 0}
@@ -217,12 +227,8 @@ const ProfileDetail = () => {
 								</p>
 							</div>
 							<div
-								className={`text-center cursor-pointer p-2 rounded-xl transition-colors ${
-									activeTab === "following"
-										? "bg-primary/5 text-primary"
-										: "hover:bg-gray-50 dark:hover:bg-gray-800"
-								}`}
-								onClick={() => setActiveTab("following")}
+								className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-xl transition-colors"
+								onClick={() => handleFollowsClick("following")}
 							>
 								<p className="text-xl font-black text-gray-900 dark:text-white">
 									{user.following?.length || 0}
@@ -257,14 +263,6 @@ const ProfileDetail = () => {
 					<h3 className="text-xl font-black text-gray-900 dark:text-white capitalize">
 						{activeTab}
 					</h3>
-					{activeTab !== "posts" && (
-						<button
-							onClick={() => setActiveTab("posts")}
-							className="text-sm text-primary font-bold hover:underline"
-						>
-							Back to Posts
-						</button>
-					)}
 				</div>
 
 				<div className="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm transition-colors duration-300">
@@ -290,112 +288,6 @@ const ProfileDetail = () => {
 										</div>
 										<p className="text-gray-500 dark:text-gray-400 font-medium">
 											No posts yet
-										</p>
-									</div>
-								)}
-							</motion.div>
-						)}
-
-						{activeTab === "followers" && (
-							<motion.div
-								key="followers"
-								initial={{ opacity: 0, y: 10 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: -10 }}
-								className="divide-y divide-gray-100 dark:divide-gray-800"
-							>
-								{user.followers?.length > 0 ? (
-									user.followers.map((follower) => (
-										<div
-											key={follower._id}
-											className="flex items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-										>
-											<div
-												className="flex items-center gap-4 cursor-pointer"
-												onClick={() => {
-													navigate(`/profile/${follower._id}`);
-													setActiveTab("posts");
-												}}
-											>
-												<Avatar src={follower.image?.secure_url} size="md" />
-												<div>
-													<p className="font-bold text-gray-900 dark:text-white">
-														{follower.firstName} {follower.lastName}
-													</p>
-													<p className="text-sm text-gray-500 dark:text-gray-400">
-														@{follower.username}
-													</p>
-												</div>
-											</div>
-											{currentUser?._id !== follower._id && (
-												<Button
-													variant="secondary"
-													size="sm"
-													className="rounded-xl"
-													onClick={() => navigate(`/profile/${follower._id}`)}
-												>
-													View Profile
-												</Button>
-											)}
-										</div>
-									))
-								) : (
-									<div className="py-20 text-center">
-										<p className="text-gray-500 dark:text-gray-400 font-medium">
-											No followers yet
-										</p>
-									</div>
-								)}
-							</motion.div>
-						)}
-
-						{activeTab === "following" && (
-							<motion.div
-								key="following"
-								initial={{ opacity: 0, y: 10 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: -10 }}
-								className="divide-y divide-gray-100 dark:divide-gray-800"
-							>
-								{user.following?.length > 0 ? (
-									user.following.map((followed) => (
-										<div
-											key={followed._id}
-											className="flex items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-										>
-											<div
-												className="flex items-center gap-4 cursor-pointer"
-												onClick={() => {
-													navigate(`/profile/${followed._id}`);
-													setActiveTab("posts");
-												}}
-											>
-												<Avatar src={followed.image?.secure_url} size="md" />
-												<div>
-													<p className="font-bold text-gray-900 dark:text-white">
-														{followed.firstName} {followed.lastName}
-													</p>
-													<p className="text-sm text-gray-500 dark:text-gray-400">
-														@{followed.username}
-													</p>
-												</div>
-											</div>
-											{currentUser?._id !== followed._id && (
-												<Button
-													variant="secondary"
-													size="sm"
-													className="rounded-xl"
-													onClick={() => navigate(`/profile/${followed._id}`)}
-												>
-													View Profile
-												</Button>
-											)}
-										</div>
-									))
-								) : (
-									<div className="py-20 text-center">
-										<p className="text-gray-500 dark:text-gray-400 font-medium">
-											Not following anyone yet
 										</p>
 									</div>
 								)}

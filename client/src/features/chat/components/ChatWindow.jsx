@@ -24,6 +24,7 @@ const ChatWindow = () => {
 	const [text, setText] = useState("");
 	const [selectedFiles, setSelectedFiles] = useState([]);
 	const [previewUrls, setPreviewUrls] = useState([]);
+	const [uploadProgress, setUploadProgress] = useState(0);
 	const messagesEndRef = useRef(null);
 	const fileInputRef = useRef(null);
 
@@ -88,8 +89,16 @@ const ChatWindow = () => {
 			formData.append("file", file);
 		});
 
+		setUploadProgress(1); // Start showing progress
+
 		sendMessage(
-			{ chatId, data: formData },
+			{
+				chatId,
+				data: formData,
+				onUploadProgress: (progress) => {
+					setUploadProgress(progress);
+				},
+			},
 			{
 				onSuccess: (response) => {
 					if (socket && otherUser?._id) {
@@ -101,6 +110,10 @@ const ChatWindow = () => {
 					setText("");
 					setSelectedFiles([]);
 					setPreviewUrls([]);
+					setUploadProgress(0);
+				},
+				onError: () => {
+					setUploadProgress(0);
 				},
 			}
 		);
@@ -206,6 +219,24 @@ const ChatWindow = () => {
 							</button>
 						</div>
 					))}
+				</div>
+			)}
+
+			{/* Upload Progress */}
+			{uploadProgress > 0 && uploadProgress < 100 && (
+				<div className="px-4 py-2 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
+					<div className="flex items-center gap-3">
+						<div className="flex-1 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+							<motion.div
+								initial={{ width: 0 }}
+								animate={{ width: `${uploadProgress}%` }}
+								className="h-full bg-primary"
+							/>
+						</div>
+						<span className="text-[10px] font-bold text-primary whitespace-nowrap">
+							{uploadProgress}%
+						</span>
+					</div>
 				</div>
 			)}
 
