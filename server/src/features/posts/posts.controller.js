@@ -2,6 +2,7 @@ import Posts from "./posts.model.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
 import errorHandler from "../../shared/middlewares/errorHandler.js";
 import appError from "../../shared/utils/appError.js";
+import { createNotification } from "../notifications/notification.controller.js";
 
 const addPost = errorHandler(async (req, res, next) => {
 	let post;
@@ -138,7 +139,18 @@ const likeOnPost = errorHandler(async (req, res, next) => {
 				unLikesNumber: lenUnLike > 0 ? lenUnLike - 1 : lenUnLike,
 			},
 			{ new: true }
-		);
+		).populate("userId");
+
+		// Create notification
+		if (post.userId._id.toString() !== req.user._id.toString()) {
+			await createNotification({
+				recipient: post.userId._id,
+				sender: req.user._id,
+				type: "like",
+				post: post._id,
+			});
+		}
+
 		return res.status(200).json({ status: "success", data: post });
 	} else if (liked === true) {
 		const post = await Posts.findByIdAndUpdate(

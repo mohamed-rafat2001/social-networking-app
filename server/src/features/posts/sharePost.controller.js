@@ -3,6 +3,7 @@ import Post from "./posts.model.js";
 import errorHandler from "../../shared/middlewares/errorHandler.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
 import appError from "../../shared/utils/appError.js";
+import { createNotification } from "../notifications/notification.controller.js";
 
 const sharePost = errorHandler(async (req, res, next) => {
 	const postId = req.params.id; //post id
@@ -47,6 +48,18 @@ const sharePost = errorHandler(async (req, res, next) => {
 		return next(error);
 	}
 	await sharePO.save();
+
+	// Create notification
+	const post = await Post.findById(postId).populate("userId");
+	if (post && post.userId._id.toString() !== _id.toString()) {
+		await createNotification({
+			recipient: post.userId._id,
+			sender: _id,
+			type: "share",
+			post: post._id,
+		});
+	}
+
 	res.status(200).json({ status: "success", data: sharePO });
 });
 

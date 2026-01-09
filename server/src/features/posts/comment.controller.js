@@ -3,6 +3,7 @@ import Comment from "./comment.model.js";
 import errorHandler from "../../shared/middlewares/errorHandler.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
 import appError from "../../shared/utils/appError.js";
+import { createNotification } from "../notifications/notification.controller.js";
 
 const addComment = errorHandler(async (req, res, next) => {
 	const postId = req.params.id; //post id
@@ -26,12 +27,26 @@ const addComment = errorHandler(async (req, res, next) => {
 
 	const post = await Posts.findByIdAndUpdate(postId, {
 		$push: { comments: addComment._id },
-	});
+	}).populate("userId");
+
 	if (!post) {
 		const error = appError.Error("post not found", "fail", 404);
 		return next(error);
 	}
+
 	await addComment.save();
+
+	// Create notification
+	if (post.userId._id.toString() !== userId.toString()) {
+		await createNotification({
+			recipient: post.userId._id,
+			sender: userId,
+			type: "comment",
+			post: post._id,
+			content: addComment.content,
+		});
+	}
+
 	res.status(200).json({ status: "success", data: addComment });
 });
 

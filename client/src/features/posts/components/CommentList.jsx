@@ -5,13 +5,15 @@ import InputEmoji from "react-input-emoji";
 import { Avatar, Button, Spinner, cn } from "../../../shared/components/UI";
 import { useUser } from "../../../shared/hooks/useUser";
 import { useTheme } from "../../../providers/ThemeProvider";
+import { useSocket } from "../../../shared/hooks/useSocket";
 import { useAddComment } from "../hooks/useCommentQueries";
 import CommentItem from "./CommentItem";
 
-function CommentList({ comments, postId }) {
+function CommentList({ comments, postId, recipientId }) {
 	const [text, setText] = useState("");
 	const { user } = useUser();
 	const { darkMode } = useTheme();
+	const { socket } = useSocket();
 	const { mutate: addComment, isLoading } = useAddComment();
 
 	const handleSubmit = () => {
@@ -23,9 +25,24 @@ function CommentList({ comments, postId }) {
 				commentData: { commentBody: text },
 			},
 			{
-				onSuccess: () => {
+				onSuccess: (response) => {
 					setText("");
 					toast.success("Comment added!");
+
+					// Emit socket event for notification
+					if (socket && recipientId && recipientId !== user?._id) {
+						socket.emit("sendNotification", {
+							recipientId,
+							notification: {
+								type: "comment",
+								sender: user,
+								post: { _id: postId },
+								content: text,
+								createdAt: new Date(),
+								read: false,
+							},
+						});
+					}
 				},
 				onError: (error) => {
 					toast.error(error.response?.data?.message || "Failed to add comment");

@@ -51,24 +51,43 @@ const NotificationManager = () => {
 
 		const handleMessage = (newMessage) => {
 			const isInChat = location.pathname === `/messages/${newMessage.chatId}`;
-			
+
 			if (!isInChat) {
 				const senderName = newMessage.senderName || "Someone";
-				toast.success(`New message from ${senderName}: ${newMessage.content.substring(0, 30)}${newMessage.content.length > 30 ? "..." : ""}`, {
-					icon: "💬",
-					duration: 4000,
-				});
-				
+				toast.success(
+					`New message from ${senderName}: ${newMessage.content.substring(
+						0,
+						30
+					)}${newMessage.content.length > 30 ? "..." : ""}`,
+					{
+						icon: "💬",
+						duration: 4000,
+					}
+				);
+
 				queryClient.invalidateQueries(["chats"]);
 			}
 		};
 
 		socket.on("getNotification", handleNotification);
 		socket.on("getMessage", handleMessage);
+		socket.on("notification", (msgNotification) => {
+			// This is for real-time message toasts if getMessage isn't enough
+			// or if we want to handle the specific 'notification' event from socket server
+			if (location.pathname !== `/messages/${msgNotification.chatId}`) {
+				toast.success(
+					`New message: ${msgNotification.content.substring(0, 30)}...`,
+					{
+						icon: "💬",
+					}
+				);
+			}
+		});
 
 		return () => {
 			socket.off("getNotification", handleNotification);
 			socket.off("getMessage", handleMessage);
+			socket.off("notification");
 		};
 	}, [socket, queryClient, location.pathname]);
 

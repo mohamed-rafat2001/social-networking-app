@@ -206,7 +206,11 @@ function PostDetailPage() {
 			{/* Comments Section */}
 			<div className="pb-20">
 				{post.comments && (
-					<CommentList comments={post.comments} postId={post._id} />
+					<CommentList
+						comments={post.comments || []}
+						postId={post._id}
+						recipientId={post.userId?._id || post.userId}
+					/>
 				)}
 			</div>
 		</div>

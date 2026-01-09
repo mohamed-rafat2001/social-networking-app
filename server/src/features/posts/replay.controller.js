@@ -3,6 +3,7 @@ import Replay from "./replay.model.js";
 import errorHandler from "../../shared/middlewares/errorHandler.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
 import appError from "../../shared/utils/appError.js";
+import { createNotification } from "../notifications/notification.controller.js";
 
 const addReplay = errorHandler(async (req, res, next) => {
 	const commentId = req.params.id; //comment id
@@ -28,12 +29,27 @@ const addReplay = errorHandler(async (req, res, next) => {
 	}
 	const comment = await Comment.findByIdAndUpdate(commentId, {
 		$push: { replies: addReplay._id },
-	});
+	}).populate("userId");
+
 	if (!comment) {
 		const error = appError.Error("comment not found", "fail", 404);
 		return next(error);
 	}
+
 	await addReplay.save();
+
+	// Create notification
+	if (comment.userId._id.toString() !== userId.toString()) {
+		await createNotification({
+			recipient: comment.userId._id,
+			sender: userId,
+			type: "comment", // Using comment type for replies too as per NotificationList logic
+			post: comment.postId,
+			comment: comment._id,
+			content: addReplay.content,
+		});
+	}
+
 	res.status(200).json({ status: "success", data: addReplay });
 });
 
