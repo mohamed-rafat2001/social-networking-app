@@ -106,9 +106,12 @@ const NotificationList = () => {
 						)}
 
 						<p className="text-xs text-gray-400 dark:text-gray-500 mt-1 font-medium">
-							{formatDistanceToNow(new Date(notification.createdAt), {
-								addSuffix: true,
-							})}
+							{notification.createdAt &&
+							!isNaN(new Date(notification.createdAt).getTime())
+								? formatDistanceToNow(new Date(notification.createdAt), {
+										addSuffix: true,
+								  })
+								: "just now"}
 						</p>
 					</div>
 

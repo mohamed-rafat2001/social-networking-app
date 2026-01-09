@@ -122,12 +122,15 @@ const ChatList = () => {
 											</h4>
 											{lastMessage && (
 												<span className="text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap ml-2">
-													{formatDistanceToNow(
-														new Date(lastMessage.createdAt),
-														{
-															addSuffix: false,
-														}
-													)}
+													{lastMessage.createdAt &&
+													!isNaN(new Date(lastMessage.createdAt).getTime())
+														? formatDistanceToNow(
+																new Date(lastMessage.createdAt),
+																{
+																	addSuffix: false,
+																}
+														  )
+														: "just now"}
 												</span>
 											)}
 										</div>
