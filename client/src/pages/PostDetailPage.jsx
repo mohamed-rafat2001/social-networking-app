@@ -125,18 +125,22 @@ function PostDetailPage() {
 
 				<div className="flex items-center gap-1 text-gray-500 dark:text-gray-400 text-sm mb-4 pb-4 border-b dark:border-gray-800">
 					<span>
-						{new Date(post.createdAt).toLocaleTimeString([], {
-							hour: "2-digit",
-							minute: "2-digit",
-						})}
+						{post.createdAt && !isNaN(new Date(post.createdAt).getTime())
+							? new Date(post.createdAt).toLocaleTimeString([], {
+									hour: "2-digit",
+									minute: "2-digit",
+							  })
+							: ""}
 					</span>
 					<span>·</span>
 					<span>
-						{new Date(post.createdAt).toLocaleDateString([], {
-							month: "short",
-							day: "numeric",
-							year: "numeric",
-						})}
+						{post.createdAt && !isNaN(new Date(post.createdAt).getTime())
+							? new Date(post.createdAt).toLocaleDateString([], {
+									month: "short",
+									day: "numeric",
+									year: "numeric",
+							  })
+							: ""}
 					</span>
 					<span>·</span>
 					<span className="font-bold text-black dark:text-white">

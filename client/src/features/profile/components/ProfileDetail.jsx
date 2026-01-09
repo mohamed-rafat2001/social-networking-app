@@ -102,9 +102,34 @@ const ProfileDetail = () => {
 								(u) => String(u.userId) === String(user._id)
 							)}
 						/>
-						<div className="flex gap-3">
-							{!isCurrentUser ? (
-								<>
+						<div className="flex items-center gap-6">
+							<div className="flex gap-4">
+								<div
+									className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-xl transition-colors"
+									onClick={() => setActiveTab("followers")}
+								>
+									<p className="text-xl font-black text-gray-900 dark:text-white">
+										{user.followers?.length || 0}
+									</p>
+									<p className="text-xs text-gray-500 dark:text-gray-500 uppercase font-bold tracking-wider">
+										Followers
+									</p>
+								</div>
+								<div
+									className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-xl transition-colors"
+									onClick={() => setActiveTab("following")}
+								>
+									<p className="text-xl font-black text-gray-900 dark:text-white">
+										{user.following?.length || 0}
+									</p>
+									<p className="text-xs text-gray-500 dark:text-gray-500 uppercase font-bold tracking-wider">
+										Following
+									</p>
+								</div>
+							</div>
+
+							{!isCurrentUser && (
+								<div className="flex gap-3 border-l border-gray-100 dark:border-gray-800 pl-6">
 									<Button
 										variant="secondary"
 										className="rounded-xl flex items-center gap-2"
@@ -134,31 +159,6 @@ const ProfileDetail = () => {
 											</>
 										)}
 									</Button>
-								</>
-							) : (
-								<div className="flex gap-4">
-									<div
-										className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-xl transition-colors"
-										onClick={() => setActiveTab("followers")}
-									>
-										<p className="text-xl font-black text-gray-900 dark:text-white">
-											{user.followers?.length || 0}
-										</p>
-										<p className="text-xs text-gray-500 dark:text-gray-500 uppercase font-bold tracking-wider">
-											Followers
-										</p>
-									</div>
-									<div
-										className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-xl transition-colors"
-										onClick={() => setActiveTab("following")}
-									>
-										<p className="text-xl font-black text-gray-900 dark:text-white">
-											{user.following?.length || 0}
-										</p>
-										<p className="text-xs text-gray-500 dark:text-gray-500 uppercase font-bold tracking-wider">
-											Following
-										</p>
-									</div>
 								</div>
 							)}
 						</div>
