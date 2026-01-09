@@ -12,7 +12,7 @@ router
 	.route("/")
 	.get(postsController.allPosts)
 	.post(
-		fileUpload(fileValidation.image).array("fileUp"),
+		fileUpload(fileValidation.image).array("fileUp", 10),
 		postsController.addPost
 	);
 
