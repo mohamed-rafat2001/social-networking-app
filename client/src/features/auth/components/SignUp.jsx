@@ -23,6 +23,9 @@ const signUpSchema = z
 				"Password must contain at least one special character"
 			),
 		confirmPassword: z.string(),
+		gender: z.enum(["male", "female"], {
+			errorMap: () => ({ message: "Please select your gender" }),
+		}),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		message: "Passwords don't match",
@@ -119,6 +122,39 @@ const SignUp = () => {
 				{...register("confirmPassword")}
 				error={errors.confirmPassword?.message}
 			/>
+
+			<div className="space-y-2">
+				<label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+					Gender
+				</label>
+				<div className="flex gap-4">
+					<label className="flex items-center gap-2 cursor-pointer group">
+						<input
+							type="radio"
+							value="male"
+							{...register("gender")}
+							className="w-4 h-4 text-primary focus:ring-primary border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+						/>
+						<span className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+							Male
+						</span>
+					</label>
+					<label className="flex items-center gap-2 cursor-pointer group">
+						<input
+							type="radio"
+							value="female"
+							{...register("gender")}
+							className="w-4 h-4 text-primary focus:ring-primary border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+						/>
+						<span className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+							Female
+						</span>
+					</label>
+				</div>
+				{errors.gender && (
+					<p className="text-xs text-red-500 mt-1">{errors.gender.message}</p>
+				)}
+			</div>
 
 			<div className="pt-2">
 				<Button type="submit" className="w-full py-3" disabled={isPending}>

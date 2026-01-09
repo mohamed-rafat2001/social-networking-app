@@ -7,11 +7,11 @@ export const getChats = async () => {
 
 export const getSingleChat = async (chatId) => {
 	if (!chatId) return null;
-	const response = await apiApp.get(`/chat/${chatId}`);
+	const response = await apiApp.get(`/chats/${chatId}`);
 	return response.data;
 };
 
 export const createChat = async (userId) => {
-	const response = await apiApp.post(`/chat`, { userId });
+	const response = await apiApp.post(`/chats`, { secondId: userId });
 	return response.data;
 };

@@ -1,9 +1,9 @@
 import { useChats } from "../hooks/useChatQueries";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Avatar } from "../../../shared/components/UI";
 import { formatDistanceToNow } from "date-fns";
 import { useUser } from "../../../shared/hooks/useUser";
-import { useSocket } from "../../../providers/SocketProvider";
+import { useSocket } from "../../../shared/hooks/useSocket";
 import { HiOutlineChatAlt2 } from "react-icons/hi";
 
 import { useState } from "react";
@@ -12,6 +12,7 @@ import UserSearch from "./UserSearch";
 import { AnimatePresence, motion } from "framer-motion";
 
 const ChatList = () => {
+	const { chatId: activeChatId } = useParams();
 	const { data: chats, isLoading } = useChats();
 	const { user: currentUser } = useUser();
 	const { onlineUsers } = useSocket();
@@ -34,8 +35,8 @@ const ChatList = () => {
 	}
 
 	return (
-		<div className="relative min-h-full">
-			<div className="p-4 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
+		<div className="relative h-full flex flex-col">
+			<div className="p-4 flex justify-between items-center border-b border-gray-100 dark:border-gray-800 sticky top-0 bg-white dark:bg-gray-900 z-10">
 				<h2 className="text-xl font-bold text-gray-900 dark:text-white">
 					Messages
 				</h2>
@@ -61,80 +62,99 @@ const ChatList = () => {
 				)}
 			</AnimatePresence>
 
-			{!chats?.length ? (
-				<div className="flex flex-col items-center justify-center py-20 text-center px-4">
-					<div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6 text-gray-400 dark:text-gray-500">
-						<HiOutlineChatAlt2 size={40} />
+			<div className="flex-1 overflow-y-auto">
+				{!chats?.length ? (
+					<div className="flex flex-col items-center justify-center py-20 text-center px-4">
+						<div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6 text-gray-400 dark:text-gray-500">
+							<HiOutlineChatAlt2 size={40} />
+						</div>
+						<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+							No conversations yet
+						</h3>
+						<p className="text-gray-500 dark:text-gray-400 max-w-xs mb-6">
+							Start a conversation with other students to collaborate on
+							projects or study together.
+						</p>
+						<button
+							onClick={() => setShowNewChat(true)}
+							className="px-6 py-2 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors"
+						>
+							Start a Chat
+						</button>
 					</div>
-					<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-						No conversations yet
-					</h3>
-					<p className="text-gray-500 dark:text-gray-400 max-w-xs mb-6">
-						Start a conversation with other students to collaborate on projects
-						or study together.
-					</p>
-					<button
-						onClick={() => setShowNewChat(true)}
-						className="px-6 py-2 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors"
-					>
-						Start a Chat
-					</button>
-				</div>
-			) : (
-				<div className="divide-y divide-gray-100 dark:divide-gray-800">
-					{chats.map((chat) => {
-						const otherUser = chat.users.find(
-							(u) => u._id !== currentUser?._id
-						);
-						const lastMessage = chat.latestMessage;
+				) : (
+					<div className="divide-y divide-gray-100 dark:divide-gray-800">
+						{chats.map((chat) => {
+							const otherUser = chat.users.find(
+								(u) => u._id !== currentUser?._id
+							);
+							const lastMessage = chat.latestMessage;
+							const isActive = chat._id === activeChatId;
 
-						return (
-							<Link
-								key={chat._id}
-								to={`/messages/${chat._id}`}
-								className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-							>
-								<Avatar
-									src={otherUser?.image?.secure_url}
-									size="lg"
-									isActive={onlineUsers?.some(
-										(u) => String(u.userId) === String(otherUser?._id)
+							return (
+								<Link
+									key={chat._id}
+									to={`/messages/${chat._id}`}
+									className={`flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-all relative ${
+										isActive ? "bg-primary/5 dark:bg-primary/10" : ""
+									}`}
+								>
+									{isActive && (
+										<div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />
 									)}
-								/>
-								<div className="flex-1 min-w-0">
-									<div className="flex justify-between items-baseline mb-1">
-										<h4 className="font-bold text-gray-900 dark:text-white truncate">
-											{otherUser?.firstName} {otherUser?.lastName}
-										</h4>
-										{lastMessage && (
-											<span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
-												{formatDistanceToNow(new Date(lastMessage.createdAt), {
-													addSuffix: true,
-												})}
-											</span>
+									<Avatar
+										src={otherUser?.image?.secure_url}
+										size="lg"
+										isActive={onlineUsers?.some(
+											(u) => String(u.userId) === String(otherUser?._id)
 										)}
+									/>
+									<div className="flex-1 min-w-0">
+										<div className="flex justify-between items-baseline mb-1">
+											<h4
+												className={`font-bold truncate ${
+													isActive
+														? "text-primary"
+														: "text-gray-900 dark:text-white"
+												}`}
+											>
+												{otherUser?.firstName} {otherUser?.lastName}
+											</h4>
+											{lastMessage && (
+												<span className="text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap ml-2">
+													{formatDistanceToNow(
+														new Date(lastMessage.createdAt),
+														{
+															addSuffix: false,
+														}
+													)}
+												</span>
+											)}
+										</div>
+										<p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+											{lastMessage ? (
+												<>
+													{lastMessage.sender === currentUser?._id
+														? "You: "
+														: ""}
+													{lastMessage.content}
+												</>
+											) : (
+												"No messages yet"
+											)}
+										</p>
 									</div>
-									<p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-										{lastMessage ? (
-											<>
-												{lastMessage.sender === currentUser?._id ? "You: " : ""}
-												{lastMessage.content}
-											</>
-										) : (
-											"No messages yet"
-										)}
-									</p>
-								</div>
-								{chat.unreadCount > 0 && (
-									<div className="w-5 h-5 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-										{chat.unreadCount}
-									</div>
-								)}
-							</Link>
-						);
-					})}
-				</div>
-			)}
+									{chat.unreadCount > 0 && (
+										<div className="w-5 h-5 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0">
+											{chat.unreadCount}
+										</div>
+									)}
+								</Link>
+							);
+						})}
+					</div>
+				)}
+			</div>
 		</div>
 	);
 };

@@ -28,7 +28,6 @@ const sharePost = errorHandler(async (req, res, next) => {
 			postId,
 			{
 				$push: { shares: { shareId: sharePO._id, userId: _id } },
-				$inc: { views: 1 },
 			},
 			{ new: true }
 		);
@@ -38,7 +37,6 @@ const sharePost = errorHandler(async (req, res, next) => {
 			postId,
 			{
 				$push: { shares: { shareId: sharePO._id, userId: _id } },
-				$inc: { views: 1 },
 			},
 			{ new: true }
 		);

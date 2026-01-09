@@ -1,22 +1,26 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useMessages, useCreateMessage } from "../hooks/useMessageQueries";
 import { useSingleChat } from "../hooks/useChatQueries";
 import { useState, useEffect, useRef } from "react";
 import { Avatar, Button, Spinner } from "../../../shared/components/UI";
 import { useUser } from "../../../shared/hooks/useUser";
 import { HiOutlineArrowLeft, HiOutlinePaperAirplane } from "react-icons/hi";
-import { useSocket } from "../../../providers/SocketProvider";
+import { useSocket } from "../../../shared/hooks/useSocket";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ChatWindow = () => {
 	const { chatId } = useParams();
 	const navigate = useNavigate();
 	const { user: currentUser } = useUser();
 	const { socket, onlineUsers } = useSocket();
+	const queryClient = useQueryClient();
 	const [text, setText] = useState("");
 	const messagesEndRef = useRef(null);
 
 	const { data: chat, isLoading: chatLoading } = useSingleChat(chatId);
-	const { data: messages, isLoading: messagesLoading } = useMessages(chatId);
+	const { data: messagesData, isLoading: messagesLoading } =
+		useMessages(chatId);
+	const messages = messagesData?.data || [];
 	const { mutate: sendMessage } = useCreateMessage();
 
 	const otherUser = chat?.users?.find((u) => u._id !== currentUser?._id);
@@ -32,11 +36,42 @@ const ChatWindow = () => {
 		scrollToBottom();
 	}, [messages]);
 
+	useEffect(() => {
+		if (socket && chatId) {
+			socket.on("getMessage", (newMessage) => {
+				if (newMessage.chatId === chatId) {
+					queryClient.setQueryData(["messages", chatId], (old) => {
+						const oldData = old?.data || [];
+						const exists = oldData.some((m) => m._id === newMessage._id);
+						if (exists) return old;
+						return { ...old, data: [...oldData, newMessage] };
+					});
+				}
+			});
+		}
+		return () => {
+			socket?.off("getMessage");
+		};
+	}, [socket, chatId, queryClient]);
+
 	const handleSend = (e) => {
 		e.preventDefault();
 		if (!text.trim()) return;
 
-		sendMessage({ chatId, data: { content: text } });
+		const messageData = { content: text };
+		sendMessage(
+			{ chatId, data: messageData },
+			{
+				onSuccess: (response) => {
+					if (socket && otherUser?._id) {
+						socket.emit("sendMessage", {
+							newMessage: response.data,
+							userId: otherUser._id,
+						});
+					}
+				},
+			}
+		);
 		setText("");
 	};
 
@@ -54,20 +89,28 @@ const ChatWindow = () => {
 			<div className="flex items-center gap-4 p-4 border-b border-gray-100 dark:border-gray-800 sticky top-0 bg-white dark:bg-gray-900 z-10">
 				<button
 					onClick={() => navigate("/messages")}
-					className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-900 dark:text-white"
+					className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-900 dark:text-white lg:hidden"
 				>
 					<HiOutlineArrowLeft size={20} />
 				</button>
-				<Avatar
-					src={otherUser?.image?.secure_url}
-					size="md"
-					isActive={isOnline}
-				/>
-				<div className="flex-1 min-w-0">
-					<h4 className="font-bold text-gray-900 dark:text-white truncate">
-						{otherUser?.firstName} {otherUser?.lastName}
-					</h4>
-				</div>
+				<Link
+					to={`/profile/${otherUser?._id}`}
+					className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+				>
+					<Avatar
+						src={otherUser?.image?.secure_url}
+						size="md"
+						isActive={isOnline}
+					/>
+					<div>
+						<h3 className="font-bold text-gray-900 dark:text-white leading-tight">
+							{otherUser?.firstName} {otherUser?.lastName}
+						</h3>
+						<p className="text-xs text-gray-500 dark:text-gray-400">
+							{isOnline ? "Online" : "Offline"}
+						</p>
+					</div>
+				</Link>
 			</div>
 
 			{/* Messages */}

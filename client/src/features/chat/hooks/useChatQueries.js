@@ -8,7 +8,7 @@ export const useChats = () => {
 	return useQuery({
 		queryKey: ["chats"],
 		queryFn: chatService.getChats,
-		refetchInterval: 5000,
+		staleTime: 30000,
 	});
 };
 
@@ -32,10 +32,10 @@ export const useCreateChat = () => {
 
 	return useMutation({
 		mutationFn: chatService.createChat,
-		onSuccess: (data) => {
+		onSuccess: (response) => {
 			queryClient.invalidateQueries(["chats"]);
-			if (data._id) {
-				navigate(`/messages/${data._id}`);
+			if (response?.data?._id) {
+				navigate(`/messages/${response.data._id}`);
 			}
 		},
 	});

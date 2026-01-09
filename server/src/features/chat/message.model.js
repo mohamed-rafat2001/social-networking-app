@@ -4,7 +4,7 @@ const messageSchema = new mongoose.Schema(
 	{
 		chatId: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
 		senderId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-		text: String,
+		content: String,
 		file: [
 			{
 				public_id: String,

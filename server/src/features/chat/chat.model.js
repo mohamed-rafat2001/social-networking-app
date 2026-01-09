@@ -2,14 +2,8 @@ import mongoose from "mongoose";
 
 const chatSchema = new mongoose.Schema(
 	{
-		userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-		secondId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-		members: [
-			{
-				userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-				secondId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-			},
-		],
+		members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+		latestMessage: { type: mongoose.Schema.Types.ObjectId, ref: "Message" },
 	},
 	{ timestamps: true }
 );

@@ -1,29 +1,54 @@
-import { useParams } from "react-router-dom";
-import { useUserProfile } from "../../auth/hooks/useUserQueries";
-import { useSocket } from "../../../providers/SocketProvider";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+	useUserProfile,
+	useFollowUser,
+	useUnfollowUser,
+} from "../../auth/hooks/useUserQueries";
+import { useSocket } from "../../../shared/hooks/useSocket";
+import { useUser } from "../../../shared/hooks/useUser";
 import { usePosts } from "../../posts/hooks/usePostQueries";
+import { PostItem } from "../../posts";
 import { Avatar, Button, Spinner } from "../../../shared/components/UI";
 import {
 	HiOutlineMail,
 	HiOutlineAcademicCap,
 	HiOutlineCalendar,
-	HiOutlineChatAlt2,
-	HiRefresh,
 	HiHeart,
 	HiDotsHorizontal,
+	HiOutlineChatAlt2,
+	HiUserAdd,
+	HiUserRemove,
 } from "react-icons/hi";
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 const ProfileDetail = () => {
 	const { userId } = useParams();
+	const navigate = useNavigate();
+	const { user: currentUser } = useUser();
 	const { onlineUsers } = useSocket();
 	const { data: profile, isLoading: profileLoading } = useUserProfile(userId);
 	const { data: postsResponse, isLoading: postsLoading } = usePosts();
+	const { mutate: followUser } = useFollowUser();
+	const { mutate: unfollowUser } = useUnfollowUser();
+
+	const [activeTab, setActiveTab] = useState("posts"); // posts, followers, following
+
+	const isCurrentUser =
+		currentUser?._id === userId || !userId || userId === "user";
 
 	const allPosts = postsResponse?.data || [];
 	const userPosts = Array.isArray(allPosts)
-		? allPosts.filter((post) => post.userId?._id === userId)
+		? allPosts.filter(
+				(post) =>
+					String(post.userId?._id) === String(userId || currentUser?._id) ||
+					post.shares?.some(
+						(s) =>
+							String(s.userId?._id || s.userId) ===
+							String(userId || currentUser?._id)
+					)
+		  )
 		: [];
 
 	if (profileLoading || postsLoading) {
@@ -45,6 +70,22 @@ const ProfileDetail = () => {
 	}
 
 	const user = profile.data;
+	const isFollowing = user.followers?.some(
+		(f) => String(f._id || f) === String(currentUser?._id)
+	);
+
+	const handleFollowToggle = () => {
+		if (isFollowing) {
+			unfollowUser(user._id);
+		} else {
+			followUser(user._id);
+		}
+	};
+
+	const handleMessage = () => {
+		// Logic to open or create a chat
+		navigate("/messages");
+	};
 
 	return (
 		<div className="max-w-4xl mx-auto p-4 md:p-8">
@@ -62,10 +103,64 @@ const ProfileDetail = () => {
 							)}
 						/>
 						<div className="flex gap-3">
-							<Button variant="secondary" className="rounded-xl">
-								Message
-							</Button>
-							<Button className="rounded-xl">Follow</Button>
+							{!isCurrentUser ? (
+								<>
+									<Button
+										variant="secondary"
+										className="rounded-xl flex items-center gap-2"
+										onClick={handleMessage}
+									>
+										<HiOutlineChatAlt2 size={18} />
+										Message
+									</Button>
+									<Button
+										className={`rounded-xl flex items-center gap-2 ${
+											isFollowing
+												? "bg-red-50 text-red-600 hover:bg-red-100 border-red-100"
+												: ""
+										}`}
+										variant={isFollowing ? "outline" : "primary"}
+										onClick={handleFollowToggle}
+									>
+										{isFollowing ? (
+											<>
+												<HiUserRemove size={18} />
+												Unfollow
+											</>
+										) : (
+											<>
+												<HiUserAdd size={18} />
+												Follow
+											</>
+										)}
+									</Button>
+								</>
+							) : (
+								<div className="flex gap-4">
+									<div
+										className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-xl transition-colors"
+										onClick={() => setActiveTab("followers")}
+									>
+										<p className="text-xl font-black text-gray-900 dark:text-white">
+											{user.followers?.length || 0}
+										</p>
+										<p className="text-xs text-gray-500 dark:text-gray-500 uppercase font-bold tracking-wider">
+											Followers
+										</p>
+									</div>
+									<div
+										className="text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-xl transition-colors"
+										onClick={() => setActiveTab("following")}
+									>
+										<p className="text-xl font-black text-gray-900 dark:text-white">
+											{user.following?.length || 0}
+										</p>
+										<p className="text-xs text-gray-500 dark:text-gray-500 uppercase font-bold tracking-wider">
+											Following
+										</p>
+									</div>
+								</div>
+							)}
 						</div>
 					</div>
 
@@ -105,7 +200,14 @@ const ProfileDetail = () => {
 						</div>
 
 						<div className="flex gap-8 pt-4 border-t border-gray-100 dark:border-gray-800">
-							<div className="text-center">
+							<div
+								className={`text-center cursor-pointer p-2 rounded-xl transition-colors ${
+									activeTab === "followers"
+										? "bg-primary/5 text-primary"
+										: "hover:bg-gray-50 dark:hover:bg-gray-800"
+								}`}
+								onClick={() => setActiveTab("followers")}
+							>
 								<p className="text-xl font-black text-gray-900 dark:text-white">
 									{user.followers?.length || 0}
 								</p>
@@ -113,7 +215,14 @@ const ProfileDetail = () => {
 									Followers
 								</p>
 							</div>
-							<div className="text-center">
+							<div
+								className={`text-center cursor-pointer p-2 rounded-xl transition-colors ${
+									activeTab === "following"
+										? "bg-primary/5 text-primary"
+										: "hover:bg-gray-50 dark:hover:bg-gray-800"
+								}`}
+								onClick={() => setActiveTab("following")}
+							>
 								<p className="text-xl font-black text-gray-900 dark:text-white">
 									{user.following?.length || 0}
 								</p>
@@ -121,7 +230,14 @@ const ProfileDetail = () => {
 									Following
 								</p>
 							</div>
-							<div className="text-center">
+							<div
+								className={`text-center cursor-pointer p-2 rounded-xl transition-colors ${
+									activeTab === "posts"
+										? "bg-primary/5 text-primary"
+										: "hover:bg-gray-50 dark:hover:bg-gray-800"
+								}`}
+								onClick={() => setActiveTab("posts")}
+							>
 								<p className="text-xl font-black text-gray-900 dark:text-white">
 									{userPosts.length}
 								</p>
@@ -134,105 +250,155 @@ const ProfileDetail = () => {
 				</div>
 			</div>
 
-			{/* User Posts Section */}
+			{/* Content Section */}
 			<div className="space-y-4">
-				<h3 className="text-xl font-black text-gray-900 dark:text-white px-4">
-					Posts
-				</h3>
+				<div className="flex items-center justify-between px-4">
+					<h3 className="text-xl font-black text-gray-900 dark:text-white capitalize">
+						{activeTab}
+					</h3>
+					{activeTab !== "posts" && (
+						<button
+							onClick={() => setActiveTab("posts")}
+							className="text-sm text-primary font-bold hover:underline"
+						>
+							Back to Posts
+						</button>
+					)}
+				</div>
+
 				<div className="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm transition-colors duration-300">
-					<AnimatePresence initial={false}>
-						{userPosts.length > 0 ? (
-							userPosts.map((post, index) => (
-								<motion.div
-									key={post._id}
-									className="border-b dark:border-gray-800 p-6 hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-all"
-									initial={{ opacity: 0, y: 20 }}
-									animate={{ opacity: 1, y: 0 }}
-									transition={{
-										duration: 0.3,
-										delay: Math.min(index * 0.05, 0.5),
-									}}
-									layout
-								>
-									<div className="flex gap-4">
-										<Avatar
-											src={user.image?.secure_url}
-											isActive={onlineUsers?.some(
-												(u) => String(u.userId) === String(user._id)
-											)}
-										/>
-										<div className="flex-1">
-											<div className="flex justify-between items-center">
-												<div className="flex items-center gap-2 flex-wrap">
-													<span className="font-bold text-gray-900 dark:text-white">
-														{user.firstName} {user.lastName}
-													</span>
-													<span className="text-gray-500 dark:text-gray-400 text-sm">
-														·{" "}
-														{formatDistanceToNow(new Date(post.createdAt), {
-															addSuffix: true,
-														})}
-													</span>
-												</div>
-												<button className="text-gray-400 hover:text-primary p-2 rounded-full transition-colors">
-													<HiDotsHorizontal />
-												</button>
-											</div>
-
-											<p className="mt-2 mb-4 text-gray-800 dark:text-gray-200 leading-relaxed">
-												{post.text}
-											</p>
-
-											{post.fileUp?.[0] && (
-												<div className="rounded-2xl overflow-hidden border dark:border-gray-800 mb-4 bg-gray-50 dark:bg-gray-800/50">
-													<img
-														className="w-full h-auto max-h-[600px] object-contain block mx-auto"
-														src={post.fileUp[0].secure_url}
-														alt="Post content"
-													/>
-												</div>
-											)}
-
-											<div className="flex justify-between text-gray-500 dark:text-gray-400 max-w-md">
-												<button className="flex items-center gap-2 hover:text-primary transition-colors group">
-													<div className="p-2 rounded-full group-hover:bg-primary/10 transition-colors">
-														<HiOutlineChatAlt2 size={20} />
-													</div>
-													<span className="text-sm font-medium">0</span>
-												</button>
-												<button className="flex items-center gap-2 hover:text-green-500 transition-colors group">
-													<div className="p-2 rounded-full group-hover:bg-green-500/10 transition-colors">
-														<HiRefresh size={20} />
-													</div>
-													<span className="text-sm font-medium">
-														{post.shares?.length || 0}
-													</span>
-												</button>
-												<button className="flex items-center gap-2 hover:text-pink-500 transition-colors group">
-													<div className="p-2 rounded-full group-hover:bg-pink-500/10 transition-colors">
-														<HiHeart size={20} />
-													</div>
-													<span className="text-sm font-medium">
-														{post.likes?.length || 0}
-													</span>
-												</button>
-											</div>
+					<AnimatePresence mode="wait">
+						{activeTab === "posts" && (
+							<motion.div
+								key="posts"
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -10 }}
+							>
+								{userPosts.length > 0 ? (
+									userPosts.map((post, index) => (
+										<PostItem key={post._id} post={post} index={index} />
+									))
+								) : (
+									<div className="py-20 text-center">
+										<div className="bg-gray-50 dark:bg-gray-800/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+											<HiDotsHorizontal
+												size={40}
+												className="text-gray-300 dark:text-gray-600"
+											/>
 										</div>
+										<p className="text-gray-500 dark:text-gray-400 font-medium">
+											No posts yet
+										</p>
 									</div>
-								</motion.div>
-							))
-						) : (
-							<div className="py-20 text-center">
-								<div className="bg-gray-50 dark:bg-gray-800/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-									<HiOutlineChatAlt2
-										size={40}
-										className="text-gray-300 dark:text-gray-600"
-									/>
-								</div>
-								<p className="text-gray-500 dark:text-gray-400 font-medium">
-									No posts yet
-								</p>
-							</div>
+								)}
+							</motion.div>
+						)}
+
+						{activeTab === "followers" && (
+							<motion.div
+								key="followers"
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -10 }}
+								className="divide-y divide-gray-100 dark:divide-gray-800"
+							>
+								{user.followers?.length > 0 ? (
+									user.followers.map((follower) => (
+										<div
+											key={follower._id}
+											className="flex items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+										>
+											<div
+												className="flex items-center gap-4 cursor-pointer"
+												onClick={() => {
+													navigate(`/profile/${follower._id}`);
+													setActiveTab("posts");
+												}}
+											>
+												<Avatar src={follower.image?.secure_url} size="md" />
+												<div>
+													<p className="font-bold text-gray-900 dark:text-white">
+														{follower.firstName} {follower.lastName}
+													</p>
+													<p className="text-sm text-gray-500 dark:text-gray-400">
+														@{follower.username}
+													</p>
+												</div>
+											</div>
+											{currentUser?._id !== follower._id && (
+												<Button
+													variant="secondary"
+													size="sm"
+													className="rounded-xl"
+													onClick={() => navigate(`/profile/${follower._id}`)}
+												>
+													View Profile
+												</Button>
+											)}
+										</div>
+									))
+								) : (
+									<div className="py-20 text-center">
+										<p className="text-gray-500 dark:text-gray-400 font-medium">
+											No followers yet
+										</p>
+									</div>
+								)}
+							</motion.div>
+						)}
+
+						{activeTab === "following" && (
+							<motion.div
+								key="following"
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -10 }}
+								className="divide-y divide-gray-100 dark:divide-gray-800"
+							>
+								{user.following?.length > 0 ? (
+									user.following.map((followed) => (
+										<div
+											key={followed._id}
+											className="flex items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+										>
+											<div
+												className="flex items-center gap-4 cursor-pointer"
+												onClick={() => {
+													navigate(`/profile/${followed._id}`);
+													setActiveTab("posts");
+												}}
+											>
+												<Avatar src={followed.image?.secure_url} size="md" />
+												<div>
+													<p className="font-bold text-gray-900 dark:text-white">
+														{followed.firstName} {followed.lastName}
+													</p>
+													<p className="text-sm text-gray-500 dark:text-gray-400">
+														@{followed.username}
+													</p>
+												</div>
+											</div>
+											{currentUser?._id !== followed._id && (
+												<Button
+													variant="secondary"
+													size="sm"
+													className="rounded-xl"
+													onClick={() => navigate(`/profile/${followed._id}`)}
+												>
+													View Profile
+												</Button>
+											)}
+										</div>
+									))
+								) : (
+									<div className="py-20 text-center">
+										<p className="text-gray-500 dark:text-gray-400 font-medium">
+											Not following anyone yet
+										</p>
+									</div>
+								)}
+							</motion.div>
 						)}
 					</AnimatePresence>
 				</div>

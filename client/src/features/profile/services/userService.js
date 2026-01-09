@@ -25,3 +25,13 @@ export const searchUsers = async (searchTerm) => {
 	const response = await apiApp.get(`/user/search?name=${searchTerm}`);
 	return response.data;
 };
+
+export const followUser = async (userId) => {
+	const response = await apiApp.post(`/user/follow/${userId}`);
+	return response.data;
+};
+
+export const unfollowUser = async (userId) => {
+	const response = await apiApp.post(`/user/unfollow/${userId}`);
+	return response.data;
+};

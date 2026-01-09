@@ -40,6 +40,7 @@ app.all("*", (req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
+	console.error("Error occurred:", error);
 	const statusCode = error.code || 500;
 	if (process.env.MODE === "DEV") {
 		return res.status(statusCode).json({

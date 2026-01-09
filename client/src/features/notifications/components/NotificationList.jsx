@@ -2,7 +2,7 @@ import { useNotifications } from "../hooks/useNotifications";
 import { Avatar } from "../../../shared/components/UI";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from "react-router-dom";
-import { useSocket } from "../../../providers/SocketProvider";
+import { useSocket } from "../../../shared/hooks/useSocket";
 import {
 	HiOutlineBell,
 	HiOutlineChatAlt2,

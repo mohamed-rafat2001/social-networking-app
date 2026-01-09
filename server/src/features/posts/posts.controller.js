@@ -41,16 +41,32 @@ const addPost = errorHandler(async (req, res, next) => {
 
 const singlePost = errorHandler(async (req, res, next) => {
 	const _id = req.params.id; //post id
+	const post = await Posts.findById(_id)
+		.populate("userId")
+		.populate({
+			path: "comments",
+			populate: {
+				path: "userId",
+			},
+		});
+	if (!post) {
+		const error = appError.Error("post not found", "fail", 404);
+		return next(error);
+	}
+	res.status(200).json({ status: "success", data: post });
+});
+
+const incrementView = errorHandler(async (req, res, next) => {
+	const _id = req.params.id;
 	const post = await Posts.findByIdAndUpdate(
 		_id,
 		{ $inc: { views: 1 } },
-		{ new: true, runValidators: true }
+		{ new: true }
 	);
 	if (!post) {
 		const error = appError.Error("post not found", "fail", 404);
 		return next(error);
 	}
-	await post.populate("comments");
 	res.status(200).json({ status: "success", data: post });
 });
 
@@ -112,7 +128,6 @@ const likeOnPost = errorHandler(async (req, res, next) => {
 				$push: { likes: req.user._id },
 				likesNumber: len + 1,
 				$pull: { unLikes: req.user._id },
-				$inc: { views: 1 },
 				unLikesNumber: lenUnLike > 0 ? lenUnLike - 1 : lenUnLike,
 			},
 			{ new: true }
@@ -195,6 +210,7 @@ const unLikeOnPost = errorHandler(async (req, res, next) => {
 export {
 	addPost,
 	singlePost,
+	incrementView,
 	updatePost,
 	deletePost,
 	allPosts,

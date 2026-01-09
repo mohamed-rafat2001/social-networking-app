@@ -7,62 +7,88 @@ import errorHandler from "../../shared/middlewares/errorHandler.js";
 const createChat = errorHandler(async (req, res, next) => {
 	const userId = req.user._id;
 	const secondId = req.body.secondId;
+
+	if (!secondId) {
+		const error = appError.Error("secondId is required", "fail", 400);
+		return next(error);
+	}
+
 	const findSecondId = await User.findById(secondId);
 	if (!findSecondId) {
 		const error = appError.Error("user not found", "fail", 404);
 		return next(error);
 	}
-	const findChat = await Chat.findOne({
-		members: { $elemMatch: { userId, secondId } },
+
+	// Find chat between these two users
+	let chat = await Chat.findOne({
+		members: { $all: [userId, secondId] },
+	}).populate("members", "firstName lastName image username");
+
+	if (chat) {
+		// Map members to users for frontend compatibility
+		const chatObj = chat.toObject();
+		chatObj.users = chatObj.members;
+		return res.status(200).json({ status: "success", data: chatObj });
+	}
+
+	chat = await Chat.create({
+		members: [userId, secondId],
 	});
-	if (findChat) {
-		return res.status(200).json({ status: "success", data: findChat });
-	}
-	const chat = await Chat({ members: { userId, secondId } });
-	if (!chat) {
-		const error = appError.Error("not create chat", "fail", 404);
-		return next(error);
-	}
-	await chat.save();
-	res.status(200).json({ status: "success", data: chat });
+
+	await chat.populate("members", "firstName lastName image username");
+
+	const chatObj = chat.toObject();
+	chatObj.users = chatObj.members;
+
+	res.status(200).json({ status: "success", data: chatObj });
 });
 
 const findChat = errorHandler(async (req, res, next) => {
 	const _id = req.params.id;
-	const chat = await Chat.findById(_id).populate([
-		"members.secondId",
-		"members.userId",
-	]);
+	const chat = await Chat.findById(_id).populate("members", "firstName lastName image username");
+	
 	if (!chat) {
 		const error = appError.Error("chat not found", "fail", 404);
 		return next(error);
 	}
-	res.status(200).json({ status: "success", data: chat });
+
+	const chatObj = chat.toObject();
+	chatObj.users = chatObj.members;
+
+	res.status(200).json({ status: "success", data: chatObj });
 });
 
 const findUserChats = errorHandler(async (req, res, next) => {
 	const userId = req.user._id;
-	const chat = await Chat.find({
-		members: {
-			$elemMatch: {
-				$or: [{ userId }, { secondId: userId }],
-			},
-		},
-	}).populate(["members.secondId", "members.userId"]);
-	if (chat.length === 0) {
+	const chats = await Chat.find({
+		members: { $in: [userId] },
+	})
+	.populate("members", "firstName lastName image username")
+	.populate({
+		path: "latestMessage",
+		select: "text senderId createdAt"
+	})
+	.sort({ updatedAt: -1 });
+
+	if (!chats) {
 		const error = appError.Error("chats not found", "fail", 404);
 		return next(error);
 	}
 
-	res.status(200).json({ status: "success", data: chat });
+	const formattedChats = chats.map(chat => {
+		const chatObj = chat.toObject();
+		chatObj.users = chatObj.members;
+		return chatObj;
+	});
+
+	res.status(200).json({ status: "success", data: formattedChats });
 });
 
 const deleteChat = errorHandler(async (req, res, next) => {
-	const userId = req.user._id;
-	const secondId = req.params.id;
-	const chat = await Chat.findOneAndDelete({ userId, secondId });
+	const chatId = req.params.id;
+	const chat = await Chat.findByIdAndDelete(chatId);
 	if (!chat) {
-		const error = appError.Error("chats not found", "fail", 404);
+		const error = appError.Error("chat not found", "fail", 404);
 		return next(error);
 	}
 

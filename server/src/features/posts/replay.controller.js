@@ -26,11 +26,11 @@ const addReplay = errorHandler(async (req, res, next) => {
 	} else {
 		addReplay = new Replay({ ...req.body, commentId, userId });
 	}
-	const post = await Comment.findByIdAndUpdate(commentId, {
+	const comment = await Comment.findByIdAndUpdate(commentId, {
 		$push: { replies: addReplay._id },
 	});
-	if (!addReplay && !post) {
-		const error = appError.Error("replay not add", "fail", 404);
+	if (!comment) {
+		const error = appError.Error("comment not found", "fail", 404);
 		return next(error);
 	}
 	await addReplay.save();

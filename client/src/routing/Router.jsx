@@ -5,6 +5,7 @@ import FeedPage from "../pages/FeedPage";
 import MessagesPage from "../pages/MessagesPage";
 import ChatDetailPage from "../pages/ChatDetailPage";
 import ProfilePage from "../pages/ProfilePage";
+import PostDetailPage from "../pages/PostDetailPage";
 import MainLayout from "../shared/components/layout/MainLayout";
 import { ProtectedRoute } from "../features/auth";
 
@@ -30,14 +31,20 @@ export const router = createBrowserRouter([
 					{
 						path: "/messages",
 						element: <MessagesPage />,
-					},
-					{
-						path: "/messages/:chatId",
-						element: <ChatDetailPage />,
+						children: [
+							{
+								path: ":chatId",
+								element: <ChatDetailPage />,
+							},
+						],
 					},
 					{
 						path: "/profile/:userId",
 						element: <ProfilePage />,
+					},
+					{
+						path: "/posts/:postId",
+						element: <PostDetailPage />,
 					},
 				],
 			},

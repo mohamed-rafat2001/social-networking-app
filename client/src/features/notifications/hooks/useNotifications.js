@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import apiApp from "../../../shared/api/apiApp";
-import { useSocket } from "../../../providers/SocketProvider";
+import { useSocket } from "../../../shared/hooks/useSocket";
 
 const getNotifications = async () => {
 	const response = await apiApp.get("/notifications");

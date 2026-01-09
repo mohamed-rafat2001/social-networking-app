@@ -19,9 +19,9 @@ io.on("connection", (socket) => {
 
 			io.to(user.socketId).emit("getMessage", newMessage);
 			io.to(user.socketId).emit("notification", {
-				senderId: newMessage.data.senderId,
-				chatId: newMessage.data.chatId,
-				text: newMessage.data.text,
+				senderId: newMessage.senderId,
+				chatId: newMessage.chatId,
+				content: newMessage.content,
 				isRead: false,
 			});
 		}

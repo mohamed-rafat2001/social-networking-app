@@ -27,8 +27,8 @@ const addComment = errorHandler(async (req, res, next) => {
 	const post = await Posts.findByIdAndUpdate(postId, {
 		$push: { comments: addComment._id },
 	});
-	if (!addComment && !post) {
-		const error = appError.Error("not add comment", "fail", 404);
+	if (!post) {
+		const error = appError.Error("post not found", "fail", 404);
 		return next(error);
 	}
 	await addComment.save();
@@ -147,6 +147,20 @@ const disLikeComm = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: disLike });
 });
 
+const postComments = errorHandler(async (req, res, next) => {
+	const postId = req.params.id;
+	const comments = await Comment.find({ postId })
+		.populate("userId")
+		.populate({
+			path: "replies",
+			populate: {
+				path: "userId",
+				select: "firstName lastName username image",
+			},
+		});
+	res.status(200).json({ status: "success", data: comments });
+});
+
 export {
 	addComment,
 	singleComment,
@@ -154,4 +168,5 @@ export {
 	deleteComment,
 	likeOnComm,
 	disLikeComm,
+	postComments,
 };

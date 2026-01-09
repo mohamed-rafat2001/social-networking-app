@@ -44,21 +44,35 @@ const UserSearch = ({ onClose }) => {
 					<div className="text-center py-4 text-gray-500">Searching...</div>
 				) : searchResults?.data?.length > 0 ? (
 					searchResults.data.map((user) => (
-						<button
+						<div
 							key={user._id}
+							className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors cursor-pointer group"
 							onClick={() => handleUserClick(user._id)}
-							className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors text-left"
 						>
-							<Avatar src={user.image?.secure_url} size="md" />
-							<div>
-								<p className="font-bold text-gray-900 dark:text-white">
+							<Link
+								to={`/profile/${user._id}`}
+								onClick={(e) => e.stopPropagation()}
+								className="shrink-0"
+							>
+								<Avatar src={user.image?.secure_url} size="md" />
+							</Link>
+							<div className="flex-1 min-w-0">
+								<Link
+									to={`/profile/${user._id}`}
+									onClick={(e) => e.stopPropagation()}
+									className="font-bold text-gray-900 dark:text-white hover:text-primary transition-colors block truncate"
+								>
 									{user.firstName} {user.lastName}
-								</p>
-								<p className="text-xs text-gray-500 dark:text-gray-400">
+								</Link>
+								<p className="text-xs text-gray-500 dark:text-gray-400 truncate">
 									@{user.username}
 								</p>
 							</div>
-						</button>
+							<HiChatAlt
+								className="text-gray-300 dark:text-gray-600 group-hover:text-primary transition-colors"
+								size={20}
+							/>
+						</div>
 					))
 				) : searchTerm.length > 2 ? (
 					<div className="text-center py-8 text-gray-500 dark:text-gray-400">

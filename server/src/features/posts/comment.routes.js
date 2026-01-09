@@ -6,8 +6,17 @@ import * as commentController from "./comment.controller.js";
 
 const router = express.Router();
 
+// like comment
+router.patch("/like/:id", protect, commentController.likeOnComm);
+
+// dislike for post
+router.patch("/disLike/:id", protect, commentController.disLikeComm);
+
+// get all comments for a post
+router.get("/post/:id", protect, commentController.postComments);
+
 router
-	.route("/comment/:id")
+	.route("/:id")
 	// add comment
 	.post(
 		protect,
@@ -20,11 +29,5 @@ router
 	.patch(protect, commentController.updateComment)
 	//delete comment
 	.delete(protect, commentController.deleteComment);
-
-// like comment
-router.patch("/comment/like/:id", protect, commentController.likeOnComm);
-
-// dislike for post
-router.patch("/comment/disLike/:id", protect, commentController.disLikeComm);
 
 export default router;

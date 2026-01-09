@@ -6,6 +6,7 @@ export const useMessages = (chatId) => {
 		queryKey: ["messages", chatId],
 		queryFn: () => messageService.getMessages(chatId),
 		enabled: !!chatId,
+		staleTime: 10000,
 	});
 };
 

@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useUser } from "./useUser";
-import { useSocket } from "./useSocket";
-import { useMessages as useMessagesQuery } from "../features/chat/hooks/useMessageQueries";
+import { useUser } from "../../../shared/hooks/useUser";
+import { useNotifications } from "../../notifications/hooks/useNotifications";
+import { useMessages as useMessagesQuery } from "./useMessageQueries";
 
 export const useMessages = () => {
 	const activeChat = useSelector((state) => state.chats.activeChat);
 	const [userDetails, setUserDetails] = useState({});
 	const { user: currentUser } = useUser();
-	const { notifications } = useSocket();
+	const { notifications } = useNotifications();
 
-	const allMessageNotifications = notifications.filter(
-		(n) => n.isRead === false
-	).length;
+	const allMessageNotifications =
+		notifications?.filter((n) => n.isRead === false).length || 0;
 
 	const { data: messagesData, isLoading } = useMessagesQuery(activeChat?._id);
 

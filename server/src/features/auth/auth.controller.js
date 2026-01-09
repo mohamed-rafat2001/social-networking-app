@@ -8,12 +8,8 @@ import Email from "../../shared/utils/sendEmail.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
 import apiFeatures from "../../shared/utils/apiFeatures.js";
 
-const singUp = errorHandler(async (req, res, next) => {
+const signUp = errorHandler(async (req, res, next) => {
 	const user = new User(req.body);
-	if (!user) {
-		const error = appError.Error("email or password is wrong", "fail", 404);
-		return next(error);
-	}
 	const token = user.creatToken();
 	await user.save();
 	res.status(200).json({ status: "success", data: { user, token } });
@@ -33,12 +29,12 @@ const login = errorHandler(async (req, res, next) => {
 	const email = req.body.email;
 	const user = await User.findOne({ email });
 	if (!user) {
-		const error = appError.Error("email or password is wrong", "fail", 404);
+		const error = appError.Error("email or password is wrong", "fail", 401);
 		return next(error);
 	}
 	const pass = await bcryptjs.compare(req.body.password, user.password);
 	if (!pass) {
-		const error = appError.Error("email or password is wrong", "fail", 404);
+		const error = appError.Error("email or password is wrong", "fail", 401);
 		return next(error);
 	}
 
@@ -117,10 +113,14 @@ const user = errorHandler(async (req, res, next) => {
 	const userId = req.params.userId;
 	let userData;
 
-	if (userId && userId !== "user") {
-		userData = await User.findById(userId);
+	if (userId && userId !== "user" && userId !== "undefined") {
+		userData = await User.findById(userId)
+			.populate("followers", "firstName lastName username image")
+			.populate("following", "firstName lastName username image");
 	} else {
-		userData = req.user;
+		userData = await User.findById(req.user._id)
+			.populate("followers", "firstName lastName username image")
+			.populate("following", "firstName lastName username image");
 	}
 
 	if (!userData) {
@@ -146,6 +146,7 @@ const searchUsers = errorHandler(async (req, res, next) => {
 		$or: [
 			{ firstName: { $regex: searchTerm, $options: "i" } },
 			{ lastName: { $regex: searchTerm, $options: "i" } },
+			{ username: { $regex: searchTerm, $options: "i" } },
 			{ email: { $regex: searchTerm, $options: "i" } },
 		],
 		_id: { $ne: req.user._id },
@@ -154,8 +155,50 @@ const searchUsers = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: users });
 });
 
+const followUser = errorHandler(async (req, res, next) => {
+	const userToFollow = await User.findById(req.params.userId);
+	const currentUser = await User.findById(req.user._id);
+
+	if (!userToFollow) {
+		return next(appError.Error("User not found", "fail", 404));
+	}
+
+	if (currentUser.following.includes(userToFollow._id)) {
+		return next(appError.Error("Already following this user", "fail", 400));
+	}
+
+	currentUser.following.push(userToFollow._id);
+	userToFollow.followers.push(currentUser._id);
+
+	await currentUser.save();
+	await userToFollow.save();
+
+	res.status(200).json({ status: "success", data: currentUser });
+});
+
+const unfollowUser = errorHandler(async (req, res, next) => {
+	const userToUnfollow = await User.findById(req.params.userId);
+	const currentUser = await User.findById(req.user._id);
+
+	if (!userToUnfollow) {
+		return next(appError.Error("User not found", "fail", 404));
+	}
+
+	currentUser.following = currentUser.following.filter(
+		(id) => id.toString() !== userToUnfollow._id.toString()
+	);
+	userToUnfollow.followers = userToUnfollow.followers.filter(
+		(id) => id.toString() !== currentUser._id.toString()
+	);
+
+	await currentUser.save();
+	await userToUnfollow.save();
+
+	res.status(200).json({ status: "success", data: currentUser });
+});
+
 export {
-	singUp,
+	signUp,
 	profileImg,
 	login,
 	profile,
@@ -165,4 +208,6 @@ export {
 	resetPassword,
 	user,
 	searchUsers,
+	followUser,
+	unfollowUser,
 };

@@ -44,3 +44,25 @@ export const useUserProfile = (userId) => {
 		enabled: !!userId,
 	});
 };
+
+export const useFollowUser = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: userService.followUser,
+		onSuccess: (_, userId) => {
+			queryClient.invalidateQueries(["userProfile", userId]);
+			queryClient.invalidateQueries(["currentUser"]);
+		},
+	});
+};
+
+export const useUnfollowUser = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: userService.unfollowUser,
+		onSuccess: (_, userId) => {
+			queryClient.invalidateQueries(["userProfile", userId]);
+			queryClient.invalidateQueries(["currentUser"]);
+		},
+	});
+};

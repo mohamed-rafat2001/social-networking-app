@@ -23,6 +23,7 @@ const regestrationValidator = [
 			minSymbols: 1,
 		})
 		.withMessage("in-valid password"),
+	body("gender").isIn(["male", "female"]).withMessage("gender must be male or female"),
 ];
 
 const fileValidation = {

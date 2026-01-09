@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -7,6 +7,9 @@ import { HiX } from "react-icons/hi";
 
 const MainLayout = () => {
 	const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+	const location = useLocation();
+
+	const isMessagesPage = location.pathname.startsWith("/messages");
 
 	return (
 		<div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col transition-colors duration-300">
@@ -57,57 +60,84 @@ const MainLayout = () => {
 						<Sidebar onMobileItemClick={null} />
 					</div>
 				</aside>
-				<main className="flex-1 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
+				<main
+					className={`flex-1 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden ${
+						isMessagesPage ? "xl:max-w-none" : ""
+					}`}
+				>
 					<Outlet />
 				</main>
-				<aside className="hidden xl:block w-80 shrink-0">
-					<div className="sticky top-24 space-y-6">
-						{/* Right Sidebar - Trending or Suggestions */}
-						<div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
-							<h3 className="font-bold text-lg mb-4 text-gray-900 dark:text-white">
-								Trending for Engineers
-							</h3>
-							<div className="space-y-4">
-								<div className="group cursor-pointer">
-									<p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
-										Computer Science · Trending
-									</p>
-									<p className="font-bold text-gray-900 dark:text-white group-hover:underline">
-										#React19_Released
-									</p>
-									<p className="text-xs text-gray-500 dark:text-gray-400">
-										1,234 Posts
-									</p>
-								</div>
-								<div className="group cursor-pointer">
-									<p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
-										Civil Engineering · Trending
-									</p>
-									<p className="font-bold text-gray-900 dark:text-white group-hover:underline">
-										#SmartBridges
-									</p>
-									<p className="text-xs text-gray-500 dark:text-gray-400">
-										856 Posts
-									</p>
-								</div>
-								<div className="group cursor-pointer">
-									<p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
-										Mechanical · Trending
-									</p>
-									<p className="font-bold text-gray-900 dark:text-white group-hover:underline">
-										#EV_Future
-									</p>
-									<p className="text-xs text-gray-500 dark:text-gray-400">
-										2,102 Posts
-									</p>
+				{!isMessagesPage && (
+					<aside className="hidden xl:block w-80 shrink-0">
+						<div className="sticky top-24 space-y-6">
+							{/* Right Sidebar - Trending or Suggestions */}
+							<div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+								<h3 className="font-bold text-lg mb-4 text-gray-900 dark:text-white">
+									Trending for Engineers
+								</h3>
+								<div className="space-y-4">
+									<div className="group cursor-pointer">
+										<p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
+											Computer Science · Trending
+										</p>
+										<p className="font-bold text-gray-900 dark:text-white group-hover:underline">
+											#React19_Released
+										</p>
+										<p className="text-xs text-gray-500 dark:text-gray-400">
+											1,234 Posts
+										</p>
+									</div>
+									<div className="group cursor-pointer">
+										<p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
+											Civil Engineering · Trending
+										</p>
+										<p className="font-bold text-gray-900 dark:text-white group-hover:underline">
+											#SmartBridges
+										</p>
+										<p className="text-xs text-gray-500 dark:text-gray-400">
+											856 Posts
+										</p>
+									</div>
+									<div className="group cursor-pointer">
+										<p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
+											Mechanical · Trending
+										</p>
+										<p className="font-bold text-gray-900 dark:text-white group-hover:underline">
+											#EV_Future
+										</p>
+										<p className="text-xs text-gray-500 dark:text-gray-400">
+											2,431 Posts
+										</p>
+									</div>
 								</div>
 							</div>
-							<button className="text-primary text-sm font-semibold mt-6 hover:underline">
-								Show more
-							</button>
+
+							{/* Suggestions */}
+							<div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+								<h3 className="font-bold text-lg mb-4 text-gray-900 dark:text-white">
+									Who to follow
+								</h3>
+								<div className="space-y-4">
+									{/* Placeholder suggestions */}
+									<div className="flex items-center justify-between">
+										<div className="flex items-center gap-2">
+											<div className="w-10 h-10 rounded-full bg-primary/10" />
+											<div>
+												<p className="text-sm font-bold text-gray-900 dark:text-white">
+													Dr. Sarah Chen
+												</p>
+												<p className="text-xs text-gray-500">@sarah_ai</p>
+											</div>
+										</div>
+										<button className="text-xs font-bold text-primary hover:underline">
+											Follow
+										</button>
+									</div>
+								</div>
+							</div>
 						</div>
-					</div>
-				</aside>
+					</aside>
+				)}
 			</div>
 		</div>
 	);

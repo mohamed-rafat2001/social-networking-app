@@ -11,7 +11,7 @@ import {
 	HiSun,
 } from "react-icons/hi";
 import { useUser } from "../../hooks/useUser";
-import { useSocket } from "../../../providers/SocketProvider";
+import { useSocket } from "../../hooks/useSocket";
 import { Avatar, Button } from "../UI";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";

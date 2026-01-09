@@ -15,7 +15,7 @@ router.post(
 	"/signup",
 	regestrationValidator,
 	handelValidation(),
-	authController.singUp
+	authController.signUp
 );
 router.post(
 	"/login",
@@ -46,5 +46,8 @@ router
 
 router.get("/user", authController.user);
 router.get("/:userId", authController.user);
+
+router.post("/follow/:userId", authController.followUser);
+router.post("/unfollow/:userId", authController.unfollowUser);
 
 export default router;

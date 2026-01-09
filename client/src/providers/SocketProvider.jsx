@@ -4,14 +4,6 @@ import { useUser } from "../shared/hooks/useUser";
 
 export const SocketContext = createContext(null);
 
-export const useSocket = () => {
-	const context = useContext(SocketContext);
-	if (context === undefined) {
-		throw new Error("useSocket must be used within a SocketProvider");
-	}
-	return context;
-};
-
 export const SocketProvider = ({ children }) => {
 	const [socket, setSocket] = useState(null);
 	const [onlineUsers, setOnlineUsers] = useState([]);
