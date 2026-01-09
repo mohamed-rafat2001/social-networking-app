@@ -220,22 +220,27 @@ function CommentItem({ comment, postId }) {
 							>
 								<div className="flex gap-2">
 									<Avatar src={user?.image?.secure_url} size="xs" />
-									<div className="flex-1">
-										<InputEmoji
-											value={replyText}
-											onChange={setReplyText}
-											cleanOnEnter
-											onEnter={handleReplySubmit}
-											placeholder="Post your reply"
-											fontSize={13}
-											theme={darkMode ? "dark" : "light"}
-										/>
-										<div className="flex justify-end mt-1">
+									<div className="flex-1 min-w-0">
+										<div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl px-1">
+											<InputEmoji
+												value={replyText}
+												onChange={setReplyText}
+												cleanOnEnter
+												onEnter={handleReplySubmit}
+												placeholder="Post your reply"
+												fontSize={13}
+												theme={darkMode ? "dark" : "light"}
+												background={darkMode ? "#1f2937" : "#f9fafb"}
+												color={darkMode ? "#f3f4f6" : "#1f2937"}
+												placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
+											/>
+										</div>
+										<div className="flex justify-end mt-2">
 											<Button
 												size="sm"
 												disabled={!replyText.trim() || isReplying}
 												onClick={handleReplySubmit}
-												className="rounded-full h-8 text-xs px-4"
+												className="rounded-full h-7 text-[11px] px-3 font-bold"
 											>
 												{isReplying ? (
 													<Spinner size="xs" variant="white" />

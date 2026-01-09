@@ -38,26 +38,31 @@ function CommentList({ comments, postId }) {
 		<div className="w-full">
 			{/* Add Comment Form */}
 			<div className="p-4 border-b dark:border-gray-800">
-				<div className="flex gap-3">
-					<Avatar src={user?.image?.secure_url} size="sm" />
-					<div className="flex-1">
-						<InputEmoji
-							value={text}
-							onChange={setText}
-							cleanOnEnter
-							onEnter={handleSubmit}
-							placeholder="Post your reply"
-							fontSize={15}
-							fontFamily="inherit"
-							borderColor="transparent"
-							theme={darkMode ? "dark" : "light"}
-						/>
-						<div className="flex justify-end mt-2">
+				<div className="flex gap-4">
+					<Avatar src={user?.image?.secure_url} size="md" />
+					<div className="flex-1 min-w-0">
+						<div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl focus-within:bg-white dark:focus-within:bg-gray-800 border border-transparent focus-within:border-primary/20 transition-all px-2">
+							<InputEmoji
+								value={text}
+								onChange={setText}
+								cleanOnEnter
+								onEnter={handleSubmit}
+								placeholder="Post your reply"
+								fontSize={15}
+								fontFamily="inherit"
+								borderColor="transparent"
+								theme={darkMode ? "dark" : "light"}
+								background={darkMode ? "#1f2937" : "#f9fafb"}
+								color={darkMode ? "#f3f4f6" : "#1f2937"}
+								placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
+							/>
+						</div>
+						<div className="flex justify-end mt-3">
 							<Button
 								size="sm"
 								disabled={!text.trim() || isLoading}
 								onClick={handleSubmit}
-								className="rounded-full px-4 font-bold"
+								className="rounded-full px-5 font-bold shadow-md shadow-primary/10"
 							>
 								{isLoading ? <Spinner size="xs" variant="white" /> : "Reply"}
 							</Button>

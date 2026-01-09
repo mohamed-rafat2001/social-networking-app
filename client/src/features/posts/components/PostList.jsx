@@ -45,6 +45,7 @@ function PostList() {
 	const fileInputRef = useRef(null);
 
 	const { user } = useUser();
+	const { darkMode } = useTheme();
 	const { onlineUsers } = useSocket();
 
 	const { data: postsData, isLoading: isPostsLoading } = usePosts();
@@ -171,11 +172,10 @@ function PostList() {
 								fontSize={16}
 								fontFamily="inherit"
 								borderColor="transparent"
-								theme={
-									document.documentElement.classList.contains("dark")
-										? "dark"
-										: "light"
-								}
+								theme={darkMode ? "dark" : "light"}
+								background={darkMode ? "#1f2937" : "#f9fafb"}
+								color={darkMode ? "#f3f4f6" : "#1f2937"}
+								placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
 							/>
 						</div>
 

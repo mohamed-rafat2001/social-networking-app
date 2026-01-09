@@ -11,6 +11,7 @@ import {
 	ImageModal,
 } from "../../../shared/components/UI";
 import { useUser } from "../../../shared/hooks/useUser";
+import { useTheme } from "../../../providers/ThemeProvider";
 import {
 	HiOutlineArrowLeft,
 	HiOutlinePaperAirplane,
@@ -27,6 +28,7 @@ const ChatWindow = () => {
 	const { chatId } = useParams();
 	const navigate = useNavigate();
 	const { user: currentUser } = useUser();
+	const { darkMode } = useTheme();
 	const { socket, onlineUsers } = useSocket();
 	const queryClient = useQueryClient();
 	const [text, setText] = useState("");
@@ -346,7 +348,10 @@ const ChatWindow = () => {
 							cleanOnEnter
 							onEnter={handleSend}
 							placeholder="Type a message..."
-							theme="auto"
+							theme={darkMode ? "dark" : "light"}
+							background={darkMode ? "#1f2937" : "#f9fafb"}
+							color={darkMode ? "#f3f4f6" : "#1f2937"}
+							placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
 							borderRadius={12}
 							fontSize={14}
 							fontFamily="inherit"

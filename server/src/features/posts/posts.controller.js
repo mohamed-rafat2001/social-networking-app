@@ -48,9 +48,13 @@ const singlePost = errorHandler(async (req, res, next) => {
 		.populate("userId")
 		.populate({
 			path: "comments",
-			populate: {
-				path: "userId",
-			},
+			populate: [
+				{ path: "userId" },
+				{
+					path: "replies",
+					populate: { path: "userId" },
+				},
+			],
 		});
 	if (!post) {
 		const error = appError.Error("post not found", "fail", 404);

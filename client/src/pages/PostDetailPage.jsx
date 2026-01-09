@@ -75,15 +75,17 @@ function PostDetailPage() {
 	return (
 		<div className="w-full max-w-2xl mx-auto border-x dark:border-gray-800 min-h-screen bg-white dark:bg-gray-900">
 			{/* Header */}
-			<div className="sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b dark:border-gray-800 z-20 px-4 py-3 flex items-center gap-8">
+			<div className="sticky top-0 bg-white dark:bg-gray-900 border-b dark:border-gray-800 z-[60] px-4 py-3 flex items-center gap-8">
 				<button
 					onClick={() => navigate(-1)}
-					className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+					className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-900 dark:text-white"
 				>
 					<HiArrowLeft className="text-xl" />
 				</button>
 				<div>
-					<h1 className="text-xl font-bold">Post</h1>
+					<h1 className="text-xl font-bold text-gray-900 dark:text-white">
+						Post
+					</h1>
 					<p className="text-xs text-gray-500">Thread</p>
 				</div>
 			</div>
@@ -95,7 +97,7 @@ function PostDetailPage() {
 						<Avatar src={post.userId?.image?.secure_url} size="lg" />
 					</Link>
 					<div className="flex-1 min-w-0">
-						<div className="flex justify-between items-start">
+						<div className="flex justify-between items-start pt-1">
 							<div>
 								<Link
 									to={`/profile/${post.userId?._id}`}
@@ -107,7 +109,7 @@ function PostDetailPage() {
 									@{post.userId?.firstName?.toLowerCase()}
 								</p>
 							</div>
-							<button className="text-gray-500 hover:text-primary p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+							<button className="text-gray-500 hover:text-primary p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors -mt-2">
 								<HiDotsHorizontal size={18} />
 							</button>
 						</div>
