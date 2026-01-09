@@ -8,6 +8,8 @@ import {
 	HiOutlineChatAlt2,
 	HiOutlineUserAdd,
 	HiOutlineThumbUp,
+	HiOutlineShare,
+	HiOutlineAtSymbol,
 } from "react-icons/hi";
 
 const NotificationList = () => {
@@ -22,6 +24,10 @@ const NotificationList = () => {
 				return <HiOutlineChatAlt2 className="text-purple-500" />;
 			case "follow":
 				return <HiOutlineUserAdd className="text-green-500" />;
+			case "share":
+				return <HiOutlineShare className="text-pink-500" />;
+			case "mention":
+				return <HiOutlineAtSymbol className="text-yellow-500" />;
 			default:
 				return <HiOutlineBell className="text-gray-500" />;
 		}
@@ -96,6 +102,7 @@ const NotificationList = () => {
 								{notification.type === "comment" && "commented on your post"}
 								{notification.type === "follow" && "started following you"}
 								{notification.type === "mention" && "mentioned you in a post"}
+								{notification.type === "share" && "shared your post"}
 							</span>
 						</p>
 
