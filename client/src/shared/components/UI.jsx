@@ -1,6 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { clsx } from "clsx";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+	HiOutlineX,
+	HiOutlineDownload,
+	HiOutlineChevronLeft,
+	HiOutlineChevronRight,
+} from "react-icons/hi";
 
 /**
  * Utility for tailwind class merging
@@ -149,6 +156,206 @@ export const Input = React.forwardRef(
 	}
 );
 Input.displayName = "Input";
+
+/**
+ * ImageModal Component
+ * Full-screen modal for viewing images
+ */
+export const ImageModal = ({
+	isOpen,
+	onClose,
+	images = [],
+	initialIndex = 0,
+}) => {
+	const [currentIndex, setCurrentIndex] = useState(initialIndex);
+
+	if (!isOpen) return null;
+
+	const handlePrevious = (e) => {
+		e.stopPropagation();
+		setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+	};
+
+	const handleNext = (e) => {
+		e.stopPropagation();
+		setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+	};
+
+	const currentImage = images[currentIndex]?.secure_url || images[currentIndex];
+
+	const handleDownload = async (e) => {
+		e.stopPropagation();
+		try {
+			const response = await fetch(currentImage);
+			const blob = await response.blob();
+			const url = window.URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+
+			// Extract filename from URL or use a default
+			const filename = currentImage.split("/").pop() || "download";
+			link.setAttribute("download", filename);
+
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+			window.URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error("Download failed:", error);
+			// Fallback to opening in new tab if blob download fails
+			window.open(currentImage, "_blank");
+		}
+	};
+
+	return (
+		<AnimatePresence>
+			<motion.div
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				exit={{ opacity: 0 }}
+				className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
+				onClick={onClose}
+			>
+				{/* Close Button */}
+				<button
+					onClick={onClose}
+					className="absolute top-6 right-6 z-[110] p-3 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
+				>
+					<HiOutlineX size={28} />
+				</button>
+
+				{/* Download Button */}
+				<button
+					onClick={handleDownload}
+					className="absolute top-6 right-20 z-[110] p-3 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
+				>
+					<HiOutlineDownload size={24} />
+				</button>
+
+				{/* Navigation - Prev */}
+				{images.length > 1 && (
+					<button
+						onClick={handlePrevious}
+						className="absolute left-6 z-[110] p-4 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all"
+					>
+						<HiOutlineChevronLeft size={36} />
+					</button>
+				)}
+
+				{/* Main Image */}
+				<motion.div
+					key={currentIndex}
+					initial={{ opacity: 0, scale: 0.9, y: 20 }}
+					animate={{ opacity: 1, scale: 1, y: 0 }}
+					exit={{ opacity: 0, scale: 0.9, y: 20 }}
+					transition={{ type: "spring", damping: 25, stiffness: 200 }}
+					className="relative max-w-7xl max-h-full flex items-center justify-center"
+					onClick={(e) => e.stopPropagation()}
+				>
+					<img
+						src={currentImage}
+						alt={`Full view ${currentIndex + 1}`}
+						className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+					/>
+
+					{/* Index Indicator */}
+					{images.length > 1 && (
+						<div className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-white/60 text-sm font-medium">
+							{currentIndex + 1} / {images.length}
+						</div>
+					)}
+				</motion.div>
+
+				{/* Navigation - Next */}
+				{images.length > 1 && (
+					<button
+						onClick={handleNext}
+						className="absolute right-6 z-[110] p-4 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all"
+					>
+						<HiOutlineChevronRight size={36} />
+					</button>
+				)}
+			</motion.div>
+		</AnimatePresence>
+	);
+};
+
+/**
+ * ImageGallery Component
+ * Displays images in a grid similar to Twitter/WhatsApp
+ */
+export const ImageGallery = ({ images = [], className }) => {
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [selectedIndex, setSelectedIndex] = useState(0);
+
+	if (!images || images.length === 0) return null;
+
+	const count = images.length;
+
+	const handleImageClick = (e, index) => {
+		e.stopPropagation();
+		setSelectedIndex(index);
+		setIsModalOpen(true);
+	};
+
+	const getGridClass = () => {
+		if (count === 1) return "grid-cols-1";
+		if (count === 2) return "grid-cols-2";
+		if (count === 3) return "grid-cols-2 grid-rows-2";
+		return "grid-cols-2 grid-rows-2";
+	};
+
+	const getImageClass = (index) => {
+		if (count === 3 && index === 0) return "row-span-2 h-full";
+		return "h-full";
+	};
+
+	return (
+		<>
+			<div
+				className={cn(
+					"grid gap-1 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50",
+					getGridClass(),
+					count === 1 ? "max-h-[500px]" : "aspect-[16/9]",
+					className
+				)}
+				onClick={(e) => e.stopPropagation()}
+			>
+				{images.slice(0, 4).map((image, index) => (
+					<div
+						key={index}
+						className={cn(
+							"relative group cursor-pointer",
+							getImageClass(index)
+						)}
+						onClick={(e) => handleImageClick(e, index)}
+					>
+						<img
+							src={image.secure_url || image}
+							alt={`Gallery image ${index + 1}`}
+							className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+							loading="lazy"
+						/>
+						{count > 4 && index === 3 && (
+							<div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-[2px]">
+								<span className="text-white text-xl font-bold">
+									+{count - 4}
+								</span>
+							</div>
+						)}
+					</div>
+				))}
+			</div>
+
+			<ImageModal
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				images={images}
+				initialIndex={selectedIndex}
+			/>
+		</>
+	);
+};
 
 /**
  * Spinner Component

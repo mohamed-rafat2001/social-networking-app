@@ -13,9 +13,10 @@ export const createMessage = async ({ chatId, data, onUploadProgress }) => {
 				data instanceof FormData ? "multipart/form-data" : "application/json",
 		},
 		onUploadProgress: (progressEvent) => {
-			if (onUploadProgress && progressEvent.total) {
+			if (onUploadProgress) {
+				const total = progressEvent.total || progressEvent.loaded;
 				const percentCompleted = Math.round(
-					(progressEvent.loaded * 100) / progressEvent.total
+					(progressEvent.loaded * 100) / total
 				);
 				onUploadProgress(percentCompleted);
 			}

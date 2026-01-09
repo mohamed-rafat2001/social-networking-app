@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Avatar } from "../../../shared/components/UI";
+import { Avatar, ImageGallery, cn } from "../../../shared/components/UI";
 import { useUser } from "../../../shared/hooks/useUser";
 import {
 	useLikePost,
@@ -116,19 +116,8 @@ function PostItem({ post, index }) {
 						{post.text}
 					</p>
 
-					{post.fileUp?.[0] && (
-						<motion.div
-							className="rounded-2xl overflow-hidden border dark:border-gray-800 mb-3 bg-gray-50 dark:bg-gray-800/50"
-							initial={{ opacity: 0, scale: 0.98 }}
-							animate={{ opacity: 1, scale: 1 }}
-						>
-							<img
-								className="w-full h-auto max-h-[600px] object-contain block mx-auto"
-								src={post.fileUp[0].secure_url}
-								alt="Post content"
-								loading="lazy"
-							/>
-						</motion.div>
+					{post.fileUp && post.fileUp.length > 0 && (
+						<ImageGallery images={post.fileUp} className="mb-3" />
 					)}
 
 					<div className="flex justify-between text-gray-500 dark:text-gray-400 max-w-md mt-2">

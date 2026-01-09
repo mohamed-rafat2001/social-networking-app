@@ -2,7 +2,13 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useMessages, useCreateMessage } from "../hooks/useMessageQueries";
 import { useSingleChat } from "../hooks/useChatQueries";
 import { useState, useEffect, useRef } from "react";
-import { Avatar, Button, Spinner } from "../../../shared/components/UI";
+import {
+	Avatar,
+	Button,
+	Spinner,
+	ImageGallery,
+	cn,
+} from "../../../shared/components/UI";
 import { useUser } from "../../../shared/hooks/useUser";
 import {
 	HiOutlineArrowLeft,
@@ -14,6 +20,7 @@ import {
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useQueryClient } from "@tanstack/react-query";
 import InputEmoji from "react-input-emoji";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ChatWindow = () => {
 	const { chatId } = useParams();
@@ -45,7 +52,7 @@ const ChatWindow = () => {
 
 	useEffect(() => {
 		scrollToBottom();
-	}, [messages]);
+	}, [messages, uploadProgress, previewUrls]);
 
 	useEffect(() => {
 		if (socket && chatId) {
@@ -172,16 +179,13 @@ const ChatWindow = () => {
 								}`}
 							>
 								{msg.file && msg.file.length > 0 && (
-									<div className="grid grid-cols-1 gap-2">
-										{msg.file.map((file, idx) => (
-											<img
-												key={idx}
-												src={file.secure_url}
-												alt="attachment"
-												className="rounded-xl max-h-60 object-cover border border-gray-100 dark:border-gray-800"
-											/>
-										))}
-									</div>
+									<ImageGallery
+										images={msg.file}
+										className={cn(
+											"w-[300px] md:w-[400px]",
+											isMe ? "rounded-tr-none" : "rounded-tl-none"
+										)}
+									/>
 								)}
 								{msg.content && (
 									<div
@@ -223,22 +227,35 @@ const ChatWindow = () => {
 			)}
 
 			{/* Upload Progress */}
-			{uploadProgress > 0 && uploadProgress < 100 && (
-				<div className="px-4 py-2 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
-					<div className="flex items-center gap-3">
-						<div className="flex-1 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-							<motion.div
-								initial={{ width: 0 }}
-								animate={{ width: `${uploadProgress}%` }}
-								className="h-full bg-primary"
-							/>
+			<AnimatePresence>
+				{uploadProgress > 0 && (
+					<motion.div
+						initial={{ opacity: 0, height: 0 }}
+						animate={{ opacity: 1, height: "auto" }}
+						exit={{ opacity: 0, height: 0 }}
+						className="px-4 py-2 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 overflow-hidden"
+					>
+						<div className="flex flex-col gap-1">
+							<div className="flex items-center justify-between mb-1">
+								<span className="text-[10px] font-bold text-primary uppercase tracking-wider">
+									{uploadProgress === 100 ? "Processing..." : "Uploading..."}
+								</span>
+								<span className="text-[10px] font-bold text-primary">
+									{uploadProgress}%
+								</span>
+							</div>
+							<div className="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+								<motion.div
+									initial={{ width: 0 }}
+									animate={{ width: `${uploadProgress}%` }}
+									transition={{ type: "spring", damping: 20, stiffness: 100 }}
+									className="h-full bg-primary"
+								/>
+							</div>
 						</div>
-						<span className="text-[10px] font-bold text-primary whitespace-nowrap">
-							{uploadProgress}%
-						</span>
-					</div>
-				</div>
-			)}
+					</motion.div>
+				)}
+			</AnimatePresence>
 
 			{/* Input */}
 			<div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
