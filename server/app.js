@@ -41,18 +41,33 @@ app.all("*", (req, res, next) => {
 
 app.use((error, req, res, next) => {
 	console.error("Error occurred:", error);
-	const statusCode = error.code || 500;
+
+	// Handle Multer errors
+	if (error.name === "MulterError") {
+		return res.status(400).json({
+			status: "fail",
+			message: `Upload error: ${error.message}`,
+			code: 400,
+		});
+	}
+
+	let statusCode = error.code || error.statusCode || 500;
+	if (typeof statusCode !== "number" || statusCode < 100 || statusCode > 599) {
+		statusCode = 500;
+	}
+	const message = error.message || "Internal Server Error";
+
 	if (process.env.MODE === "DEV") {
 		return res.status(statusCode).json({
 			status: "error",
-			message: error.message,
+			message: message,
 			code: statusCode,
 			stack: error.stack,
 		});
 	}
 	res.status(statusCode).json({
 		status: "error",
-		message: error.message,
+		message: message,
 		code: statusCode,
 	});
 });

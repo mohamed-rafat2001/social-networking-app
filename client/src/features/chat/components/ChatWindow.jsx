@@ -8,6 +8,7 @@ import {
 	Spinner,
 	ImageGallery,
 	cn,
+	ImageModal,
 } from "../../../shared/components/UI";
 import { useUser } from "../../../shared/hooks/useUser";
 import {
@@ -32,6 +33,8 @@ const ChatWindow = () => {
 	const [selectedFiles, setSelectedFiles] = useState([]);
 	const [previewUrls, setPreviewUrls] = useState([]);
 	const [uploadProgress, setUploadProgress] = useState(0);
+	const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+	const [selectedPreviewIndex, setSelectedPreviewIndex] = useState(0);
 	const messagesEndRef = useRef(null);
 	const fileInputRef = useRef(null);
 
@@ -207,22 +210,61 @@ const ChatWindow = () => {
 
 			{/* File Previews */}
 			{previewUrls.length > 0 && (
-				<div className="px-4 py-2 flex gap-2 overflow-x-auto bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800">
-					{previewUrls.map((url, index) => (
-						<div key={index} className="relative shrink-0">
-							<img
-								src={url}
-								alt="preview"
-								className="w-20 h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
-							/>
-							<button
-								onClick={() => removeFile(index)}
-								className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-sm"
+				<div className="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800">
+					<div
+						className={cn(
+							"grid gap-2 max-w-[400px]",
+							previewUrls.length === 1 ? "grid-cols-1" : "grid-cols-2"
+						)}
+					>
+						{previewUrls.slice(0, 4).map((url, index) => (
+							<div
+								key={index}
+								className={cn(
+									"relative group rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-pointer",
+									previewUrls.length === 1 ? "" : "aspect-square"
+								)}
+								onClick={() => {
+									setSelectedPreviewIndex(index);
+									setIsPreviewModalOpen(true);
+								}}
 							>
-								<HiOutlineX size={12} />
-							</button>
-						</div>
-					))}
+								<img
+									src={url}
+									alt="preview"
+									className={cn(
+										"w-full h-full object-cover",
+										previewUrls.length === 1 && "max-h-[200px] object-contain"
+									)}
+								/>
+								<button
+									onClick={(e) => {
+										e.stopPropagation();
+										removeFile(index);
+									}}
+									className="absolute top-1.5 right-1.5 p-1 bg-gray-900/60 hover:bg-gray-900/80 text-white rounded-full backdrop-blur-sm transition-all z-10"
+								>
+									<HiOutlineX size={14} />
+								</button>
+								{previewUrls.length > 4 && index === 3 && (
+									<div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center backdrop-blur-[2px] group-hover:bg-black/40 transition-colors">
+										<span className="text-white text-lg font-bold">
+											+{previewUrls.length - 4}
+										</span>
+										<span className="text-white/80 text-[10px] font-medium uppercase tracking-wider">
+											more
+										</span>
+									</div>
+								)}
+							</div>
+						))}
+					</div>
+					<ImageModal
+						isOpen={isPreviewModalOpen}
+						onClose={() => setIsPreviewModalOpen(false)}
+						images={previewUrls}
+						initialIndex={selectedPreviewIndex}
+					/>
 				</div>
 			)}
 

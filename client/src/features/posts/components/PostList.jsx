@@ -10,7 +10,13 @@ import {
 import { useSocket } from "../../../shared/hooks/useSocket";
 import InputEmoji from "react-input-emoji";
 import { motion, AnimatePresence } from "framer-motion";
-import { Avatar, Button, Spinner } from "../../../shared/components/UI";
+import {
+	Avatar,
+	Button,
+	Spinner,
+	cn,
+	ImageModal,
+} from "../../../shared/components/UI";
 
 import {
 	HiPhotograph,
@@ -33,6 +39,8 @@ function PostList() {
 	const [previewUrls, setPreviewUrls] = useState([]);
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const [isUploading, setIsUploading] = useState(false);
+	const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+	const [selectedPreviewIndex, setSelectedPreviewIndex] = useState(0);
 	const fileInputRef = useRef(null);
 
 	const { user } = useUser();
@@ -88,7 +96,7 @@ function PostList() {
 		} else {
 			const data = new FormData();
 			files.forEach((f) => {
-				data.append("filess", f);
+				data.append("fileUp", f);
 			});
 			if (text) data.append("text", text);
 			postData = data;
@@ -173,37 +181,64 @@ function PostList() {
 						{/* Image Previews */}
 						{previewUrls.length > 0 && (
 							<div
-								className={`grid gap-2 mb-4 ${
+								className={cn(
+									"grid gap-2 mb-4",
 									previewUrls.length === 1 ? "grid-cols-1" : "grid-cols-2"
-								}`}
+								)}
 							>
-								{previewUrls.map((url, index) => (
+								{previewUrls.slice(0, 4).map((url, index) => (
 									<div
 										key={url}
-										className={`relative group rounded-2xl overflow-hidden border dark:border-gray-800 bg-gray-100 dark:bg-gray-800 ${
+										className={cn(
+											"relative group rounded-2xl overflow-hidden border dark:border-gray-800 bg-gray-100 dark:bg-gray-800 cursor-pointer",
 											previewUrls.length === 1 ? "" : "aspect-square"
-										}`}
+										)}
+										onClick={() => {
+											setSelectedPreviewIndex(index);
+											setIsPreviewModalOpen(true);
+										}}
 									>
 										<img
 											src={url}
 											alt=""
-											className={`w-full h-full ${
+											className={cn(
+												"w-full h-full",
 												previewUrls.length === 1
 													? "object-contain max-h-[512px]"
 													: "object-cover"
-											}`}
+											)}
 										/>
 										<button
 											type="button"
-											onClick={() => removeFile(index)}
-											className="absolute top-2 right-2 p-1.5 bg-gray-900/60 hover:bg-gray-900/80 text-white rounded-full backdrop-blur-sm transition-all"
+											onClick={(e) => {
+												e.stopPropagation();
+												removeFile(index);
+											}}
+											className="absolute top-2 right-2 p-1.5 bg-gray-900/60 hover:bg-gray-900/80 text-white rounded-full backdrop-blur-sm transition-all z-10"
 										>
 											<HiX className="text-sm" />
 										</button>
+										{previewUrls.length > 4 && index === 3 && (
+											<div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center backdrop-blur-[2px] group-hover:bg-black/40 transition-colors">
+												<span className="text-white text-2xl font-bold">
+													+{previewUrls.length - 4}
+												</span>
+												<span className="text-white/80 text-xs font-medium uppercase tracking-wider">
+													more images
+												</span>
+											</div>
+										)}
 									</div>
 								))}
 							</div>
 						)}
+
+						<ImageModal
+							isOpen={isPreviewModalOpen}
+							onClose={() => setIsPreviewModalOpen(false)}
+							images={previewUrls}
+							initialIndex={selectedPreviewIndex}
+						/>
 
 						<div className="flex justify-between items-center mt-2 pt-2 border-t dark:border-gray-800">
 							<div className="flex gap-1">
