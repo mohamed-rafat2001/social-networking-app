@@ -11,7 +11,7 @@ router.use(protect);
 router
 	.route("/:id")
 	.post(
-		fileUpload(fileValidation.image).array("file"),
+		fileUpload(fileValidation.image).array("file", 10),
 		messageController.createMessage
 	)
 	.get(messageController.ChatMessages)

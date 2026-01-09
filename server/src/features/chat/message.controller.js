@@ -18,15 +18,29 @@ const createMessage = errorHandler(async (req, res, next) => {
 	let messageData = { senderId, chatId, content };
 
 	if (req.files && req.files.length > 0) {
-		const files = [];
-		for (const file of req.files) {
-			const { public_id, secure_url } = await cloudinary.uploader.upload(
-				file.path,
-				{ folder: `social-app/chat/chatId_${chatId}` }
+		const uploadPromises = req.files.map((file) =>
+			cloudinary.uploader.upload(file.path, {
+				folder: `social-app/chat/chatId_${chatId}`,
+				resource_type: "auto",
+			})
+		);
+
+		try {
+			const uploadResults = await Promise.all(uploadPromises);
+			const files = uploadResults.map((result) => ({
+				public_id: result.public_id,
+				secure_url: result.secure_url,
+			}));
+			messageData.file = files;
+		} catch (uploadError) {
+			console.error("Cloudinary upload error in chat:", uploadError);
+			const error = appError.Error(
+				`Failed to upload chat files: ${uploadError.message}`,
+				"fail",
+				500
 			);
-			files.push({ public_id, secure_url });
+			return next(error);
 		}
-		messageData.file = files;
 	}
 
 	const message = await Message.create(messageData);
@@ -48,14 +62,14 @@ const createMessage = errorHandler(async (req, res, next) => {
 const ChatMessages = errorHandler(async (req, res, next) => {
 	const chatId = req.params.id;
 	const messages = await Message.find({ chatId }).sort({ createdAt: 1 });
-	
+
 	if (!messages) {
 		const error = appError.Error("messages not found", "fail", 404);
 		return next(error);
 	}
 
 	// Map senderId to sender for frontend compatibility if needed
-	const formattedMessages = messages.map(msg => {
+	const formattedMessages = messages.map((msg) => {
 		const msgObj = msg.toObject();
 		msgObj.sender = msgObj.senderId;
 		return msgObj;
