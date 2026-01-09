@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useUserProfile } from "../../auth/hooks/useUserQueries";
 import { useSocket } from "../../../providers/SocketProvider";
 import { usePosts } from "../../posts/hooks/usePostQueries";
-import { Avatar, Button, Spinner } from "../../../ui";
+import { Avatar, Button, Spinner } from "../../../shared/components/UI";
 import {
 	HiOutlineMail,
 	HiOutlineAcademicCap,
@@ -12,9 +12,8 @@ import {
 	HiHeart,
 	HiDotsHorizontal,
 } from "react-icons/hi";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
-import moment from "moment";
 
 const ProfileDetail = () => {
 	const { userId } = useParams();
@@ -77,8 +76,7 @@ const ProfileDetail = () => {
 							</h1>
 							<div className="flex items-center gap-3">
 								<p className="text-gray-500 dark:text-gray-400 font-medium">
-									@{user.firstName.toLowerCase()}
-									{user.lastName.toLowerCase()}
+									@{user.username}
 								</p>
 							</div>
 						</div>
@@ -91,7 +89,7 @@ const ProfileDetail = () => {
 						<div className="flex flex-wrap gap-6 pt-2">
 							<div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 font-medium">
 								<HiOutlineAcademicCap size={18} className="text-primary" />
-								<span>Student ID: {user.idNumber}</span>
+								<span>Handle: @{user.username}</span>
 							</div>
 							<div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 font-medium">
 								<HiOutlineMail size={18} className="text-primary" />
@@ -170,7 +168,10 @@ const ProfileDetail = () => {
 														{user.firstName} {user.lastName}
 													</span>
 													<span className="text-gray-500 dark:text-gray-400 text-sm">
-														· {moment(post.createdAt).fromNow()}
+														·{" "}
+														{formatDistanceToNow(new Date(post.createdAt), {
+															addSuffix: true,
+														})}
 													</span>
 												</div>
 												<button className="text-gray-400 hover:text-primary p-2 rounded-full transition-colors">

@@ -1,5 +1,5 @@
 import { useNotifications } from "../hooks/useNotifications";
-import { Avatar } from "../../../ui";
+import { Avatar } from "../../../shared/components/UI";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from "react-router-dom";
 import { useSocket } from "../../../providers/SocketProvider";

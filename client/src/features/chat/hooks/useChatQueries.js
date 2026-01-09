@@ -1,7 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { setActiveChat } from "../../../store/rtk/chats";
-import * as chatService from "../../../services/chatService";
+import * as chatService from "../services/chatService";
 
 export const useChats = () => {
 	return useQuery({
@@ -20,6 +21,21 @@ export const useSingleChat = (chatId) => {
 		onSuccess: (data) => {
 			if (data) {
 				dispatch(setActiveChat(data));
+			}
+		},
+	});
+};
+
+export const useCreateChat = () => {
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+
+	return useMutation({
+		mutationFn: chatService.createChat,
+		onSuccess: (data) => {
+			queryClient.invalidateQueries(["chats"]);
+			if (data._id) {
+				navigate(`/messages/${data._id}`);
 			}
 		},
 	});

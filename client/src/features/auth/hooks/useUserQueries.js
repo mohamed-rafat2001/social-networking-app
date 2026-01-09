@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { storeToken } from "../../../utils";
-import * as userService from "../../../services/userService";
+import { storeToken } from "../../../shared/utils/helpers";
+import * as userService from "../../profile/services/userService";
 
 export const useCurrentUser = () => {
 	return useQuery({

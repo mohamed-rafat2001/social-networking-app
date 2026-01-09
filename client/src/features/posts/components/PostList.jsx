@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
-import moment from "moment";
+import { formatDistanceToNow } from "date-fns";
 import { toast } from "react-hot-toast";
-import { useUser } from "../../../hooks/useUser.js";
+import { useUser } from "../../../shared/hooks/useUser.js";
 import {
 	usePosts,
 	useAddPost,
@@ -11,7 +11,7 @@ import {
 import { useSocket } from "../../../providers/SocketProvider";
 import InputEmoji from "react-input-emoji";
 import { motion, AnimatePresence } from "framer-motion";
-import { Avatar, Button, Spinner } from "../../../ui";
+import { Avatar, Button, Spinner } from "../../../shared/components/UI";
 
 import {
 	HiPhotograph,
@@ -304,7 +304,9 @@ function PostList() {
 												·
 											</span>
 											<span className="text-gray-500 dark:text-gray-400 text-sm">
-												{moment(post.createdAt).fromNow(true)}
+												{formatDistanceToNow(new Date(post.createdAt), {
+													addSuffix: true,
+												})}
 											</span>
 										</div>
 										<button className="text-gray-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-full transition-colors">

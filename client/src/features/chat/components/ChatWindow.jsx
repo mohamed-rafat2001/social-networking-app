@@ -2,8 +2,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useMessages, useCreateMessage } from "../hooks/useMessageQueries";
 import { useSingleChat } from "../hooks/useChatQueries";
 import { useState, useEffect, useRef } from "react";
-import { Avatar, Button, Spinner } from "../../../ui";
-import { useUser } from "../../../hooks/useUser";
+import { Avatar, Button, Spinner } from "../../../shared/components/UI";
+import { useUser } from "../../../shared/hooks/useUser";
 import { HiOutlineArrowLeft, HiOutlinePaperAirplane } from "react-icons/hi";
 import { useSocket } from "../../../providers/SocketProvider";
 

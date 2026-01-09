@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import * as postService from "../../../services/postService";
+import * as postService from "../services/postService";
 
 export const usePosts = () => {
 	return useQuery({

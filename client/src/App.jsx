@@ -1,23 +1,27 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import { Provider } from "react-redux";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { store } from "./store";
+import { router } from "./routing/Router";
+import { SocketProvider } from "./providers/SocketProvider";
+import { ThemeProvider, useTheme } from "./providers/ThemeProvider";
 
-import MainLayout from "./layouts/MainLayout";
-import LandingPage from "./features/landing/components/LandingPage";
-import Register from "./features/auth/components/Register";
-import PostList from "./features/posts/components/PostList";
-import ChatList from "./features/chat/components/ChatList";
-import ChatWindow from "./features/chat/components/ChatWindow";
-import ProfileDetail from "./features/profile/components/ProfileDetail";
-import ProtectedRoute from "./features/auth/components/ProtectedRoute";
-import ScrollToTop from "./layouts/ScrollToTop";
-import { useTheme } from "./providers/ThemeProvider";
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: 1000 * 60 * 5, // 5 minutes
+			retry: 1,
+		},
+	},
+});
 
-function App() {
+function AppContent() {
 	const { darkMode } = useTheme();
 
 	return (
-		<BrowserRouter>
-			<ScrollToTop />
+		<>
 			<Toaster
 				position="bottom-right"
 				gutter={8}
@@ -39,25 +43,23 @@ function App() {
 					},
 				}}
 			/>
-			<Routes>
-				{/* Public Routes */}
-				<Route path="/" element={<LandingPage />} />
-				<Route path="/welcome" element={<Register />} />
+			<RouterProvider router={router} />
+		</>
+	);
+}
 
-				{/* Protected Routes */}
-				<Route element={<ProtectedRoute />}>
-					<Route element={<MainLayout />}>
-						<Route path="/feed" element={<PostList />} />
-						<Route path="/messages" element={<ChatList />} />
-						<Route path="/messages/:chatId" element={<ChatWindow />} />
-						<Route path="/profile/:userId" element={<ProfileDetail />} />
-					</Route>
-				</Route>
-
-				{/* 404 Route */}
-				<Route path="*" element={<Navigate to="/" replace />} />
-			</Routes>
-		</BrowserRouter>
+function App() {
+	return (
+		<QueryClientProvider client={queryClient}>
+			<Provider store={store}>
+				<ThemeProvider>
+					<SocketProvider>
+						<AppContent />
+					</SocketProvider>
+				</ThemeProvider>
+			</Provider>
+			<ReactQueryDevtools initialIsOpen={false} />
+		</QueryClientProvider>
 	);
 }
 

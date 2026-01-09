@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { HiMail, HiLockClosed, HiUser, HiIdentification } from "react-icons/hi";
-import { Button, Input, Spinner } from "../../../ui";
+import { Button, Input, Spinner } from "../../../shared/components/UI";
 import { useSignUp } from "../hooks/useUserQueries";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -23,7 +23,6 @@ const signUpSchema = z
 				"Password must contain at least one special character"
 			),
 		confirmPassword: z.string(),
-		idNumber: z.string().min(5, "ID Number must be at least 5 characters"),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		message: "Passwords don't match",
@@ -101,14 +100,6 @@ const SignUp = () => {
 				placeholder="john.doe@university.edu"
 				{...register("email")}
 				error={errors.email?.message}
-			/>
-
-			<Input
-				label="Student ID Number"
-				icon={HiIdentification}
-				placeholder="20240001"
-				{...register("idNumber")}
-				error={errors.idNumber?.message}
 			/>
 
 			<Input

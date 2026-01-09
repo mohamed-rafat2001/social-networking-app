@@ -1,4 +1,4 @@
-const { Server } = require("socket.io");
+import { Server } from "socket.io";
 const io = new Server({ cors: "http://localhost:3000" });
 let onLineUsers = [];
 io.on("connection", (socket) => {
@@ -24,6 +24,14 @@ io.on("connection", (socket) => {
 				text: newMessage.data.text,
 				isRead: false,
 			});
+		}
+	});
+
+	// Handle general notifications (likes, comments, etc.)
+	socket.on("sendNotification", ({ recipientId, notification }) => {
+		const user = onLineUsers.find((user) => user.userId === recipientId);
+		if (user) {
+			io.to(user.socketId).emit("getNotification", notification);
 		}
 	});
 	socket.on("disconnect", () => {

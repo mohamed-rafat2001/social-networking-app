@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import * as messageService from "../../../services/messageService";
+import * as messageService from "../services/messageService";
 
 export const useMessages = (chatId) => {
 	return useQuery({

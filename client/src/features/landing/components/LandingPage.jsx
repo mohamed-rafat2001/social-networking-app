@@ -1,15 +1,15 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useUser } from "../../../hooks/useUser";
-import Header from "../../../layouts/Header";
-import Footer from "../../../layouts/Footer";
+import { useUser } from "../../../shared/hooks/useUser";
+import Header from "../../../shared/components/layout/Header";
+import Footer from "../../../shared/components/layout/Footer";
 import Hero from "./Hero";
 import Features from "./Features";
 import About from "./About";
 import Majors from "./Majors";
 import Contact from "./Contact";
-import { Spinner } from "../../../ui";
+import { Spinner } from "../../../shared/components/UI";
 
 const LandingPage = () => {
 	const { user, isLoading } = useUser();

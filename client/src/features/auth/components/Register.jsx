@@ -3,8 +3,8 @@ import { useLocation } from "react-router-dom";
 import Login from "./Login";
 import SignUp from "./SignUp";
 import { motion, AnimatePresence } from "framer-motion";
-import Header from "../../../layouts/Header";
-import Footer from "../../../layouts/Footer";
+import Header from "../../../shared/components/layout/Header";
+import Footer from "../../../shared/components/layout/Footer";
 
 const Register = () => {
 	const location = useLocation();

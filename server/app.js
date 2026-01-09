@@ -1,47 +1,59 @@
-const express = require("express");
+import express from "express";
+import cors from "cors";
+import mongoose from "mongoose";
+
+// Features
+import userRouter from "./src/features/auth/auth.routes.js";
+import adminRouter from "./src/features/admin/admin.routes.js";
+import postsRouter from "./src/features/posts/posts.routes.js";
+import youtubeRouter from "./src/features/youtube/youtube.routes.js";
+import commentRouter from "./src/features/posts/comment.routes.js";
+import replayRouter from "./src/features/posts/replay.routes.js";
+import shareRouter from "./src/features/posts/sharePost.routes.js";
+import chatRouter from "./src/features/chat/chat.routes.js";
+import messageRouter from "./src/features/chat/message.routes.js";
+import notificationRouter from "./src/features/notifications/notification.routes.js";
+
 const app = express();
-const cors = require("cors");
-const mongoose = require("mongoose");
+
 mongoose.set("strictQuery", true);
 
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000" }));
-const userRouter = require("./src/routes/user.js");
-const adminRouter = require("./src/routes/admin.js");
-const postsRouter = require("./src/routes/posts.js");
-const youtubeRouter = require("./src/routes/youtube.js");
-const commentRouter = require("./src/routes/comment.js");
-const replayRouter = require("./src/routes/replay.js");
-const shareRouter = require("./src/routes/sharePost.js");
-const chatRouter = require("./src/routes/chat.js");
-const messageRouter = require("./src/routes/message.js");
+app.use(cors({ origin: "*" })); // Allow all for development, refine later
 
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
-app.use("/", postsRouter);
+app.use("/posts", postsRouter); // Changed from / to /posts for clarity
 app.use("/youtube", youtubeRouter);
-app.use("/", commentRouter);
-app.use("/", replayRouter);
-app.use("/", shareRouter);
-app.use("/", chatRouter);
-app.use("/", messageRouter);
+app.use("/comments", commentRouter);
+app.use("/replays", replayRouter);
+app.use("/shares", shareRouter);
+app.use("/chats", chatRouter);
+app.use("/messages", messageRouter);
+app.use("/notifications", notificationRouter);
+
+// Database Connection
+import "./src/shared/db/mongoose.db.js";
 
 app.all("*", (req, res, next) => {
 	res.status(404).json({ status: "fail", message: "this route not defined" });
 });
+
 app.use((error, req, res, next) => {
-	if (process.env.MODE == "DEV") {
-		return res.status(error.code || 500).json({
+	const statusCode = error.code || 500;
+	if (process.env.MODE === "DEV") {
+		return res.status(statusCode).json({
 			status: "error",
 			message: error.message,
-			code: error.code,
+			code: statusCode,
 			stack: error.stack,
 		});
 	}
-	res
-		.status(error.code || 500)
-		.json({ status: "error", message: error.message, code: error.code });
+	res.status(statusCode).json({
+		status: "error",
+		message: error.message,
+		code: statusCode,
+	});
 });
-require("./src/db/mongoose.js");
 
-module.exports = app;
+export default app;
