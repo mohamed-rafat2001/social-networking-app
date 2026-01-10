@@ -77,6 +77,7 @@ function PostDetailPage() {
 	const isShare = post.type === "share";
 	const isOwner =
 		user?._id === (isShare ? post.sharedBy?._id : post.userId?._id);
+	const showStats = !isShare || !!post.shareNote;
 
 	const handleLike = () => {
 		likePost(post._id);

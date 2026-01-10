@@ -374,60 +374,54 @@ const likeOnPost = errorHandler(async (req, res, next) => {
 
 const unLikeOnPost = errorHandler(async (req, res, next) => {
 	let _id = req.params.id; //post id
+	let Model = Posts;
 
-	// Check if it's a share and resolve to original post if so
+	// Check if it's a share
 	const share = await Share.findById(_id);
 	if (share) {
-		_id = share.sharePost;
+		if (share.note) {
+			Model = Share;
+		} else {
+			_id = share.sharePost;
+			Model = Posts;
+		}
 	}
 
-	const likesnum = await Posts.findById(_id);
-	if (!likesnum) {
+	const doc = await Model.findById(_id);
+	if (!doc) {
 		const error = appError.Error("post not found", "fail", 404);
 		return next(error);
 	}
 
-	const numLike = likesnum.likes;
+	const numLike = doc.likes;
 	const len = numLike.length;
-	const numUnLike = likesnum.unLikes;
+	const numUnLike = doc.unLikes;
 	const lenUnLike = numUnLike.length;
 	const unLiked = numUnLike.includes(req.user._id.toString());
+	const liked = numLike.includes(req.user._id.toString());
+
 	if (unLiked === false) {
-		const post = await Posts.findByIdAndUpdate(
+		const updatedDoc = await Model.findByIdAndUpdate(
 			_id,
 			{
 				$push: { unLikes: req.user._id },
 				unLikesNumber: lenUnLike + 1,
 				$pull: { likes: req.user._id },
-				likesNumber: len,
+				likesNumber: liked ? len - 1 : len,
 			},
 			{ new: true }
 		);
-		return res.status(200).json({ status: "success", data: post });
-	} else if (unLiked === true) {
-		const post = await Posts.findByIdAndUpdate(
+		return res.status(200).json({ status: "success", data: updatedDoc });
+	} else {
+		const updatedDoc = await Model.findByIdAndUpdate(
 			_id,
 			{
-				$pull: { likes: req.user._id },
-				likesNumber: len,
 				$pull: { unLikes: req.user._id },
 				unLikesNumber: lenUnLike - 1,
 			},
 			{ new: true }
 		);
-		return res.status(200).json({ status: "success", data: post });
-	} else {
-		const post = await Posts.findByIdAndUpdate(
-			_id,
-			{
-				$pull: { unLikes: req.user._id },
-				unLikesNumber: lenUnLike,
-				$pull: { likes: req.user._id },
-				likesNumber: len,
-			},
-			{ new: true }
-		);
-		res.status(200).json({ status: "success", data: post });
+		return res.status(200).json({ status: "success", data: updatedDoc });
 	}
 });
 
