@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useUser } from "../../../shared/hooks/useUser";
-import { Spinner } from "../../../shared/components/UI";
+import { Spinner } from "../../../shared/components/ui";
 import { motion } from "framer-motion";
 
 const ProtectedRoute = () => {

@@ -5,15 +5,13 @@ const regestrationValidator = [
 		.isString()
 		.isLength({ min: 3, max: 20 })
 		.trim()
-		.isLowercase()
-		.withMessage("in-valid firstName"),
+		.withMessage("First name must be between 3 and 20 characters"),
 	body("lastName")
 		.isString()
 		.isLength({ min: 3, max: 20 })
 		.trim()
-		.isLowercase()
-		.withMessage("in-valid lastName"),
-	body("email").trim().isEmail().withMessage("in-valid email"),
+		.withMessage("Last name must be between 3 and 20 characters"),
+	body("email").trim().isEmail().withMessage("Please enter a valid email"),
 	body("password")
 		.isStrongPassword({
 			minlength: 8,
@@ -22,8 +20,22 @@ const regestrationValidator = [
 			minNumbers: 1,
 			minSymbols: 1,
 		})
-		.withMessage("in-valid password"),
-	body("gender").isIn(["male", "female"]).withMessage("gender must be male or female"),
+		.withMessage(
+			"Password must be at least 8 characters and include uppercase, lowercase, number, and symbol"
+		),
+	body("gender")
+		.isIn(["male", "female"])
+		.withMessage("Gender must be male or female"),
+	body("phoneNumber")
+		.notEmpty()
+		.withMessage("Phone number is required")
+		.isMobilePhone()
+		.withMessage("Please enter a valid phone number"),
+	body("city").notEmpty().trim().withMessage("City is required"),
+	body("country").notEmpty().trim().withMessage("Country is required"),
+	body("userType")
+		.isIn(["engineering student", "engineering teacher", "engineer"])
+		.withMessage("Please select a valid profession"),
 ];
 
 const fileValidation = {

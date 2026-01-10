@@ -84,6 +84,37 @@ export const useUnfollowUser = () => {
 	});
 };
 
+export const useBlockUser = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: userService.blockUser,
+		onSuccess: (_, userId) => {
+			queryClient.invalidateQueries(["userProfile", userId]);
+			queryClient.invalidateQueries(["currentUser"]);
+			queryClient.invalidateQueries(["blockedUsers"]);
+		},
+	});
+};
+
+export const useUnblockUser = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: userService.unblockUser,
+		onSuccess: (_, userId) => {
+			queryClient.invalidateQueries(["userProfile", userId]);
+			queryClient.invalidateQueries(["currentUser"]);
+			queryClient.invalidateQueries(["blockedUsers"]);
+		},
+	});
+};
+
+export const useBlockedUsers = () => {
+	return useQuery({
+		queryKey: ["blockedUsers"],
+		queryFn: userService.getBlockedUsers,
+	});
+};
+
 export const useUpdateProfileImage = () => {
 	const queryClient = useQueryClient();
 	return useMutation({

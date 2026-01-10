@@ -7,7 +7,7 @@ import {
 	ProgressBar,
 	cn,
 	Avatar,
-} from "../../../shared/components/UI";
+} from "../../../shared/components/ui";
 import { HiOutlinePhotograph, HiOutlineX } from "react-icons/hi";
 import { useUpdateProfileImage } from "../../auth/hooks/useUserQueries";
 
@@ -110,19 +110,19 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 				</div>
 
 				{/* Post Text Input - Post Style with Emoji */}
-				<div className="px-1 profile-emoji-input">
+				<div className="px-1 profile-emoji-input emoji-input-container">
 					<style>
 						{`
 							.profile-emoji-input .react-input-emoji--container {
-								background: ${darkMode ? "#1f2937" : "#ffffff"} !important;
+								background: transparent !important;
 								border: none !important;
 							}
 							.profile-emoji-input .react-input-emoji--wrapper {
-								background: ${darkMode ? "#1f2937" : "#ffffff"} !important;
+								background: transparent !important;
 								border: none !important;
 							}
 							.profile-emoji-input .react-input-emoji--input {
-								background: ${darkMode ? "#1f2937" : "#ffffff"} !important;
+								background: transparent !important;
 								padding: 12px 0 !important;
 							}
 						`}
@@ -136,7 +136,7 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 						fontSize={16}
 						fontFamily="inherit"
 						borderColor="transparent"
-						background={darkMode ? "#1f2937" : "#ffffff"}
+						background="transparent"
 						placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
 						color={darkMode ? "#f3f4f6" : "#1f2937"}
 					/>

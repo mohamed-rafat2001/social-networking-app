@@ -1,5 +1,5 @@
 import User from "./user.model.js";
-import Follow from "./follow.model.js";
+import Follow from "../follow/follow.model.js";
 import Posts from "../posts/posts.model.js";
 import Share from "../posts/sharePost.model.js";
 import bcryptjs from "bcryptjs";
@@ -11,7 +11,31 @@ import { createNotification } from "../notifications/notification.controller.js"
 import apiFeatures from "../../shared/utils/apiFeatures.js";
 
 const signUp = errorHandler(async (req, res, next) => {
-	const user = new User(req.body);
+	const {
+		firstName,
+		lastName,
+		email,
+		password,
+		gender,
+		phoneNumber,
+		city,
+		country,
+		userType,
+	} = req.body;
+
+	const user = new User({
+		firstName,
+		lastName,
+		email,
+		password,
+		gender,
+		phoneNumber,
+		city,
+		country,
+		userType,
+		role: "user",
+	});
+
 	const token = user.creatToken();
 	await user.save();
 	res.status(200).json({ status: "success", data: { user, token } });
@@ -104,7 +128,28 @@ const profile = errorHandler(async (req, res, next) => {
 });
 
 const updateProfile = errorHandler(async (req, res, next) => {
+	const allowedUpdates = [
+		"firstName",
+		"lastName",
+		"phoneNumber",
+		"city",
+		"country",
+		"bio",
+		"gender",
+		"userType",
+		"acountType",
+	];
+
 	const updates = Object.keys(req.body);
+	const isValidOperation = updates.every((update) =>
+		allowedUpdates.includes(update)
+	);
+
+	if (!isValidOperation) {
+		const error = appError.Error("Invalid updates!", "fail", 400);
+		return next(error);
+	}
+
 	updates.forEach((el) => (req.user[el] = req.body[el]));
 	await req.user.save();
 	res.status(200).json({ status: "success", data: req.user });
@@ -158,8 +203,8 @@ const user = errorHandler(async (req, res, next) => {
 		return next(error);
 	}
 
-	// Fetch followers and following from the Follow model
-	const [followers, following, posts] = await Promise.all([
+	// Fetch followers, following, posts, and shared posts
+	const [followers, following, posts, sharedPosts] = await Promise.all([
 		Follow.find({ following: userId }).populate(
 			"follower",
 			"firstName lastName username image"
@@ -168,13 +213,35 @@ const user = errorHandler(async (req, res, next) => {
 			"following",
 			"firstName lastName username image"
 		),
-		Posts.find({ userId: userData._id }),
+		Posts.find({ userId: userData._id }).populate("userId"),
+		Share.find({ userId: userData._id }).populate({
+			path: "sharePost",
+			populate: { path: "userId" },
+		}),
 	]);
+
+	// Combine posts and shared posts
+	const allUserPosts = [
+		...posts.map((p) => ({ ...p.toObject(), type: "post" })),
+		...sharedPosts.map((s) => ({
+			...s.sharePost.toObject(),
+			_id: s._id,
+			originalPostId: s.sharePost._id,
+			shareNote: s.note,
+			shareDate: s.createdAt,
+			type: "share",
+			sharedBy: userData,
+		})),
+	].sort((a, b) => {
+		const dateA = a.type === "share" ? a.shareDate : a.createdAt;
+		const dateB = b.type === "share" ? b.shareDate : b.createdAt;
+		return new Date(dateB) - new Date(dateA);
+	});
 
 	const userObj = userData.toObject();
 	userObj.followers = followers.map((f) => f.follower);
 	userObj.following = following.map((f) => f.following);
-	userObj.posts = posts;
+	userObj.posts = allUserPosts;
 
 	userObj.isFollowing = followers.some(
 		(f) => f.follower._id.toString() === req.user._id.toString()

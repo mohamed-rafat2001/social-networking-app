@@ -30,8 +30,10 @@ export const likePost = async (postId) => {
 	return response.data;
 };
 
-export const sharePost = async (postId) => {
-	const response = await apiApp.post(`/shares/sharePost/${postId}`);
+export const sharePost = async ({ postId, note }) => {
+	// If we have a note, we send it as a JSON request.
+	// The server route is now updated to handle both JSON and multipart/form-data.
+	const response = await apiApp.post(`/shares/sharePost/${postId}`, { note });
 	return response.data;
 };
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import InputEmoji from "react-input-emoji";
-import { Avatar, Button, Spinner, cn } from "../../../shared/components/UI";
+import { Avatar, Button, Spinner, cn } from "../../../shared/components/ui";
 import { useUser } from "../../../shared/hooks/useUser";
 import { useTheme } from "../../../providers/ThemeProvider";
 import { useSocket } from "../../../shared/hooks/useSocket";
@@ -58,7 +58,7 @@ function CommentList({ comments, postId, recipientId }) {
 				<div className="flex gap-4">
 					<Avatar src={user?.image?.secure_url} size="md" />
 					<div className="flex-1 min-w-0">
-						<div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl focus-within:bg-white dark:focus-within:bg-gray-800 border border-transparent focus-within:border-primary/20 transition-all px-2">
+						<div className="emoji-input-container bg-gray-50 dark:bg-gray-800/50 rounded-2xl focus-within:bg-white dark:focus-within:bg-gray-800 border border-transparent focus-within:border-primary/20 transition-all px-2">
 							<InputEmoji
 								value={text}
 								onChange={setText}

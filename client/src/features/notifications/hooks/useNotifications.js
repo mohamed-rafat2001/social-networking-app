@@ -11,6 +11,11 @@ const markAsRead = async (id) => {
 	return response.data.data;
 };
 
+const markAllAsRead = async () => {
+	const response = await apiApp.patch("/notifications/read-all");
+	return response.data.data;
+};
+
 export const useNotifications = () => {
 	const queryClient = useQueryClient();
 
@@ -31,9 +36,20 @@ export const useNotifications = () => {
 		},
 	});
 
+	const markAllAsReadMutation = useMutation({
+		mutationFn: markAllAsRead,
+		onSuccess: () => {
+			queryClient.setQueryData(["notifications"], (old) => {
+				return old.map((n) => ({ ...n, read: true }));
+			});
+			queryClient.invalidateQueries(["notifications"]);
+		},
+	});
+
 	return {
 		notifications,
 		isLoading,
 		markAsRead: markAsReadMutation.mutate,
+		markAllAsRead: markAllAsReadMutation.mutate,
 	};
 };

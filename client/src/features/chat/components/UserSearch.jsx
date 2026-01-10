@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Avatar, Input } from "../../../shared/components/UI";
+import { Avatar, Input } from "../../../shared/components/ui";
 import { useQuery } from "@tanstack/react-query";
 import { HiSearch, HiChatAlt } from "react-icons/hi";
 import * as userService from "../../../features/profile/services/userService";

@@ -1,5 +1,5 @@
 import Follow from "./follow.model.js";
-import User from "./user.model.js";
+import User from "../auth/user.model.js";
 import errorHandler from "../../shared/middlewares/errorHandler.js";
 import appError from "../../shared/utils/appError.js";
 import { createNotification } from "../notifications/notification.controller.js";

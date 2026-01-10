@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { HiMail, HiPhone, HiLocationMarker } from "react-icons/hi";
-import { Button } from "../../../ui";
+import { Button } from "../../../shared/components/ui";
 
 const Contact = () => {
 	const infoItems = [

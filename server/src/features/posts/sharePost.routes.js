@@ -11,7 +11,14 @@ router
 	//share post
 	.post(
 		protect,
-		fileUpload(fileValidation.image).array("files", 12),
+		(req, res, next) => {
+			// Only use multer if it's a multipart request (likely has files)
+			if (req.headers["content-type"]?.includes("multipart/form-data")) {
+				return fileUpload(fileValidation.image).array("files", 12)(req, res, next);
+			}
+			// Otherwise, express.json() will have already parsed the body
+			next();
+		},
 		sharePostController.sharePost
 	)
 	//delete share post

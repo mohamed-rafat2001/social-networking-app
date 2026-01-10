@@ -46,4 +46,15 @@
 	::-webkit-scrollbar-thumb:hover {
 		background: #bbb;
 	}
+
+	/* Fix for react-input-emoji picker being clipped or having z-index issues */
+	.react-input-emoji--picker {
+		z-index: 9999 !important;
+	}
+
+	/* Ensure containers using InputEmoji don't clip the picker */
+	.emoji-input-container {
+		position: relative !important;
+		overflow: visible !important;
+	}
 }

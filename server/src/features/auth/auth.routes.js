@@ -1,6 +1,5 @@
 import express from "express";
 import * as authController from "./auth.controller.js";
-import * as followController from "./follow.controller.js";
 import { user as protect } from "../../shared/middlewares/auth.middleware.js";
 import handelValidation from "../../shared/middlewares/handelValidation.js";
 import {
@@ -48,8 +47,5 @@ router
 
 router.get("/user", authController.user);
 router.get("/:userId", authController.user);
-
-router.post("/follow/:userId", followController.followUser);
-router.post("/unfollow/:userId", followController.unfollowUser);
 
 export default router;

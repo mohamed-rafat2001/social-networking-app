@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { HiMail, HiLockClosed, HiUser, HiIdentification } from "react-icons/hi";
-import { Button, Input, Spinner } from "../../../shared/components/UI";
 import { useSignUp } from "../hooks/useUserQueries";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { AnimatePresence } from "framer-motion";
+import SignUpProgressBar from "./detail/SignUpProgressBar";
+import SignUpStep1 from "./detail/SignUpStep1";
+import SignUpStep2 from "./detail/SignUpStep2";
 
 const signUpSchema = z
 	.object({
@@ -23,9 +26,18 @@ const signUpSchema = z
 				"Password must contain at least one special character"
 			),
 		confirmPassword: z.string(),
+		phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
+		city: z.string().min(2, "City is required"),
+		country: z.string().min(2, "Country is required"),
 		gender: z.enum(["male", "female"], {
 			errorMap: () => ({ message: "Please select your gender" }),
 		}),
+		userType: z.enum(
+			["engineering student", "engineering teacher", "engineer"],
+			{
+				errorMap: () => ({ message: "Please select your profession" }),
+			}
+		),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		message: "Passwords don't match",
@@ -34,24 +46,37 @@ const signUpSchema = z
 
 const SignUp = () => {
 	const navigate = useNavigate();
+	const [step, setStep] = useState(1);
 	const { mutate: signUpMutation, isPending } = useSignUp();
 
 	const {
 		register,
 		handleSubmit,
 		setError,
+		trigger,
 		formState: { errors },
 	} = useForm({
 		resolver: zodResolver(signUpSchema),
+		mode: "onChange",
 	});
 
+	const nextStep = async () => {
+		const fieldsToValidate =
+			step === 1
+				? ["firstName", "lastName", "email", "password", "confirmPassword"]
+				: [];
+
+		const isValid = await trigger(fieldsToValidate);
+		if (isValid) setStep(2);
+	};
+
+	const prevStep = () => setStep(1);
+
 	const onSubmit = (data) => {
-		// eslint-disable-next-line no-unused-vars
 		const { confirmPassword, ...userData } = data;
 		signUpMutation(userData, {
 			onSuccess: () => {
 				toast.success("Account created successfully!");
-				// Small delay to ensure token is stored and query invalidated
 				setTimeout(() => {
 					navigate("/feed");
 				}, 100);
@@ -60,7 +85,6 @@ const SignUp = () => {
 				const serverErrors = error?.response?.data?.validation;
 				if (serverErrors && Array.isArray(serverErrors)) {
 					serverErrors.forEach((err) => {
-						// Map server field names to client field names if they differ
 						const fieldName = err.path || err.param;
 						if (fieldName) {
 							setError(fieldName, {
@@ -78,109 +102,40 @@ const SignUp = () => {
 	};
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-			<div className="grid grid-cols-2 gap-4">
-				<Input
-					label="First Name"
-					icon={HiUser}
-					placeholder="John"
-					{...register("firstName")}
-					error={errors.firstName?.message}
-				/>
-				<Input
-					label="Last Name"
-					icon={HiUser}
-					placeholder="Doe"
-					{...register("lastName")}
-					error={errors.lastName?.message}
-				/>
-			</div>
+		<div className="relative">
+			<SignUpProgressBar step={step} />
 
-			<Input
-				label="University Email"
-				icon={HiMail}
-				type="email"
-				placeholder="john.doe@university.edu"
-				{...register("email")}
-				error={errors.email?.message}
-			/>
-
-			<Input
-				label="Password"
-				icon={HiLockClosed}
-				type="password"
-				placeholder="••••••••"
-				{...register("password")}
-				error={errors.password?.message}
-			/>
-
-			<Input
-				label="Confirm Password"
-				icon={HiLockClosed}
-				type="password"
-				placeholder="••••••••"
-				{...register("confirmPassword")}
-				error={errors.confirmPassword?.message}
-			/>
-
-			<div className="space-y-2">
-				<label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-					Gender
-				</label>
-				<div className="flex gap-4">
-					<label className="flex items-center gap-2 cursor-pointer group">
-						<input
-							type="radio"
-							value="male"
-							{...register("gender")}
-							className="w-4 h-4 text-primary focus:ring-primary border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+			<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+				<AnimatePresence mode="wait">
+					{step === 1 ? (
+						<SignUpStep1
+							register={register}
+							errors={errors}
+							nextStep={nextStep}
 						/>
-						<span className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-							Male
-						</span>
-					</label>
-					<label className="flex items-center gap-2 cursor-pointer group">
-						<input
-							type="radio"
-							value="female"
-							{...register("gender")}
-							className="w-4 h-4 text-primary focus:ring-primary border-gray-300 dark:border-gray-600 dark:bg-gray-700"
-						/>
-						<span className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-							Female
-						</span>
-					</label>
-				</div>
-				{errors.gender && (
-					<p className="text-xs text-red-500 mt-1">{errors.gender.message}</p>
-				)}
-			</div>
-
-			<div className="pt-2">
-				<Button type="submit" className="w-full py-3" disabled={isPending}>
-					{isPending ? (
-						<div className="flex items-center gap-2">
-							<Spinner size="sm" variant="white" />
-							Creating account...
-						</div>
 					) : (
-						"Create Account"
+						<SignUpStep2
+							register={register}
+							errors={errors}
+							prevStep={prevStep}
+							isPending={isPending}
+						/>
 					)}
-				</Button>
-			</div>
+				</AnimatePresence>
 
-			<p className="text-xs text-center text-gray-500 dark:text-gray-400 px-4">
-				By signing up, you agree to our{" "}
-				<a href="#" className="text-primary hover:underline">
-					Terms of Service
-				</a>{" "}
-				and{" "}
-				<a href="#" className="text-primary hover:underline">
-					Privacy Policy
-				</a>
-				.
-			</p>
-		</form>
+				<p className="text-xs text-center text-gray-500 dark:text-gray-400 px-4 mt-6">
+					By signing up, you agree to our{" "}
+					<a href="#" className="text-primary hover:underline">
+						Terms of Service
+					</a>{" "}
+					and{" "}
+					<a href="#" className="text-primary hover:underline">
+						Privacy Policy
+					</a>
+					.
+				</p>
+			</form>
+		</div>
 	);
 };
 

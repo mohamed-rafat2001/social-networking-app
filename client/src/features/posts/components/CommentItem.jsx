@@ -19,7 +19,7 @@ import {
 	DropdownItem,
 	Modal,
 	ConfirmModal,
-} from "../../../shared/components/UI";
+} from "../../../shared/components/ui";
 import { useUser } from "../../../shared/hooks/useUser";
 import { useTheme } from "../../../providers/ThemeProvider";
 import {
@@ -371,12 +371,12 @@ function CommentItem({ comment, postId }) {
 								initial={{ height: 0, opacity: 0 }}
 								animate={{ height: "auto", opacity: 1 }}
 								exit={{ height: 0, opacity: 0 }}
-								className="mt-4 overflow-hidden"
+								className="mt-4"
 							>
 								<div className="flex gap-2">
 									<Avatar src={user?.image?.secure_url} size="xs" />
 									<div className="flex-1 min-w-0">
-										<div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl px-1">
+										<div className="emoji-input-container bg-gray-50 dark:bg-gray-800/50 rounded-xl px-1">
 											<InputEmoji
 												value={replyText}
 												onChange={setReplyText}

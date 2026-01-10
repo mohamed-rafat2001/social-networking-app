@@ -17,7 +17,7 @@ import {
 	Spinner,
 	cn,
 	ImageModal,
-} from "../../../shared/components/UI";
+} from "../../../shared/components/ui";
 
 import {
 	HiPhotograph,
@@ -162,7 +162,7 @@ function PostList() {
 				<div className="flex gap-4">
 					<Avatar src={user?.image?.secure_url} />
 					<form className="flex-1" onSubmit={handleSubmit}>
-						<div className="mb-2">
+						<div className="mb-2 emoji-input-container">
 							<InputEmoji
 								value={text}
 								onChange={setText}

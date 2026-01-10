@@ -25,6 +25,18 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			trim: true,
 			lowercase: true,
+			required: true,
+		},
+		country: {
+			type: String,
+			trim: true,
+			lowercase: true,
+			required: true,
+		},
+		phoneNumber: {
+			type: String,
+			trim: true,
+			required: true,
 		},
 		bio: {
 			type: String,
@@ -75,7 +87,25 @@ const userSchema = new mongoose.Schema(
 		},
 		isActive: {
 			type: Boolean,
-			default: false,
+			default: true,
+		},
+		followId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Follow",
+		},
+		blockListId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Block",
+		},
+		userType: {
+			type: String,
+			enum: ["engineering student", "engineering teacher", "engineer"],
+			required: true,
+		},
+		acountType: {
+			type: String,
+			enum: ["private", "public"],
+			default: "public",
 		},
 		gender: {
 			type: String,
@@ -84,10 +114,6 @@ const userSchema = new mongoose.Schema(
 		},
 		passwordResetToken: {
 			type: String,
-		},
-		followId: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "Follow",
 		},
 	},
 	{

@@ -27,12 +27,27 @@ export const searchUsers = async (searchTerm) => {
 };
 
 export const followUser = async (userId) => {
-	const response = await apiApp.post(`/user/follow/${userId}`);
+	const response = await apiApp.post(`/follows/follow/${userId}`);
 	return response.data;
 };
 
 export const unfollowUser = async (userId) => {
-	const response = await apiApp.post(`/user/unfollow/${userId}`);
+	const response = await apiApp.post(`/follows/unfollow/${userId}`);
+	return response.data;
+};
+
+export const blockUser = async (userId) => {
+	const response = await apiApp.post(`/blocks/block/${userId}`);
+	return response.data;
+};
+
+export const unblockUser = async (userId) => {
+	const response = await apiApp.post(`/blocks/unblock/${userId}`);
+	return response.data;
+};
+
+export const getBlockedUsers = async () => {
+	const response = await apiApp.get("/blocks");
 	return response.data;
 };
 

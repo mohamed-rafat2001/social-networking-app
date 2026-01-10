@@ -6,7 +6,7 @@ import {
 	HiUserRemove,
 } from "react-icons/hi";
 import { useState } from "react";
-import { Avatar, Button, cn } from "../../../shared/components/UI";
+import { Avatar, Button, cn } from "../../../shared/components/ui";
 import { useNavigate } from "react-router-dom";
 import {
 	useFollowUser,

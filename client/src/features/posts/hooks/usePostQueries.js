@@ -72,7 +72,7 @@ export const useSharePost = () => {
 
 	return useMutation({
 		mutationFn: postService.sharePost,
-		onSuccess: (response, postId) => {
+		onSuccess: (response, { postId }) => {
 			queryClient.invalidateQueries(["posts"]);
 			queryClient.invalidateQueries(["post", postId]);
 

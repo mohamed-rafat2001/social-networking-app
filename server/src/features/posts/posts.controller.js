@@ -1,4 +1,5 @@
 import Posts from "./posts.model.js";
+import Share from "./sharePost.model.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
 import errorHandler from "../../shared/middlewares/errorHandler.js";
 import appError from "../../shared/utils/appError.js";
@@ -118,12 +119,41 @@ const deletePost = errorHandler(async (req, res, next) => {
 });
 
 const allPosts = errorHandler(async (req, res, next) => {
-	const posts = await Posts.find({}).populate("userId").sort("-createdAt");
-	if (!posts) {
+	const [posts, sharedPosts] = await Promise.all([
+		Posts.find({}).populate("userId"),
+		Share.find({})
+			.populate({
+				path: "sharePost",
+				populate: { path: "userId" },
+			})
+			.populate("userId"),
+	]);
+
+	// Combine posts and shared posts
+	const combinedPosts = [
+		...posts.map((p) => ({ ...p.toObject(), type: "post" })),
+		...sharedPosts
+			.filter((s) => s.sharePost) // Ensure original post exists
+			.map((s) => ({
+				...s.sharePost.toObject(),
+				_id: s._id,
+				originalPostId: s.sharePost._id,
+				shareNote: s.note,
+				shareDate: s.createdAt,
+				type: "share",
+				sharedBy: s.userId,
+			})),
+	].sort((a, b) => {
+		const dateA = a.type === "share" ? a.shareDate : a.createdAt;
+		const dateB = b.type === "share" ? b.shareDate : b.createdAt;
+		return new Date(dateB) - new Date(dateA);
+	});
+
+	if (!combinedPosts.length && !posts.length) {
 		const error = appError.Error("post not found", "fail", 404);
 		return next(error);
 	}
-	res.status(200).json({ status: "success", data: posts });
+	res.status(200).json({ status: "success", data: combinedPosts });
 });
 
 const postsForUser = errorHandler(async (req, res, next) => {

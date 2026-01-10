@@ -9,6 +9,14 @@ const sharePost = errorHandler(async (req, res, next) => {
 	const postId = req.params.id; //post id
 	const _id = req.user._id; //user id
 	let sharePO;
+
+	// Check if post exists
+	const originalPost = await Post.findById(postId);
+	if (!originalPost) {
+		const error = appError.Error("Original post not found", "fail", 404);
+		return next(error);
+	}
+
 	if (req.files && req.files.length > 0) {
 		const files = [];
 		for (const file of req.files) {
@@ -25,29 +33,30 @@ const sharePost = errorHandler(async (req, res, next) => {
 			sharePost: postId,
 			image: files,
 		});
-		await Post.findByIdAndUpdate(
-			postId,
-			{
-				$push: { shares: { shareId: sharePO._id, userId: _id } },
-			},
-			{ new: true }
-		);
 	} else {
-		sharePO = new Share({ ...req.body, userId: _id, sharePost: postId });
-		await Post.findByIdAndUpdate(
-			postId,
-			{
-				$push: { shares: { shareId: sharePO._id, userId: _id } },
-			},
-			{ new: true }
-		);
+		sharePO = new Share({
+			...req.body,
+			userId: _id,
+			sharePost: postId,
+		});
 	}
 
 	if (!sharePO) {
-		const error = appError.Error("not shared", "fail", 404);
+		const error = appError.Error("Failed to create share object", "fail", 400);
 		return next(error);
 	}
+
+	// Save the share first
 	await sharePO.save();
+
+	// Update the original post with the share info
+	await Post.findByIdAndUpdate(
+		postId,
+		{
+			$push: { shares: { shareId: sharePO._id, userId: _id } },
+		},
+		{ new: true }
+	);
 
 	// Create notification
 	const post = await Post.findById(postId).populate("userId");

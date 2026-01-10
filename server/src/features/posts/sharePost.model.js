@@ -10,6 +10,7 @@ const shareSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Posts",
 		},
+		note: String,
 	},
 	{ timestamps: true }
 );
