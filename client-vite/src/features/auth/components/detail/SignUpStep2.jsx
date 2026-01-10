@@ -5,6 +5,7 @@ import {
 	HiLocationMarker,
 	HiUser,
 	HiBriefcase,
+	HiAcademicCap,
 	HiChevronLeft,
 } from "react-icons/hi";
 import {
@@ -57,6 +58,24 @@ const SignUpStep2 = ({ register, errors, prevStep, isPending }) => {
 				<option value="">Select gender</option>
 				<option value="male">Male</option>
 				<option value="female">Female</option>
+			</Select>
+
+			<Select
+				label="Engineering Major"
+				icon={HiAcademicCap}
+				{...register("major")}
+				error={errors.major?.message}
+			>
+				<option value="">Select your major</option>
+				<option value="computer science">Computer Science</option>
+				<option value="mechanical engineering">Mechanical Engineering</option>
+				<option value="electrical engineering">Electrical Engineering</option>
+				<option value="civil engineering">Civil Engineering</option>
+				<option value="chemical engineering">Chemical Engineering</option>
+				<option value="aerospace engineering">Aerospace Engineering</option>
+				<option value="biomedical engineering">Biomedical Engineering</option>
+				<option value="industrial engineering">Industrial Engineering</option>
+				<option value="other">Other</option>
 			</Select>
 
 			<Select

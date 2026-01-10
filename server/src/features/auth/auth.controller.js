@@ -45,6 +45,7 @@ const signUp = errorHandler(async (req, res, next) => {
 		phoneNumber,
 		city,
 		country,
+		major,
 		userType,
 	} = req.body;
 
@@ -57,6 +58,7 @@ const signUp = errorHandler(async (req, res, next) => {
 		phoneNumber,
 		city,
 		country,
+		major,
 		userType,
 		role: "user",
 	});

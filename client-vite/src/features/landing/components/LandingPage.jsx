@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../../shared/hooks/useUser";
 import Header from "../../../shared/components/layout/Header";

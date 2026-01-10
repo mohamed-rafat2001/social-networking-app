@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -29,6 +29,7 @@ const signUpSchema = z
 		phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
 		city: z.string().min(2, "City is required"),
 		country: z.string().min(2, "Country is required"),
+		major: z.string().min(2, "Major is required"),
 		gender: z.enum(["male", "female"], {
 			errorMap: () => ({ message: "Please select your gender" }),
 		}),

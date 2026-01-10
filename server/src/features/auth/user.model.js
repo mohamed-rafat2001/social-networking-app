@@ -34,6 +34,12 @@ const userSchema = new mongoose.Schema(
 			lowercase: true,
 			required: true,
 		},
+		major: {
+			type: String,
+			trim: true,
+			lowercase: true,
+			required: true,
+		},
 		phoneNumber: {
 			type: String,
 			trim: true,

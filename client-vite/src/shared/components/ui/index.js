@@ -11,3 +11,4 @@ export * from "./Modal";
 export * from "./ConfirmModal";
 export * from "./Spinner";
 export * from "./ProgressBar";
+export * from "./NotFound";

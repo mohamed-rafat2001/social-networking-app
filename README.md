@@ -1,79 +1,86 @@
 # EngiConnect - Social Networking for Engineers
 
-EngiConnect is a comprehensive social networking platform designed specifically for engineering students. It facilitates collaboration, resource sharing, and real-time communication across various engineering disciplines.
+EngiConnect is a comprehensive social networking platform designed specifically for engineering students and professionals. It facilitates collaboration, resource sharing, and real-time communication across various engineering disciplines.
 
-## 🚀 Features
+## 🚀 Key Features
 
 - **Personalized Feed**: Stay updated with posts and resources from your engineering community.
-- **Real-time Chat**: Connect instantly with peers and project partners.
+- **Real-time Chat**: Connect instantly with peers and project partners using socket-based messaging.
 - **Major-specific Communities**: Dedicated spaces for Civil, Mechanical, Electrical, Computer Engineering, and more.
-- **Resource Hub**: Upload and download study materials, lab reports, and lecture notes.
-- **Dark & Light Mode**: Seamless theme switching for comfortable viewing day or night.
-- **Responsive Design**: Fully optimized for mobile, tablet, and desktop devices.
-- **Secure Authentication**: Verified access for university students.
+- **Resource Hub**: Integration with educational resources (YouTube) and file sharing capabilities.
+- **Modern UI/UX**: Seamless dark/light mode switching and a fully responsive design for all devices.
+- **Secure Authentication**: Robust user management with JWT and profile customization.
 
 ## 🛠️ Tech Stack
 
-### Client
-- **Framework**: React.js with Vite
-- **Styling**: Tailwind CSS
-- **State Management**: Redux Toolkit & React Query
-- **Animations**: Framer Motion
-- **Form Handling**: React Hook Form & Zod
+- **Frontend**: [React 18](https://reactjs.org/), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/), [Redux Toolkit](https://redux-toolkit.js.org/), [TanStack Query](https://tanstack.com/query/latest).
+- **Backend**: [Node.js](https://nodejs.org/), [Express.js](https://expressjs.com/), [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/).
+- **Real-time**: [Socket.io](https://socket.io/) for instant updates and messaging.
+- **Media**: [Cloudinary](https://cloudinary.com/) for optimized image and file storage.
 
-### Server
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose
-- **File Storage**: Cloudinary
-- **Authentication**: JWT (JSON Web Tokens)
+## 📁 Project Structure
 
-### Real-time
-- **Socket Server**: Socket.io for instant messaging and notifications.
+The repository is organized into three main directories:
 
-## 📂 Project Structure
+| Directory                       | Description                                               |
+| :------------------------------ | :-------------------------------------------------------- |
+| [`client-vite/`](./client-vite) | The React frontend application powered by Vite.           |
+| [`server/`](./server)           | The Express.js REST API handling data and business logic. |
+| [`socket/`](./socket)           | The standalone Socket.io server for real-time features.   |
 
-```
-social-app/
-├── client-vite/ # Frontend React application
-├── server/     # Backend Express API
-├── socket/     # Real-time communication server
-```
+## ⚙️ Quick Start
 
-## ⚙️ Installation & Setup
+To run the entire application locally, you will need to start three separate processes:
 
-To get the project running locally, follow these steps:
+### 1. Prerequisites
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/mohamed-rafat2001/social-networking-app.git
-cd social-networking-app
-```
+- [Node.js](https://nodejs.org/) (Latest LTS)
+- [MongoDB](https://www.mongodb.com/try/download/community) (Local or Atlas)
+- Cloudinary Account (for uploads)
 
-### 2. Setup the Server
+### 2. Setup & Installation
+
+#### Backend (API Server)
+
 ```bash
 cd server
 npm install
-# Create a .env file based on the environment variables needed (see server/README.md)
+# Configure .env file (see server/README.md)
 npm start
 ```
 
-### 3. Setup the Client
+#### Real-time (Socket Server)
+
 ```bash
-cd ../client
+cd socket
+npm install
+npm start
+```
+
+#### Frontend (Vite Client)
+
+```bash
+cd client-vite
 npm install
 npm run dev
 ```
 
-### 4. Setup the Socket Server
-```bash
-cd ../socket
-npm install
-nodemon index.js
-```
+## 🌐 Environment Configuration
+
+Each directory requires its own `.env` configuration. Please refer to the individual README files in each folder for specific environment variable requirements:
+
+- [Server Environment Variables](./server/README.md#🌐-environment-variables)
+- [Client Environment Variables](./client-vite/README.md#🌐-configuration--environment)
+- [Socket Configuration](./socket/README.md#🌐-configuration)
+
+---
 
 ## 📄 License
+
 This project is licensed under the ISC License.
 
 ## 👥 Authors
-- Mohamed Rafat - *Initial work*
+
+- **Mohamed Rafat** - _Initial Work & Development_
+
+Developed for **EngiConnect** - Connecting Engineers of Tomorrow.

@@ -33,6 +33,7 @@ const regestrationValidator = [
 		.withMessage("Please enter a valid phone number"),
 	body("city").notEmpty().trim().withMessage("City is required"),
 	body("country").notEmpty().trim().withMessage("Country is required"),
+	body("major").notEmpty().trim().withMessage("Major is required"),
 	body("userType")
 		.isIn(["engineering student", "engineering teacher", "engineer"])
 		.withMessage("Please select a valid profession"),

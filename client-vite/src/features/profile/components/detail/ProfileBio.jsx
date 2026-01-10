@@ -13,7 +13,7 @@ const ProfileBio = ({ user }) => {
                 <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-bold">
                     <HiOutlineAcademicCap size={22} className="text-primary" />
                     <span className="text-sm uppercase tracking-wider">
-                        Engineering Student
+                        {user.major ? `${user.major} - ${user.userType || "Engineering Student"}` : (user.userType || "Engineering Student")}
                     </span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-bold">
