@@ -166,6 +166,7 @@ function PostItem({ post, index }) {
 							<PostItemActions
 								post={post}
 								user={user}
+								isShare={isShare}
 								handleLike={handleLike}
 								handleRepost={handleRepost}
 								setIsRepostModalOpen={setIsRepostModalOpen}

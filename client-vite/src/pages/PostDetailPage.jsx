@@ -74,7 +74,8 @@ function PostDetailPage() {
 	}
 
 	const post = postData.data;
-	const isOwner = user?._id === post.userId?._id;
+	const isShare = post.type === "share";
+	const isOwner = user?._id === (isShare ? post.sharedBy?._id : post.userId?._id);
 
 	const handleLike = () => {
 		likePost(post._id);
@@ -82,7 +83,7 @@ function PostDetailPage() {
 
 	const handleShare = () => {
 		sharePost(
-			{ postId: post._id },
+			{ postId: post.originalPostId || post._id },
 			{
 				onSuccess: () => {
 					toast.success("Reposted successfully");
@@ -97,7 +98,7 @@ function PostDetailPage() {
 	const handleRepostWithNote = () => {
 		if (!repostNote.trim()) return;
 		sharePost(
-			{ postId: post._id, note: repostNote },
+			{ postId: post.originalPostId || post._id, note: repostNote },
 			{
 				onSuccess: () => {
 					setIsRepostModalOpen(false);
@@ -145,6 +146,7 @@ function PostDetailPage() {
 			<PostDetailContent
 				post={post}
 				isOwner={isOwner}
+				isShare={isShare}
 				setIsEditModalOpen={setIsEditModalOpen}
 				setIsDeleteModalOpen={setIsDeleteModalOpen}
 			/>
@@ -152,6 +154,7 @@ function PostDetailPage() {
 			<PostDetailActions
 				post={post}
 				user={user}
+				isShare={isShare}
 				handleLike={handleLike}
 				handleShare={handleShare}
 				setIsRepostModalOpen={setIsRepostModalOpen}

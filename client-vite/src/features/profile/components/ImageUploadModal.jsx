@@ -110,21 +110,36 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 				</div>
 
 				{/* Post Text Input - Post Style with Emoji */}
-				<div className="px-1 profile-emoji-input emoji-input-container">
+				<div className="px-1 profile-emoji-input emoji-input-container relative z-[60]">
 					<style>
 						{`
 							.profile-emoji-input .react-input-emoji--container {
 								background: transparent !important;
 								border: none !important;
+								margin-bottom: 0 !important;
 							}
 							.profile-emoji-input .react-input-emoji--wrapper {
 								background: transparent !important;
 								border: none !important;
+								padding: 0 !important;
 							}
 							.profile-emoji-input .react-input-emoji--input {
 								background: transparent !important;
-								padding: 12px 0 !important;
+								padding: 8px 0 !important;
 								color: ${darkMode ? "white" : "#1f2937"} !important;
+								min-height: 40px !important;
+								max-height: 120px !important;
+								overflow-y: auto !important;
+							}
+							.profile-emoji-input .react-input-emoji--button {
+								padding: 8px !important;
+								z-index: 100 !important;
+							}
+							.profile-emoji-input .react-input-emoji--picker-wrapper {
+								z-index: 1000 !important;
+								position: absolute !important;
+								bottom: 100% !important;
+								right: 0 !important;
 							}
 						`}
 					</style>
@@ -134,7 +149,7 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 						cleanOnEnter={false}
 						placeholder={`Say something about your new profile picture...`}
 						theme={darkMode ? "dark" : "light"}
-						fontSize={16}
+						fontSize={15}
 						fontFamily="inherit"
 						borderColor="transparent"
 						background="transparent"
@@ -178,13 +193,13 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 							</div>
 						</div>
 					) : (
-						<div className="relative rounded-2xl overflow-hidden group border border-gray-100 dark:border-gray-800 shadow-sm">
-							<div className="aspect-video bg-gray-100 dark:bg-gray-800">
+						<div className="relative rounded-2xl overflow-hidden group border border-gray-100 dark:border-gray-800 shadow-sm bg-gray-50 dark:bg-gray-950">
+							<div className="flex items-center justify-center bg-gray-100 dark:bg-gray-800 max-h-[400px]">
 								<img
 									src={previewUrl}
 									alt="Preview"
 									className={cn(
-										"w-full h-full object-cover transition-all duration-500",
+										"max-w-full max-h-[400px] object-contain transition-all duration-500",
 										isLoading && "blur-sm scale-105 brightness-75"
 									)}
 								/>
