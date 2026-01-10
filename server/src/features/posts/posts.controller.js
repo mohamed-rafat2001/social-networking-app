@@ -92,9 +92,21 @@ const singlePost = errorHandler(async (req, res, next) => {
 					},
 				],
 			})
-			.populate("userId");
+			.populate("userId")
+			.populate({
+				path: "comments",
+				populate: [
+					{ path: "userId" },
+					{
+						path: "replies",
+						populate: { path: "userId" },
+					},
+				],
+			});
 
 		if (sharedPost && sharedPost.sharePost) {
+			const hasNote = !!sharedPost.note;
+
 			post = {
 				...sharedPost.sharePost.toObject(),
 				_id: sharedPost._id,
@@ -103,6 +115,17 @@ const singlePost = errorHandler(async (req, res, next) => {
 				shareDate: sharedPost.createdAt,
 				type: "share",
 				sharedBy: sharedPost.userId,
+				// If has note, use share's own stats, otherwise use original post's stats
+				views: hasNote ? sharedPost.views : sharedPost.sharePost.views,
+				likes: hasNote ? sharedPost.likes : sharedPost.sharePost.likes,
+				likesNumber: hasNote
+					? sharedPost.likesNumber
+					: sharedPost.sharePost.likesNumber,
+				comments: hasNote ? sharedPost.comments : sharedPost.sharePost.comments,
+				unLikes: hasNote ? sharedPost.unLikes : sharedPost.sharePost.unLikes,
+				unLikesNumber: hasNote
+					? sharedPost.unLikesNumber
+					: sharedPost.sharePost.unLikesNumber,
 			};
 		}
 	}
@@ -117,9 +140,19 @@ const singlePost = errorHandler(async (req, res, next) => {
 const incrementView = errorHandler(async (req, res, next) => {
 	let _id = req.params.id;
 
-	// Check if it's a share and resolve to original post if so
+	// Check if it's a share
 	const share = await Share.findById(_id);
 	if (share) {
+		if (share.note) {
+			// Increment share views if it has a note
+			const updatedShare = await Share.findByIdAndUpdate(
+				_id,
+				{ $inc: { views: 1 } },
+				{ new: true }
+			);
+			return res.status(200).json({ status: "success", data: updatedShare });
+		}
+		// Otherwise increment original post views
 		_id = share.sharePost;
 	}
 
@@ -239,15 +272,25 @@ const allPosts = errorHandler(async (req, res, next) => {
 		...posts.map((p) => ({ ...p.toObject(), type: "post" })),
 		...sharedPosts
 			.filter((s) => s.sharePost)
-			.map((s) => ({
-				...s.sharePost.toObject(),
-				_id: s._id,
-				originalPostId: s.sharePost._id,
-				shareNote: s.note,
-				shareDate: s.createdAt,
-				type: "share",
-				sharedBy: s.userId,
-			})),
+			.map((s) => {
+				const hasNote = !!s.note;
+				return {
+					...s.sharePost.toObject(),
+					_id: s._id,
+					originalPostId: s.sharePost._id,
+					shareNote: s.note,
+					shareDate: s.createdAt,
+					type: "share",
+					sharedBy: s.userId,
+					// If has note, use share's own stats, otherwise use original post's stats
+					views: hasNote ? s.views : s.sharePost.views,
+					likes: hasNote ? s.likes : s.sharePost.likes,
+					likesNumber: hasNote ? s.likesNumber : s.sharePost.likesNumber,
+					comments: hasNote ? s.comments : s.sharePost.comments,
+					unLikes: hasNote ? s.unLikes : s.sharePost.unLikes,
+					unLikesNumber: hasNote ? s.unLikesNumber : s.sharePost.unLikesNumber,
+				};
+			}),
 	].sort((a, b) => {
 		const dateA = a.type === "share" ? a.shareDate : a.createdAt;
 		const dateB = b.type === "share" ? b.shareDate : b.createdAt;
@@ -265,26 +308,33 @@ const postsForUser = factory.getAll(Posts);
 
 const likeOnPost = errorHandler(async (req, res, next) => {
 	let _id = req.params.id; //post id
+	let Model = Posts;
 
-	// Check if it's a share and resolve to original post if so
+	// Check if it's a share
 	const share = await Share.findById(_id);
 	if (share) {
-		_id = share.sharePost;
+		if (share.note) {
+			Model = Share;
+		} else {
+			_id = share.sharePost;
+			Model = Posts;
+		}
 	}
 
-	const likesnum = await Posts.findById(_id);
-	if (!likesnum) {
+	const doc = await Model.findById(_id);
+	if (!doc) {
 		const error = appError.Error("post not found", "fail", 404);
 		return next(error);
 	}
 
-	const numLike = likesnum.likes;
+	const numLike = doc.likes;
 	const len = numLike.length;
-	const numUnLike = likesnum.unLikes;
+	const numUnLike = doc.unLikes;
 	const lenUnLike = numUnLike.length;
 	const liked = numLike.includes(req.user._id.toString());
+
 	if (liked === false) {
-		const post = await Posts.findByIdAndUpdate(
+		const updatedDoc = await Model.findByIdAndUpdate(
 			_id,
 			{
 				$push: { likes: req.user._id },
@@ -296,40 +346,29 @@ const likeOnPost = errorHandler(async (req, res, next) => {
 		).populate("userId");
 
 		// Create notification
-		if (post.userId._id.toString() !== req.user._id.toString()) {
+		if (
+			updatedDoc.userId &&
+			updatedDoc.userId._id.toString() !== req.user._id.toString()
+		) {
 			await createNotification({
-				recipient: post.userId._id,
+				recipient: updatedDoc.userId._id,
 				sender: req.user._id,
 				type: "like",
-				post: post._id,
+				post: updatedDoc._id,
 			});
 		}
 
-		return res.status(200).json({ status: "success", data: post });
-	} else if (liked === true) {
-		const post = await Posts.findByIdAndUpdate(
+		return res.status(200).json({ status: "success", data: updatedDoc });
+	} else {
+		const updatedDoc = await Model.findByIdAndUpdate(
 			_id,
 			{
-				$pull: { unLikes: req.user._id },
-				unLikesNumber: lenUnLike,
 				$pull: { likes: req.user._id },
 				likesNumber: len - 1,
 			},
 			{ new: true }
 		);
-		return res.status(200).json({ status: "success", data: post });
-	} else {
-		const post = await Posts.findByIdAndUpdate(
-			_id,
-			{
-				$pull: { likes: req.user._id },
-				likesNumber: len,
-				$pull: { unLikes: req.user._id },
-				unLikesNumber: lenUnLike,
-			},
-			{ new: true }
-		);
-		res.status(200).json({ status: "success", data: post });
+		return res.status(200).json({ status: "success", data: updatedDoc });
 	}
 });
 

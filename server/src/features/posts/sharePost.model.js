@@ -17,6 +17,36 @@ const shareSchema = new mongoose.Schema(
 				secure_url: String,
 			},
 		],
+		views: {
+			type: Number,
+			default: 0,
+		},
+		likes: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "User",
+			},
+		],
+		likesNumber: {
+			type: Number,
+			default: 0,
+		},
+		comments: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Comment",
+			},
+		],
+		unLikes: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "User",
+			},
+		],
+		unLikesNumber: {
+			type: Number,
+			default: 0,
+		},
 	},
 	{ timestamps: true }
 );

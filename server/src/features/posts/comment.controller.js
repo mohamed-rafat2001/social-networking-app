@@ -39,14 +39,22 @@ const addComment = errorHandler(async (req, res, next) => {
 			populate: { path: "userId" },
 		});
 
-		if (share && share.sharePost) {
-			// Update the original post's comments array
-			post = await Posts.findByIdAndUpdate(share.sharePost._id, {
-				$push: { comments: addComment._id },
-			}).populate("userId");
+		if (share) {
+			if (share.note) {
+				// If share has a note, add comment to the share itself
+				await Share.findByIdAndUpdate(postId, {
+					$push: { comments: addComment._id },
+				});
+				post = share; // For notification purposes
+			} else if (share.sharePost) {
+				// If no note, add comment to the original post
+				post = await Posts.findByIdAndUpdate(share.sharePost._id, {
+					$push: { comments: addComment._id },
+				}).populate("userId");
 
-			// Update addComment to point to the original post ID for consistency
-			addComment.postId = share.sharePost._id;
+				// Update addComment to point to the original post ID for consistency
+				addComment.postId = share.sharePost._id;
+			}
 		} else {
 			const error = appError.Error("post not found", "fail", 404);
 			return next(error);

@@ -75,7 +75,8 @@ function PostDetailPage() {
 
 	const post = postData.data;
 	const isShare = post.type === "share";
-	const isOwner = user?._id === (isShare ? post.sharedBy?._id : post.userId?._id);
+	const isOwner =
+		user?._id === (isShare ? post.sharedBy?._id : post.userId?._id);
 
 	const handleLike = () => {
 		likePost(post._id);
@@ -203,7 +204,20 @@ function PostDetailPage() {
 				title="Repost with note"
 			>
 				<div className="space-y-4">
-					<div className="emoji-input-container">
+					<div className="emoji-input-container relative z-[60]">
+						<style>
+							{`
+								.emoji-input-container .react-input-emoji--picker-wrapper {
+									z-index: 1000 !important;
+									position: absolute !important;
+									bottom: 100% !important;
+									right: 0 !important;
+								}
+								.emoji-input-container .react-input-emoji--button {
+									z-index: 100 !important;
+								}
+							`}
+						</style>
 						<InputEmoji
 							value={repostNote}
 							onChange={setRepostNote}

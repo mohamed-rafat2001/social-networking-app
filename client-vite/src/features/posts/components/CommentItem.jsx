@@ -376,7 +376,20 @@ function CommentItem({ comment, postId }) {
 								<div className="flex gap-2">
 									<Avatar src={user?.image?.secure_url} size="xs" />
 									<div className="flex-1 min-w-0">
-										<div className="emoji-input-container bg-gray-50 dark:bg-gray-800/50 rounded-xl px-1">
+										<div className="emoji-input-container bg-gray-50 dark:bg-gray-800/50 rounded-xl px-1 relative z-[60]">
+											<style>
+												{`
+													.emoji-input-container .react-input-emoji--picker-wrapper {
+														z-index: 1000 !important;
+														position: absolute !important;
+														bottom: 100% !important;
+														right: 0 !important;
+													}
+													.emoji-input-container .react-input-emoji--button {
+														z-index: 100 !important;
+													}
+												`}
+											</style>
 											<InputEmoji
 												value={replyText}
 												onChange={setReplyText}
