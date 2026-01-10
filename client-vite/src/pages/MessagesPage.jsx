@@ -1,3 +1,4 @@
+import React from "react";
 import { ChatList } from "../features/chat";
 import { Outlet, useParams } from "react-router-dom";
 import { HiOutlineChatAlt2 } from "react-icons/hi";

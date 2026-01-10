@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
 	useMessages,
@@ -6,7 +7,6 @@ import {
 	useUpdateMessage,
 } from "../hooks/useMessageQueries";
 import { useSingleChat, useDeleteChat } from "../hooks/useChatQueries";
-import { useState, useEffect, useRef } from "react";
 import { Spinner, ConfirmModal } from "../../../shared/components/ui";
 import { useUser } from "../../../shared/hooks/useUser";
 import { useTheme } from "../../../providers/ThemeProvider";

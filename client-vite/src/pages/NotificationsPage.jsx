@@ -1,3 +1,4 @@
+import React from "react";
 import { NotificationList } from "../features/notifications";
 import { HiOutlineBell, HiOutlineCheckCircle } from "react-icons/hi";
 import { useNotifications } from "../features/notifications/hooks/useNotifications";

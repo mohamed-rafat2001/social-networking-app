@@ -1,12 +1,10 @@
+import React, { useState } from "react";
 import { useChats, useDeleteChat } from "../hooks/useChatQueries";
 import { useParams } from "react-router-dom";
 import { ConfirmModal } from "../../../shared/components/ui";
 import { useUser } from "../../../shared/hooks/useUser";
 import { useSocket } from "../../../shared/hooks/useSocket";
-import { HiOutlineChatAlt2 } from "react-icons/hi";
-
-import { useState } from "react";
-import { HiPlus } from "react-icons/hi";
+import { HiOutlineChatAlt2, HiPlus } from "react-icons/hi";
 import UserSearch from "./UserSearch";
 import { AnimatePresence } from "framer-motion";
 import ChatItem from "./detail/ChatItem";

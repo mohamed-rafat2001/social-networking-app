@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
 	HiSearch,
@@ -16,7 +17,6 @@ import { useNotifications } from "../../../features/notifications/hooks/useNotif
 import NotificationList from "../../../features/notifications/components/NotificationList";
 import { useChats } from "../../../features/chat/hooks/useChatQueries";
 import { Avatar, Button, cn } from "../ui";
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../../../providers/ThemeProvider";
 

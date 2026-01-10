@@ -1,3 +1,4 @@
+import React from "react";
 import { useNotifications } from "../hooks/useNotifications";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { HiOutlineBell } from "react-icons/hi";

@@ -1,3 +1,4 @@
+import React, { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
 	useUserProfile,
@@ -19,7 +20,6 @@ import ProfileHeader from "./detail/ProfileHeader";
 import ProfileBio from "./detail/ProfileBio";
 import ProfileTabs from "./detail/ProfileTabs";
 import ProfileContent from "./detail/ProfileContent";
-import { useState, useEffect } from "react";
 
 const ProfileDetail = () => {
 	const { userId } = useParams();

@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -8,7 +9,6 @@ import {
 	HiOutlinePencil,
 	HiOutlineTrash,
 } from "react-icons/hi";
-import { useState } from "react";
 import {
 	Avatar,
 	Button,

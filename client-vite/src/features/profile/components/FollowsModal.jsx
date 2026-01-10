@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
 	HiOutlineSearch,
@@ -5,7 +6,6 @@ import {
 	HiUserAdd,
 	HiUserRemove,
 } from "react-icons/hi";
-import { useState } from "react";
 import { Avatar, Button, cn } from "../../../shared/components/ui";
 import { useNavigate } from "react-router-dom";
 import {

@@ -199,6 +199,7 @@ const updateProfile = errorHandler(async (req, res, next) => {
 		"country",
 		"bio",
 		"gender",
+		"major",
 		"userType",
 		"acountType",
 	];
