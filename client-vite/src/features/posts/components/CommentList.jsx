@@ -84,7 +84,20 @@ function CommentList({ comments, postId, recipientId }) {
 					<Avatar src={user?.image?.secure_url} size="md" />
 					<div className="flex-1 min-w-0">
 						<form onSubmit={handleSubmit(onSubmit)}>
-							<div className="emoji-input-container bg-gray-50 dark:bg-gray-800/50 rounded-2xl focus-within:bg-white dark:focus-within:bg-gray-800 border border-transparent focus-within:border-primary/20 transition-all px-2">
+							<div className="emoji-input-container bg-gray-50 dark:bg-gray-800/50 rounded-2xl focus-within:bg-white dark:focus-within:bg-gray-800 border border-transparent focus-within:border-primary/20 transition-all px-2 relative z-[60]">
+								<style>
+									{`
+										.emoji-input-container .react-input-emoji--picker-wrapper {
+											z-index: 1000 !important;
+											position: absolute !important;
+											bottom: 100% !important;
+											right: 0 !important;
+										}
+										.emoji-input-container .react-input-emoji--button {
+											z-index: 100 !important;
+										}
+									`}
+								</style>
 								<Controller
 									name="text"
 									control={control}

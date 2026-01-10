@@ -183,7 +183,20 @@ function PostList() {
 				<div className="flex gap-4">
 					<Avatar src={user?.image?.secure_url} />
 					<form className="flex-1" onSubmit={handleFormSubmit(onSubmit)}>
-						<div className="mb-2 emoji-input-container">
+						<div className="mb-2 emoji-input-container relative z-[60]">
+							<style>
+								{`
+									.emoji-input-container .react-input-emoji--picker-wrapper {
+										z-index: 1000 !important;
+										position: absolute !important;
+										bottom: 100% !important;
+										right: 0 !important;
+									}
+									.emoji-input-container .react-input-emoji--button {
+										z-index: 100 !important;
+									}
+								`}
+							</style>
 							<Controller
 								name="text"
 								control={control}

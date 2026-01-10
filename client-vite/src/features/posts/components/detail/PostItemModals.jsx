@@ -68,27 +68,6 @@ const PostItemModals = ({
 				size="lg"
 			>
 				<div className="space-y-4" onClick={(e) => e.stopPropagation()}>
-					<style>
-						{`
-							.repost-emoji-input .react-input-emoji--container {
-								background: ${darkMode ? "#1f2937" : "#ffffff"} !important;
-								border: 1px solid ${darkMode ? "#374151" : "#e5e7eb"} !important;
-								margin: 0 !important;
-							}
-							.repost-emoji-input .react-input-emoji--wrapper {
-								background: transparent !important;
-								border: none !important;
-							}
-							.repost-emoji-input .react-input-emoji--input {
-								background: transparent !important;
-								padding: 12px !important;
-								color: ${darkMode ? "#ffffff" : "#000000"} !important;
-							}
-							.repost-emoji-input .react-input-emoji--button {
-								padding: 10px !important;
-							}
-						`}
-					</style>
 					<div className="flex gap-3">
 						<Avatar src={user?.image?.secure_url} size="md" />
 						<div className="flex-1">

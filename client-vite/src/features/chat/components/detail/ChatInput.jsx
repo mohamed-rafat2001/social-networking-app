@@ -32,7 +32,20 @@ const ChatInput = ({
 					className="hidden"
 				/>
 
-				<div className="flex-1 min-h-[46px] emoji-input-container">
+				<div className="flex-1 min-h-[46px] emoji-input-container relative z-[60]">
+					<style>
+						{`
+							.emoji-input-container .react-input-emoji--picker-wrapper {
+								z-index: 1000 !important;
+								position: absolute !important;
+								bottom: 100% !important;
+								right: 0 !important;
+							}
+							.emoji-input-container .react-input-emoji--button {
+								z-index: 100 !important;
+							}
+						`}
+					</style>
 					<InputEmoji
 						value={text}
 						onChange={setText}
