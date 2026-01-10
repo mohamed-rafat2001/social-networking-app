@@ -40,6 +40,25 @@ export const useSignUp = () => {
 	});
 };
 
+export const useForgotPassword = () => {
+	return useMutation({
+		mutationFn: userService.forgotPassword,
+	});
+};
+
+export const useResetPassword = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: userService.resetPassword,
+		onSuccess: async (data) => {
+			if (data.data?.token) {
+				storeToken(data.data.token);
+			}
+			await queryClient.invalidateQueries(["currentUser"]);
+		},
+	});
+};
+
 export const useUserProfile = (userId) => {
 	return useQuery({
 		queryKey: ["userProfile", userId],

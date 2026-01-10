@@ -5,7 +5,7 @@ import * as z from "zod";
 import { HiMail, HiLockClosed } from "react-icons/hi";
 import { Button, Input, Spinner } from "../../../shared/components/ui";
 import { useLogin } from "../hooks/useUserQueries";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const loginSchema = z.object({
@@ -92,24 +92,17 @@ const Login = () => {
 				</div>
 
 				<div className="text-sm">
-					<a
-						href="#"
+					<Link
+						to="/forgot-password"
 						className="font-medium text-primary hover:text-primary/80 transition-colors"
 					>
 						Forgot your password?
-					</a>
+					</Link>
 				</div>
 			</div>
 
 			<Button type="submit" className="w-full py-3" disabled={isPending}>
-				{isPending ? (
-					<div className="flex items-center gap-2">
-						<Spinner size="sm" variant="white" />
-						Signing in...
-					</div>
-				) : (
-					"Sign in"
-				)}
+				{isPending ? <Spinner size="sm" light /> : "Sign in"}
 			</Button>
 		</form>
 	);

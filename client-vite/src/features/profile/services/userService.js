@@ -81,6 +81,16 @@ export const updateProfile = async (userData) => {
 	return response.data;
 };
 
+export const forgotPassword = async (email) => {
+	const response = await apiApp.post("/user/forgotPassword", { email });
+	return response.data;
+};
+
+export const resetPassword = async (resetData) => {
+	const response = await apiApp.patch("/user/resetPassword", resetData);
+	return response.data;
+};
+
 export const updateProfileImageDirect = async (formData) => {
 	const response = await apiApp.post("/user/profileImg", formData, {
 		headers: {

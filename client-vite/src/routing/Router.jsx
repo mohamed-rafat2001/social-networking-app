@@ -2,6 +2,8 @@ import React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import LandingPage from "../pages/LandingPage";
 import AuthPage from "../pages/AuthPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/ResetPasswordPage";
 import FeedPage from "../pages/FeedPage";
 import MessagesPage from "../pages/MessagesPage";
 import ChatDetailPage from "../pages/ChatDetailPage";
@@ -20,6 +22,14 @@ export const router = createBrowserRouter([
 	{
 		path: "/welcome",
 		element: <AuthPage />,
+	},
+	{
+		path: "/forgot-password",
+		element: <ForgotPasswordPage />,
+	},
+	{
+		path: "/reset-password",
+		element: <ResetPasswordPage />,
 	},
 	{
 		element: <ProtectedRoute />,
