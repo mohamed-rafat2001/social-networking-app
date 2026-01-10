@@ -3,8 +3,8 @@ import Chat from "./chat.model.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
 import appError from "../../shared/utils/appError.js";
 import errorHandler from "../../shared/middlewares/errorHandler.js";
+import * as factory from "../../shared/utils/handlerFactory.js";
 
-// create message
 const createMessage = errorHandler(async (req, res, next) => {
 	const senderId = req.user._id;
 	const chatId = req.params.id;
@@ -59,24 +59,7 @@ const createMessage = errorHandler(async (req, res, next) => {
 });
 
 //chat messgaes
-const ChatMessages = errorHandler(async (req, res, next) => {
-	const chatId = req.params.id;
-	const messages = await Message.find({ chatId }).sort({ createdAt: 1 });
-
-	if (!messages) {
-		const error = appError.Error("messages not found", "fail", 404);
-		return next(error);
-	}
-
-	// Map senderId to sender for frontend compatibility if needed
-	const formattedMessages = messages.map((msg) => {
-		const msgObj = msg.toObject();
-		msgObj.sender = msgObj.senderId;
-		return msgObj;
-	});
-
-	res.status(200).json({ status: "success", data: formattedMessages });
-});
+const ChatMessages = factory.getAll(Message, {}, { id: "chatId" });
 
 const deleteMessage = errorHandler(async (req, res, next) => {
 	const messageId = req.params.id;
@@ -117,28 +100,7 @@ const deleteMessage = errorHandler(async (req, res, next) => {
 		.json({ status: "success", message: "Message deleted successfully" });
 });
 
-const updateMessage = errorHandler(async (req, res, next) => {
-	const messageId = req.params.id;
-	const userId = req.user._id;
-	const { content } = req.body;
-
-	const message = await Message.findOneAndUpdate(
-		{ _id: messageId, senderId: userId },
-		{ content },
-		{ new: true }
-	);
-
-	if (!message) {
-		const error = appError.Error(
-			"Message not found or you don't have permission to update it",
-			"fail",
-			404
-		);
-		return next(error);
-	}
-
-	res.status(200).json({ status: "success", data: message });
-});
+const updateMessage = factory.updateOneByOwner(Message, "senderId");
 
 const deleteAllMessagesFromChat = errorHandler(async (req, res, next) => {
 	const chatId = req.params.id;

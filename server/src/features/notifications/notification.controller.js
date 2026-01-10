@@ -1,6 +1,6 @@
 import Notification from "./notification.model.js";
 import errorHandler from "../../shared/middlewares/errorHandler.js";
-import AppError from "../../shared/utils/appError.js";
+import * as factory from "../../shared/utils/handlerFactory.js";
 
 const getNotifications = errorHandler(async (req, res, next) => {
 	const notifications = await Notification.find({ recipient: req.user._id })
@@ -14,31 +14,9 @@ const getNotifications = errorHandler(async (req, res, next) => {
 	});
 });
 
-const markAsRead = errorHandler(async (req, res, next) => {
-	const notification = await Notification.findByIdAndUpdate(
-		req.params.id,
-		{ read: true },
-		{ new: true }
-	);
+const markAsRead = factory.updateOne(Notification);
 
-	if (!notification) {
-		return next(AppError.Error("Notification not found", "fail", 404));
-	}
-
-	res.status(200).json({
-		status: "success",
-		data: notification,
-	});
-});
-
-const deleteNotification = errorHandler(async (req, res, next) => {
-	await Notification.findByIdAndDelete(req.params.id);
-
-	res.status(204).json({
-		status: "success",
-		data: null,
-	});
-});
+const deleteNotification = factory.deleteOne(Notification);
 
 const markAllAsRead = errorHandler(async (req, res, next) => {
 	await Notification.updateMany(

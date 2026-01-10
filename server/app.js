@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 
 // Features
 import userRouter from "./src/features/auth/auth.routes.js";
@@ -21,7 +22,13 @@ const app = express();
 mongoose.set("strictQuery", true);
 
 app.use(express.json());
-app.use(cors({ origin: "*" })); // Allow all for development, refine later
+app.use(cookieParser());
+app.use(
+	cors({
+		origin: ["http://localhost:5173", "http://localhost:3000"], // Add your client URLs
+		credentials: true,
+	})
+);
 
 app.use("/user", userRouter);
 app.use("/follows", followRouter);

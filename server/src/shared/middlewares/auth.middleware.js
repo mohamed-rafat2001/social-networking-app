@@ -3,12 +3,21 @@ import jwt from "jsonwebtoken";
 import appError from "../utils/appError.js";
 
 const user = async (req, res, next) => {
-	const authToken = req.header("Authorization");
-	if (!authToken) {
+	let token;
+	if (
+		req.headers.authorization &&
+		req.headers.authorization.startsWith("Bearer")
+	) {
+		token = req.headers.authorization.split(" ")[1];
+	} else if (req.cookies.token) {
+		token = req.cookies.token;
+	}
+
+	if (!token) {
 		const error = appError.Error("token is required", "fail", 401);
 		return next(error);
 	}
-	const token = authToken.replace("Bearer ", "");
+
 	try {
 		const verifyToken = jwt.verify(token, process.env.USER_KEY_TOKEN);
 		const userData = await User.findById(verifyToken.id);

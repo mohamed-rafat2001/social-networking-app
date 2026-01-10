@@ -11,6 +11,12 @@ const shareSchema = new mongoose.Schema(
 			ref: "Posts",
 		},
 		note: String,
+		image: [
+			{
+				public_id: String,
+				secure_url: String,
+			},
+		],
 	},
 	{ timestamps: true }
 );

@@ -35,7 +35,7 @@ EngiConnect is a comprehensive social networking platform designed specifically 
 
 ```
 social-app/
-├── client/     # Frontend React application
+├── client-vite/ # Frontend React application
 ├── server/     # Backend Express API
 ├── socket/     # Real-time communication server
 ```

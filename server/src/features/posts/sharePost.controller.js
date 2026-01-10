@@ -4,112 +4,134 @@ import errorHandler from "../../shared/middlewares/errorHandler.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
 import appError from "../../shared/utils/appError.js";
 import { createNotification } from "../notifications/notification.controller.js";
+import * as factory from "../../shared/utils/handlerFactory.js";
 
 const sharePost = errorHandler(async (req, res, next) => {
-	const postId = req.params.id; //post id
-	const _id = req.user._id; //user id
-	let sharePO;
+	let postId = req.params.id;
+	const userId = req.user._id;
 
-	// Check if post exists
+	if (!postId) {
+		return next(appError.Error("Post ID is required", "fail", 400));
+	}
+
+	// 1. Try to see if it's already a share, if so, get the original post ID
+	try {
+		const share = await Share.findById(postId);
+		if (share) {
+			postId = share.sharePost;
+		}
+	} catch (err) {
+		// If it's a CastError, it's just not a Share, continue with original postId
+	}
+
+	// 2. Check if the original post exists
 	const originalPost = await Post.findById(postId);
 	if (!originalPost) {
-		const error = appError.Error("Original post not found", "fail", 404);
-		return next(error);
+		return next(appError.Error("Original post not found", "fail", 404));
 	}
+
+	// 3. Check if user already shared this original post
+	const existingShare = await Share.findOne({ userId, sharePost: postId });
+
+	if (existingShare) {
+		// Update note if provided
+		if (req.body.note !== undefined) {
+			existingShare.note = req.body.note;
+			await existingShare.save();
+			return res.status(200).json({ status: "success", data: existingShare });
+		}
+		return res.status(200).json({ status: "success", data: existingShare });
+	}
+
+	// 4. Handle new share creation
+	let sharePO;
+	const shareData = {
+		...req.body,
+		userId,
+		sharePost: postId,
+	};
 
 	if (req.files && req.files.length > 0) {
 		const files = [];
 		for (const file of req.files) {
 			const { public_id, secure_url } = await cloudinary.uploader.upload(
 				file.path,
-				{ folder: `e-Learning/user/id_${req.user._id}/share/postId_${postId}` }
+				{ folder: `social-app/user/id_${userId}/share/postId_${postId}` }
 			);
 			files.push({ public_id, secure_url });
 		}
-
-		sharePO = new Share({
-			...req.body,
-			userId: _id,
-			sharePost: postId,
-			image: files,
-		});
-	} else {
-		sharePO = new Share({
-			...req.body,
-			userId: _id,
-			sharePost: postId,
-		});
+		shareData.image = files;
 	}
+
+	sharePO = new Share(shareData);
 
 	if (!sharePO) {
-		const error = appError.Error("Failed to create share object", "fail", 400);
-		return next(error);
+		return next(appError.Error("Failed to create share object", "fail", 400));
 	}
 
-	// Save the share first
+	// 5. Save share and update original post
 	await sharePO.save();
 
-	// Update the original post with the share info
 	await Post.findByIdAndUpdate(
 		postId,
 		{
-			$push: { shares: { shareId: sharePO._id, userId: _id } },
+			$push: { shares: { shareId: sharePO._id, userId } },
 		},
 		{ new: true }
 	);
 
-	// Create notification
-	const post = await Post.findById(postId).populate("userId");
-	if (post && post.userId._id.toString() !== _id.toString()) {
+	// 6. Notification logic
+	const postWithAuthor = await Post.findById(postId).populate("userId");
+	if (
+		postWithAuthor &&
+		postWithAuthor.userId?._id.toString() !== userId.toString()
+	) {
 		await createNotification({
-			recipient: post.userId._id,
-			sender: _id,
+			recipient: postWithAuthor.userId._id,
+			sender: userId,
 			type: "share",
-			post: post._id,
+			post: postWithAuthor._id,
 		});
 	}
 
-	res.status(200).json({ status: "success", data: sharePO });
+	// Emit socket event for new share
+	const io = req.app.get("io");
+	if (io) {
+		io.emit("newPost", {
+			type: "share",
+			shareId: sharePO._id,
+			userId: userId,
+		});
+	}
+
+	res.status(201).json({ status: "success", data: sharePO });
 });
 
 const deleteShare = errorHandler(async (req, res, next) => {
 	const postId = req.params.id; //post id
-	const _id = req.user._id; //user id
-	const sharePO = await Share.findOneAndDelete({
-		userId: _id,
+	const userId = req.user._id; //user id
+
+	const sharePO = await Share.findOne({
+		userId,
 		sharePost: postId,
 	});
+
 	if (!sharePO) {
-		const error = appError.Error("not deleted", "fail", 404);
+		const error = appError.Error("Share not found", "fail", 404);
 		return next(error);
 	}
+
+	// Remove from original post's shares array
+	await Post.findByIdAndUpdate(postId, {
+		$pull: { shares: { shareId: sharePO._id } },
+	});
+
+	await sharePO.deleteOne();
+
 	res.status(200).json({ status: "success", data: sharePO });
 });
 
-const updateShare = errorHandler(async (req, res, next) => {
-	const postId = req.params.id; //post id
-	const _id = req.user._id; //user id
-	const sharePO = await Share.findOneAndUpdate(
-		{ userId: _id, sharePost: postId },
-		req.body,
-		{ new: true }
-	);
-	if (!sharePO) {
-		const error = appError.Error("not updated", "fail", 404);
-		return next(error);
-	}
-	res.status(200).json({ status: "success", data: sharePO });
-});
-
-const singleShare = errorHandler(async (req, res, next) => {
-	const postId = req.params.id; //post id
-	const _id = req.user._id; //user id
-	const sharePO = await Share.findOne({ userId: _id, sharePost: postId });
-	if (!sharePO) {
-		const error = appError.Error("not founded", "fail", 404);
-		return next(error);
-	}
-	res.status(200).json({ status: "success", data: sharePO });
-});
+const updateShare = factory.updateOne(Share);
+const singleShare = factory.getOne(Share, { path: "sharePost" });
 
 export { sharePost, deleteShare, updateShare, singleShare };

@@ -6,6 +6,8 @@ import cloudinary from "../../shared/utils/cloudinary.js";
 import appError from "../../shared/utils/appError.js";
 import { createNotification } from "../notifications/notification.controller.js";
 
+import * as factory from "../../shared/utils/handlerFactory.js";
+
 const addComment = errorHandler(async (req, res, next) => {
 	const postId = req.params.id; //post id
 	const userId = req.user._id; // user id
@@ -67,45 +69,9 @@ const addComment = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: addComment });
 });
 
-const singleComment = errorHandler(async (req, res, next) => {
-	const commentId = req.params.id;
-	const comment = await Comment.findById(commentId);
-
-	if (!comment) {
-		const error = appError.Error("comment not found", "fail", 404);
-		return next(error);
-	}
-
-	await comment.populate("replies");
-	await comment.populate("userId");
-
-	res.status(200).json({ status: "success", data: comment });
-});
-
-const updateComment = errorHandler(async (req, res, next) => {
-	const _id = req.params.id; //comment id
-	const comment = await Comment.findByIdAndUpdate(
-		{ _id, userId: req.user._id },
-		req.body,
-		{ new: true, runValidators: true }
-	);
-	if (!comment) {
-		const error = appError.Error("comment not found", "fail", 404);
-		return next(error);
-	}
-	res.status(200).json({ status: "success", data: comment });
-});
-
-const deleteComment = errorHandler(async (req, res, next) => {
-	const _id = req.params.id; // id for comment
-	const commentData = await Comment.findOne({ _id, userId: req.user._id });
-	if (!commentData) {
-		const error = appError.Error("comment not found", "fail", 404);
-		return next(error);
-	}
-	await commentData.deleteOne();
-	res.status(200).json({ status: "success", data: commentData });
-});
+const singleComment = factory.getOne(Comment, ["replies", "userId"]);
+const updateComment = factory.updateOneByOwner(Comment);
+const deleteComment = factory.deleteOneByOwner(Comment);
 
 const likeOnComm = errorHandler(async (req, res, next) => {
 	const _id = req.params.id; // comment id

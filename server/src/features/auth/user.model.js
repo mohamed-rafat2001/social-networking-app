@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 import validator from "validator";
+import crypto from "crypto";
 
 const userSchema = new mongoose.Schema(
 	{
@@ -112,9 +113,8 @@ const userSchema = new mongoose.Schema(
 			enum: ["male", "female"],
 			required: true,
 		},
-		passwordResetToken: {
-			type: String,
-		},
+		passwordResetCode: Number,
+		passwordResetExpires: Date,
 	},
 	{
 		timestamps: true,
@@ -138,14 +138,25 @@ userSchema.virtual("followingCount", {
 	count: true,
 });
 
-userSchema.methods.creatToken = function () {
+userSchema.methods.createToken = function () {
 	const token = jwt.sign(
 		{ id: this._id.toString() },
 		process.env.USER_KEY_TOKEN
 	);
 	return token;
 };
+// create passwordResetToken
+userSchema.methods.createPasswordResetCode = function () {
+	const buffer = crypto.randomBytes(6);
+	let code = "";
 
+	for (let i = 0; i < 6; i++) {
+		code += (buffer[i] % 10).toString();
+	}
+	this.passwordResetCode = code;
+	this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+	return code;
+};
 // Auto-generate unique username
 userSchema.pre("save", async function (next) {
 	if (this.isModified("password")) {

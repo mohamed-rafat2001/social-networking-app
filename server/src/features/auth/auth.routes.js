@@ -24,6 +24,7 @@ router.post(
 	handelValidation(),
 	authController.login
 );
+router.get("/logout", authController.logout);
 router.post("/forgotPassword", authController.forgotPass);
 router.patch("/resetPassword", authController.resetPassword);
 

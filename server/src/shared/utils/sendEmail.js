@@ -1,27 +1,20 @@
 import nodemailer from "nodemailer";
-import uniqid from "uniqid";
-
-const email = async (user) => {
-	const token = uniqid();
-	user.passwordResetToken = token;
-	let transporter = nodemailer.createTransport({
-		host: "smtp.gmail.com",
-		port: 587,
-		secure: false, // true for 465, false for other ports
+const sendEmail = async (options) => {
+	const transporter = nodemailer.createTransport({
+		service: process.env.EMAIL_SERVICE,
+		host: process.env.EMAIL_HOST,
+		port: process.env.EMAIL_PORT,
 		auth: {
 			user: process.env.EMAIL_USERNAME,
 			pass: process.env.EMAIL_PASSWORD,
 		},
 	});
-
-	await transporter.sendMail({
-		from: '"EngiConnect 👻" <college@gmail.com>',
-		to: user.email,
-		subject: "forgot password",
-		text: `hey ${user.firstName} ${user.lastName} \n this your verify code to reset password =>>  ${token}`,
-		html: "",
-	});
-	return 0;
+	const mailOptions = {
+		from: `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_FROM}>`,
+		to: options.email,
+		subject: options.subject,
+		html: options.html,
+	};
+	await transporter.sendMail(mailOptions);
 };
-
-export default email;
+export default sendEmail;

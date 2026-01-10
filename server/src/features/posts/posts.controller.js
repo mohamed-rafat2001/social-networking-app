@@ -1,9 +1,12 @@
 import Posts from "./posts.model.js";
 import Share from "./sharePost.model.js";
+import Follow from "../follow/follow.model.js";
+import ApiFeatures from "../../shared/utils/apiFeatures.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
 import errorHandler from "../../shared/middlewares/errorHandler.js";
 import appError from "../../shared/utils/appError.js";
 import { createNotification } from "../notifications/notification.controller.js";
+import * as factory from "../../shared/utils/handlerFactory.js";
 
 const addPost = errorHandler(async (req, res, next) => {
 	let post;
@@ -41,6 +44,17 @@ const addPost = errorHandler(async (req, res, next) => {
 	}
 
 	await post.save();
+
+	// Emit socket event for new post
+	const io = req.app.get("io");
+	if (io) {
+		io.emit("newPost", {
+			type: "post",
+			postId: post._id,
+			userId: req.user._id,
+		});
+	}
+
 	res.status(200).json({ status: "success", data: post });
 });
 
@@ -187,9 +201,32 @@ const deletePost = errorHandler(async (req, res, next) => {
 });
 
 const allPosts = errorHandler(async (req, res, next) => {
+	let queryFilter = {};
+
+	// If following feed is requested, filter by followed users
+	if (req.query.feed === "following" && req.user) {
+		const following = await Follow.find({ follower: req.user._id });
+		const followingIds = following.map((f) => f.following);
+		// Include user's own posts in the following feed
+		followingIds.push(req.user._id);
+		queryFilter = { userId: { $in: followingIds } };
+	}
+
+	const postsFeatures = new ApiFeatures(Posts.find(queryFilter), req.query)
+		.filter()
+		.sort()
+		.limitFields()
+		.paginate();
+
+	const sharesFeatures = new ApiFeatures(Share.find(queryFilter), req.query)
+		.filter()
+		.sort()
+		.limitFields()
+		.paginate();
+
 	const [posts, sharedPosts] = await Promise.all([
-		Posts.find({}).populate("userId"),
-		Share.find({})
+		postsFeatures.query.populate("userId"),
+		sharesFeatures.query
 			.populate({
 				path: "sharePost",
 				populate: { path: "userId" },
@@ -197,11 +234,11 @@ const allPosts = errorHandler(async (req, res, next) => {
 			.populate("userId"),
 	]);
 
-	// Combine posts and shared posts
+	// Combine and interleave posts and shared posts
 	const combinedPosts = [
 		...posts.map((p) => ({ ...p.toObject(), type: "post" })),
 		...sharedPosts
-			.filter((s) => s.sharePost) // Ensure original post exists
+			.filter((s) => s.sharePost)
 			.map((s) => ({
 				...s.sharePost.toObject(),
 				_id: s._id,
@@ -217,21 +254,14 @@ const allPosts = errorHandler(async (req, res, next) => {
 		return new Date(dateB) - new Date(dateA);
 	});
 
-	if (!combinedPosts.length && !posts.length) {
-		const error = appError.Error("post not found", "fail", 404);
-		return next(error);
-	}
-	res.status(200).json({ status: "success", data: combinedPosts });
+	res.status(200).json({
+		status: "success",
+		results: combinedPosts.length,
+		data: combinedPosts,
+	});
 });
 
-const postsForUser = errorHandler(async (req, res, next) => {
-	const posts = await Posts.find({ userId: req.user._id });
-	if (!posts) {
-		const error = appError.Error("post not found", "fail", 404);
-		return next(error);
-	}
-	res.status(200).json({ status: "success", data: posts });
-});
+const postsForUser = factory.getAll(Posts);
 
 const likeOnPost = errorHandler(async (req, res, next) => {
 	let _id = req.params.id; //post id
