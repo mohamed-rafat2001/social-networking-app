@@ -1,4 +1,5 @@
 import Posts from "./posts.model.js";
+import Share from "./sharePost.model.js";
 import Comment from "./comment.model.js";
 import errorHandler from "../../shared/middlewares/errorHandler.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
@@ -25,25 +26,41 @@ const addComment = errorHandler(async (req, res, next) => {
 		addComment = new Comment({ ...req.body, postId, userId });
 	}
 
-	const post = await Posts.findByIdAndUpdate(postId, {
+	let post = await Posts.findByIdAndUpdate(postId, {
 		$push: { comments: addComment._id },
 	}).populate("userId");
 
 	if (!post) {
-		const error = appError.Error("post not found", "fail", 404);
-		return next(error);
+		// If not found in Posts, check if it's a Share
+		const share = await Share.findById(postId).populate({
+			path: "sharePost",
+			populate: { path: "userId" },
+		});
+
+		if (share && share.sharePost) {
+			// Update the original post's comments array
+			post = await Posts.findByIdAndUpdate(share.sharePost._id, {
+				$push: { comments: addComment._id },
+			}).populate("userId");
+
+			// Update addComment to point to the original post ID for consistency
+			addComment.postId = share.sharePost._id;
+		} else {
+			const error = appError.Error("post not found", "fail", 404);
+			return next(error);
+		}
 	}
 
 	await addComment.save();
 
 	// Create notification
-	if (post.userId._id.toString() !== userId.toString()) {
+	if (post && post.userId && post.userId._id.toString() !== userId.toString()) {
 		await createNotification({
 			recipient: post.userId._id,
 			sender: userId,
 			type: "comment",
 			post: post._id,
-			content: addComment.content,
+			content: addComment.commentBody,
 		});
 	}
 

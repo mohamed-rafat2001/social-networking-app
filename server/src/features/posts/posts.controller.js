@@ -45,8 +45,8 @@ const addPost = errorHandler(async (req, res, next) => {
 });
 
 const singlePost = errorHandler(async (req, res, next) => {
-	const _id = req.params.id; //post id
-	const post = await Posts.findById(_id)
+	const _id = req.params.id; // post or share id
+	let post = await Posts.findById(_id)
 		.populate("userId")
 		.populate({
 			path: "comments",
@@ -58,6 +58,41 @@ const singlePost = errorHandler(async (req, res, next) => {
 				},
 			],
 		});
+
+	// If not found in Posts, check if it's a Share
+	if (!post) {
+		const sharedPost = await Share.findById(_id)
+			.populate({
+				path: "sharePost",
+				populate: [
+					{ path: "userId" },
+					{
+						path: "comments",
+						populate: [
+							{ path: "userId" },
+							{
+								path: "replies",
+								populate: { path: "userId" },
+							},
+						],
+					},
+				],
+			})
+			.populate("userId");
+
+		if (sharedPost && sharedPost.sharePost) {
+			post = {
+				...sharedPost.sharePost.toObject(),
+				_id: sharedPost._id,
+				originalPostId: sharedPost.sharePost._id,
+				shareNote: sharedPost.note,
+				shareDate: sharedPost.createdAt,
+				type: "share",
+				sharedBy: sharedPost.userId,
+			};
+		}
+	}
+
 	if (!post) {
 		const error = appError.Error("post not found", "fail", 404);
 		return next(error);
@@ -66,7 +101,14 @@ const singlePost = errorHandler(async (req, res, next) => {
 });
 
 const incrementView = errorHandler(async (req, res, next) => {
-	const _id = req.params.id;
+	let _id = req.params.id;
+
+	// Check if it's a share and resolve to original post if so
+	const share = await Share.findById(_id);
+	if (share) {
+		_id = share.sharePost;
+	}
+
 	const post = await Posts.findByIdAndUpdate(
 		_id,
 		{ $inc: { views: 1 } },
@@ -80,12 +122,25 @@ const incrementView = errorHandler(async (req, res, next) => {
 });
 
 const updatePost = errorHandler(async (req, res, next) => {
-	const _id = req.params.id; //post id
-	const posts = await Posts.findByIdAndUpdate(
-		{ _id, userId: req.user },
+	const _id = req.params.id; // post or share id
+	let posts = await Posts.findOneAndUpdate(
+		{ _id, userId: req.user._id },
 		req.body,
 		{ new: true, runValidators: true }
 	);
+
+	if (!posts) {
+		// Try updating share note
+		const share = await Share.findOneAndUpdate(
+			{ _id, userId: req.user._id },
+			{ note: req.body.text || req.body.note },
+			{ new: true }
+		);
+		if (share) {
+			posts = share;
+		}
+	}
+
 	if (!posts) {
 		const error = appError.Error("post not found", "fail", 404);
 		return next(error);
@@ -94,8 +149,21 @@ const updatePost = errorHandler(async (req, res, next) => {
 });
 
 const deletePost = errorHandler(async (req, res, next) => {
-	const _id = req.params.id; // id for post
-	const post = await Posts.findOne({ userId: req.user._id, _id });
+	const _id = req.params.id; // id for post or share
+	let post = await Posts.findOne({ userId: req.user._id, _id });
+
+	if (!post) {
+		// Try deleting from shares
+		const share = await Share.findOne({ userId: req.user._id, _id });
+		if (share) {
+			// Also need to remove the share reference from the original post
+			await Posts.findByIdAndUpdate(share.sharePost, {
+				$pull: { shares: { shareId: share._id } },
+			});
+			await share.deleteOne();
+			return res.status(200).json({ status: "success", data: share });
+		}
+	}
 
 	if (!post) {
 		const error = appError.Error(
@@ -166,8 +234,20 @@ const postsForUser = errorHandler(async (req, res, next) => {
 });
 
 const likeOnPost = errorHandler(async (req, res, next) => {
-	const _id = req.params.id; //post id
+	let _id = req.params.id; //post id
+
+	// Check if it's a share and resolve to original post if so
+	const share = await Share.findById(_id);
+	if (share) {
+		_id = share.sharePost;
+	}
+
 	const likesnum = await Posts.findById(_id);
+	if (!likesnum) {
+		const error = appError.Error("post not found", "fail", 404);
+		return next(error);
+	}
+
 	const numLike = likesnum.likes;
 	const len = numLike.length;
 	const numUnLike = likesnum.unLikes;
@@ -224,8 +304,20 @@ const likeOnPost = errorHandler(async (req, res, next) => {
 });
 
 const unLikeOnPost = errorHandler(async (req, res, next) => {
-	const _id = req.params.id; //post id
+	let _id = req.params.id; //post id
+
+	// Check if it's a share and resolve to original post if so
+	const share = await Share.findById(_id);
+	if (share) {
+		_id = share.sharePost;
+	}
+
 	const likesnum = await Posts.findById(_id);
+	if (!likesnum) {
+		const error = appError.Error("post not found", "fail", 404);
+		return next(error);
+	}
+
 	const numLike = likesnum.likes;
 	const len = numLike.length;
 	const numUnLike = likesnum.unLikes;

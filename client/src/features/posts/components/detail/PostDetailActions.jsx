@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import {
 	HiHeart,
 	HiChatAlt2,
@@ -21,65 +22,37 @@ const PostDetailActions = ({
 	);
 
 	return (
-		<div className="px-4">
-			<div className="flex items-center justify-between py-4 border-b dark:border-gray-800">
-				<div className="flex items-center gap-1">
-					<span className="font-bold text-gray-900 dark:text-white">
-						{post.views || 0}
-					</span>
-					<span className="text-gray-500">Views</span>
+		<div className="px-4 py-1 border-b border-t dark:border-gray-800 flex items-center justify-center gap-6 md:gap-10 text-gray-500 dark:text-gray-400">
+			<motion.button
+				className="flex items-center gap-1.5 hover:text-primary group transition-all duration-200"
+				whileHover={{ scale: 1.05 }}
+			>
+				<div className="p-2 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
+					<HiChatAlt2 size={19} />
 				</div>
-				<div className="flex items-center gap-4">
-					<div className="flex items-center gap-1">
-						<span className="font-bold text-gray-900 dark:text-white">
-							{post.likes?.length || 0}
-						</span>
-						<span className="text-gray-500">Likes</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<span className="font-bold text-gray-900 dark:text-white">
-							{post.shares?.length || 0}
-						</span>
-						<span className="text-gray-500">Reposts</span>
-					</div>
-				</div>
-			</div>
+				<span className="text-[13px] font-medium opacity-80 group-hover:opacity-100">
+					{post.comments?.length || 0}
+				</span>
+			</motion.button>
 
-			<div className="flex items-center justify-around py-2 border-b dark:border-gray-800">
-				<button
-					onClick={handleLike}
-					className={cn(
-						"group flex items-center gap-2 p-2 rounded-full transition-all duration-200",
-						isLiked
-							? "text-red-500"
-							: "text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-					)}
-				>
-					<div className="p-2 rounded-full group-hover:bg-red-50 dark:group-hover:bg-red-900/20 transition-colors">
-						<HiHeart className={cn("text-xl", isLiked && "fill-current")} />
-					</div>
-				</button>
-
-				<button className="group flex items-center gap-2 p-2 rounded-full text-gray-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200">
-					<div className="p-2 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
-						<HiChatAlt2 className="text-xl" />
-					</div>
-				</button>
-
+			<div className="flex items-center">
 				<Dropdown
+					align="left"
 					trigger={
-						<button
+						<motion.button
 							className={cn(
-								"group flex items-center gap-2 p-2 rounded-full transition-all duration-200",
-								isShared
-									? "text-green-500"
-									: "text-gray-500 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20"
+								"flex items-center gap-1.5 transition-all duration-200 hover:text-green-500 group",
+								isShared && "text-green-500"
 							)}
+							whileHover={{ scale: 1.05 }}
 						>
 							<div className="p-2 rounded-full group-hover:bg-green-50 dark:group-hover:bg-green-900/20 transition-colors">
-								<HiRefresh className="text-xl" />
+								<HiRefresh size={19} />
 							</div>
-						</button>
+							<span className="text-[13px] font-medium opacity-80 group-hover:opacity-100">
+								{post.shares?.length || 0}
+							</span>
+						</motion.button>
 					}
 				>
 					<DropdownItem
@@ -101,12 +74,36 @@ const PostDetailActions = ({
 						Repost with note
 					</DropdownItem>
 				</Dropdown>
+			</div>
 
-				<div className="group flex items-center gap-2 p-2 rounded-full text-gray-500">
-					<div className="p-2 rounded-full">
-						<HiChartBar className="text-xl" />
-					</div>
+			<motion.button
+				className={cn(
+					"flex items-center gap-1.5 hover:text-pink-500 group transition-all duration-200",
+					isLiked && "text-pink-500"
+				)}
+				onClick={handleLike}
+				whileHover={{ scale: 1.05 }}
+			>
+				<div className="p-2 rounded-full group-hover:bg-pink-50 dark:group-hover:bg-pink-900/20 transition-colors">
+					<HiHeart
+						size={19}
+						className={cn(
+							isLiked
+								? "text-pink-500 fill-current"
+								: "text-gray-500 dark:text-gray-400"
+						)}
+					/>
 				</div>
+				<span className="text-[13px] font-medium opacity-80 group-hover:opacity-100">
+					{post.likes?.length || post.likesNumber || 0}
+				</span>
+			</motion.button>
+
+			<div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 opacity-60">
+				<div className="p-2">
+					<HiChartBar size={18} />
+				</div>
+				<span className="text-[13px] font-medium">{post.views || 0}</span>
 			</div>
 		</div>
 	);

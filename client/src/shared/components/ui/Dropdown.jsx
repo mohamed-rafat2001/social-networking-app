@@ -1,4 +1,12 @@
-import React, { useState, createContext, useContext } from "react";
+import {
+	useState,
+	createContext,
+	useContext,
+	useRef,
+	useEffect,
+	useLayoutEffect,
+} from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "./utils";
 
@@ -15,64 +23,112 @@ export const Dropdown = ({
 	className,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
+	const triggerRef = useRef(null);
+	const [coords, setCoords] = useState({
+		top: 0,
+		bottom: 0,
+		left: 0,
+		right: 0,
+	});
 
 	const close = () => setIsOpen(false);
 
-	const positions = {
-		bottom: "mt-2",
-		top: "bottom-full mb-2",
+	const updateCoords = () => {
+		if (triggerRef.current) {
+			const rect = triggerRef.current.getBoundingClientRect();
+			setCoords({
+				top: rect.top,
+				bottom: rect.bottom,
+				left: rect.left,
+				right: window.innerWidth - rect.right,
+			});
+		}
 	};
+
+	const toggle = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		updateCoords();
+		setIsOpen(!isOpen);
+	};
+
+	useEffect(() => {
+		if (isOpen) {
+			window.addEventListener("scroll", updateCoords, true);
+			window.addEventListener("resize", updateCoords);
+			return () => {
+				window.removeEventListener("scroll", updateCoords, true);
+				window.removeEventListener("resize", updateCoords);
+			};
+		}
+	}, [isOpen]);
 
 	return (
 		<DropdownContext.Provider value={{ close }}>
-			<div className="relative inline-block text-left">
-				<div
-					onClick={(e) => {
-						e.stopPropagation();
-						setIsOpen(!isOpen);
-					}}
-					className="cursor-pointer"
-				>
-					{trigger}
-				</div>
+			<div className="relative inline-block" ref={triggerRef} onClick={toggle}>
+				<div className="cursor-pointer pointer-events-none">{trigger}</div>
+
 				<AnimatePresence>
 					{isOpen && (
-						<>
+						<DropdownPortal>
 							<div
-								className="fixed inset-0 z-40"
+								className="fixed inset-0 z-[99999]"
 								onClick={(e) => {
+									e.preventDefault();
 									e.stopPropagation();
 									close();
 								}}
-							/>
-							<motion.div
-								initial={{
-									opacity: 0,
-									scale: 0.95,
-									y: position === "bottom" ? -10 : 10,
-								}}
-								animate={{ opacity: 1, scale: 1, y: 0 }}
-								exit={{
-									opacity: 0,
-									scale: 0.95,
-									y: position === "bottom" ? -10 : 10,
-								}}
-								transition={{ duration: 0.1 }}
-								className={cn(
-									"absolute z-50 w-56 rounded-2xl bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl shadow-2xl border border-gray-100 dark:border-gray-700/50 overflow-hidden py-1.5",
-									align === "right" ? "right-0" : "left-0",
-									positions[position],
-									className
-								)}
 							>
-								<div>{children}</div>
-							</motion.div>
-						</>
+								<motion.div
+									initial={{
+										opacity: 0,
+										scale: 0.95,
+										y: position === "bottom" ? -10 : 10,
+									}}
+									animate={{ opacity: 1, scale: 1, y: 0 }}
+									exit={{
+										opacity: 0,
+										scale: 0.95,
+										y: position === "bottom" ? -10 : 10,
+									}}
+									transition={{ duration: 0.1 }}
+									style={{
+										position: "fixed",
+										top: position === "bottom" ? coords.bottom + 8 : "auto",
+										bottom:
+											position === "top"
+												? window.innerHeight - coords.top + 8
+												: "auto",
+										left: align === "left" ? coords.left : "auto",
+										right: align === "right" ? coords.right : "auto",
+										zIndex: 100000,
+									}}
+									onClick={(e) => e.stopPropagation()}
+									className={cn(
+										"w-56 rounded-2xl bg-white dark:bg-gray-800 shadow-[0_10px_40px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-gray-700 overflow-hidden py-1.5",
+										className
+									)}
+								>
+									{children}
+								</motion.div>
+							</div>
+						</DropdownPortal>
 					)}
 				</AnimatePresence>
 			</div>
 		</DropdownContext.Provider>
 	);
+};
+
+const DropdownPortal = ({ children }) => {
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+		return () => setMounted(false);
+	}, []);
+
+	return mounted ? createPortal(children, document.body) : null;
 };
 
 export const DropdownItem = ({
