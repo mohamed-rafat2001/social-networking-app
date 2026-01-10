@@ -111,6 +111,22 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 
 				{/* Post Text Input - Post Style with Emoji */}
 				<div className="px-1 profile-emoji-input">
+					<style>
+						{`
+							.profile-emoji-input .react-input-emoji--container {
+								background: ${darkMode ? "#1f2937" : "#ffffff"} !important;
+								border: none !important;
+							}
+							.profile-emoji-input .react-input-emoji--wrapper {
+								background: ${darkMode ? "#1f2937" : "#ffffff"} !important;
+								border: none !important;
+							}
+							.profile-emoji-input .react-input-emoji--input {
+								background: ${darkMode ? "#1f2937" : "#ffffff"} !important;
+								padding: 12px 0 !important;
+							}
+						`}
+					</style>
 					<InputEmoji
 						value={postText}
 						onChange={setPostText}
