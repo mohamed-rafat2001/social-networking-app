@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import InputEmoji from "react-input-emoji";
@@ -9,24 +12,46 @@ import { useSocket } from "../../../shared/hooks/useSocket";
 import { useAddComment } from "../hooks/useCommentQueries";
 import CommentItem from "./CommentItem";
 
+const commentSchema = z.object({
+	text: z
+		.string()
+		.min(1, "Comment cannot be empty")
+		.max(1000, "Comment cannot exceed 1000 characters"),
+});
+
 function CommentList({ comments, postId, recipientId }) {
-	const [text, setText] = useState("");
 	const { user } = useUser();
 	const { darkMode } = useTheme();
 	const { socket } = useSocket();
 	const { mutate: addComment, isLoading } = useAddComment();
 
-	const handleSubmit = () => {
-		if (!text.trim()) return;
+	const {
+		control,
+		handleSubmit,
+		reset,
+		watch,
+		formState: { errors },
+	} = useForm({
+		resolver: zodResolver(commentSchema),
+		defaultValues: {
+			text: "",
+		},
+		mode: "onChange",
+	});
+
+	const text = watch("text");
+
+	const onSubmit = (data) => {
+		if (!data.text.trim()) return;
 
 		addComment(
 			{
 				postId,
-				commentData: { commentBody: text },
+				commentData: { commentBody: data.text },
 			},
 			{
-				onSuccess: (response) => {
-					setText("");
+				onSuccess: () => {
+					reset();
 					toast.success("Comment added!");
 
 					// Emit socket event for notification
@@ -37,7 +62,7 @@ function CommentList({ comments, postId, recipientId }) {
 								type: "comment",
 								sender: user,
 								post: { _id: postId },
-								content: text,
+								content: data.text,
 								createdAt: new Date(),
 								read: false,
 							},
@@ -58,32 +83,45 @@ function CommentList({ comments, postId, recipientId }) {
 				<div className="flex gap-4">
 					<Avatar src={user?.image?.secure_url} size="md" />
 					<div className="flex-1 min-w-0">
-						<div className="emoji-input-container bg-gray-50 dark:bg-gray-800/50 rounded-2xl focus-within:bg-white dark:focus-within:bg-gray-800 border border-transparent focus-within:border-primary/20 transition-all px-2">
-							<InputEmoji
-								value={text}
-								onChange={setText}
-								cleanOnEnter
-								onEnter={handleSubmit}
-								placeholder="Post your reply"
-								fontSize={15}
-								fontFamily="inherit"
-								borderColor="transparent"
-								theme={darkMode ? "dark" : "light"}
-								background={darkMode ? "#1f2937" : "#f9fafb"}
-								color={darkMode ? "#f3f4f6" : "#1f2937"}
-								placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
-							/>
-						</div>
-						<div className="flex justify-end mt-3">
-							<Button
-								size="sm"
-								disabled={!text.trim() || isLoading}
-								onClick={handleSubmit}
-								className="rounded-full px-5 font-bold shadow-md shadow-primary/10"
-							>
-								{isLoading ? <Spinner size="xs" variant="white" /> : "Reply"}
-							</Button>
-						</div>
+						<form onSubmit={handleSubmit(onSubmit)}>
+							<div className="emoji-input-container bg-gray-50 dark:bg-gray-800/50 rounded-2xl focus-within:bg-white dark:focus-within:bg-gray-800 border border-transparent focus-within:border-primary/20 transition-all px-2">
+								<Controller
+									name="text"
+									control={control}
+									render={({ field }) => (
+										<InputEmoji
+											value={field.value}
+											onChange={field.onChange}
+											cleanOnEnter
+											onEnter={() => handleSubmit(onSubmit)()}
+											placeholder="Post your reply"
+											fontSize={15}
+											fontFamily="inherit"
+											borderColor="transparent"
+											theme={darkMode ? "dark" : "light"}
+											background={darkMode ? "#1f2937" : "#f9fafb"}
+											color={darkMode ? "#f3f4f6" : "#1f2937"}
+											placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
+										/>
+									)}
+								/>
+							</div>
+							{errors.text && (
+								<p className="text-xs text-red-500 mt-1 px-2">
+									{errors.text.message}
+								</p>
+							)}
+							<div className="flex justify-end mt-3">
+								<Button
+									type="submit"
+									size="sm"
+									disabled={!text.trim() || isLoading}
+									className="rounded-full px-5 font-bold shadow-md shadow-primary/10"
+								>
+									{isLoading ? <Spinner size="xs" variant="white" /> : "Reply"}
+								</Button>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>

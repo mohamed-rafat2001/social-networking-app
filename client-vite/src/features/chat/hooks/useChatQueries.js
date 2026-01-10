@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setActiveChat } from "../../../store/rtk/chats";
 import * as chatService from "../services/chatService";
+import { getToken } from "../../../shared/utils/helpers";
 
 export const useChats = () => {
+	const token = getToken();
 	return useQuery({
 		queryKey: ["chats"],
 		queryFn: async () => {
@@ -12,6 +13,7 @@ export const useChats = () => {
 			return response.data; // Return only the data array
 		},
 		staleTime: 30000,
+		enabled: !!token,
 	});
 };
 

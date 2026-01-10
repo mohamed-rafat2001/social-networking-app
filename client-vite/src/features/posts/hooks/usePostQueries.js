@@ -2,12 +2,15 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import * as postService from "../services/postService";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useUser } from "../../../shared/hooks/useUser";
+import { getToken } from "../../../shared/utils/helpers";
 
 export const usePosts = () => {
+	const token = getToken();
 	return useQuery({
 		queryKey: ["posts"],
 		queryFn: postService.getPosts,
 		refetchInterval: 10000,
+		enabled: !!token,
 	});
 };
 

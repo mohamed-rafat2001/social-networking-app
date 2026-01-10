@@ -1,27 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import apiApp from "../../../shared/api/apiApp";
-
-const getNotifications = async () => {
-	const response = await apiApp.get("/notifications");
-	return response.data.data;
-};
-
-const markAsRead = async (id) => {
-	const response = await apiApp.patch(`/notifications/${id}/read`);
-	return response.data.data;
-};
-
-const markAllAsRead = async () => {
-	const response = await apiApp.patch("/notifications/read-all");
-	return response.data.data;
-};
+import {
+	getNotifications,
+	markAsRead,
+	markAllAsRead,
+} from "../services/notificationService";
+import { getToken } from "../../../shared/utils/helpers";
+import { toast } from "react-hot-toast";
 
 export const useNotifications = () => {
 	const queryClient = useQueryClient();
+	const token = getToken();
 
 	const { data: notifications, isLoading } = useQuery({
 		queryKey: ["notifications"],
 		queryFn: getNotifications,
+		enabled: !!token,
 	});
 
 	const markAsReadMutation = useMutation({
@@ -33,6 +26,9 @@ export const useNotifications = () => {
 				);
 			});
 			queryClient.invalidateQueries(["notifications"]);
+		},
+		onError: (error) => {
+			toast.error("Failed to mark notification as read");
 		},
 	});
 

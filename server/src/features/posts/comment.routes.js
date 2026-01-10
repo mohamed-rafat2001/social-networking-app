@@ -1,8 +1,12 @@
 import express from "express";
 import { user as protect } from "../../shared/middlewares/auth.middleware.js";
 import fileUpload from "../../shared/utils/multer.js";
-import { fileValidation } from "../../shared/validations/validations.js";
+import {
+	fileValidation,
+	commentValidator,
+} from "../../shared/validations/validations.js";
 import * as commentController from "./comment.controller.js";
+import handelValidation from "../../shared/middlewares/handelValidation.js";
 
 const router = express.Router();
 
@@ -21,12 +25,14 @@ router
 	.post(
 		protect,
 		fileUpload(fileValidation.image).single("file"),
+		commentValidator,
+		handelValidation(),
 		commentController.addComment
 	)
 	// single comment
 	.get(protect, commentController.singleComment)
 	//update comment
-	.patch(protect, commentController.updateComment)
+	.patch(protect, commentValidator, handelValidation(), commentController.updateComment)
 	//delete comment
 	.delete(protect, commentController.deleteComment);
 

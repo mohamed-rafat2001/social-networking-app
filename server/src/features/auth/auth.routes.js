@@ -5,6 +5,7 @@ import handelValidation from "../../shared/middlewares/handelValidation.js";
 import {
 	regestrationValidator,
 	fileValidation,
+	updateProfileValidator,
 } from "../../shared/validations/validations.js";
 import fileUpload from "../../shared/utils/multer.js";
 
@@ -43,7 +44,11 @@ router.get("/search", authController.searchUsers);
 router
 	.route("/profile")
 	.get(authController.profile)
-	.patch(authController.updateProfile)
+	.patch(
+		updateProfileValidator,
+		handelValidation(),
+		authController.updateProfile
+	)
 	.delete(authController.deleteAcount);
 
 router.get("/user", authController.user);

@@ -1,15 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { storeToken } from "../../../shared/utils/helpers";
+import { storeToken, getToken } from "../../../shared/utils/helpers";
 import * as userService from "../../profile/services/userService";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useUser } from "../../../shared/hooks/useUser";
 
 export const useCurrentUser = () => {
+	const token = getToken();
 	return useQuery({
 		queryKey: ["currentUser"],
 		queryFn: userService.getCurrentUser,
 		retry: false,
-		enabled: !!localStorage.getItem("token"),
+		enabled: !!token,
 	});
 };
 
@@ -130,6 +131,16 @@ export const useDeleteProfileImage = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: userService.deleteProfileImage,
+		onSuccess: () => {
+			queryClient.invalidateQueries(["currentUser"]);
+		},
+	});
+};
+
+export const useUpdateProfile = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: userService.updateProfile,
 		onSuccess: () => {
 			queryClient.invalidateQueries(["currentUser"]);
 		},

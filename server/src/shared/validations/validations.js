@@ -45,4 +45,72 @@ const fileValidation = {
 	sdk: ["video/mp4", "audio/mp3"],
 };
 
-export { regestrationValidator, fileValidation };
+const postValidator = [
+	body("text")
+		.optional()
+		.isString()
+		.trim()
+		.isLength({ max: 2000 })
+		.withMessage("Post text cannot exceed 2000 characters"),
+];
+
+const commentValidator = [
+	body("commentBody")
+		.isString()
+		.trim()
+		.notEmpty()
+		.withMessage("Comment text is required")
+		.isLength({ max: 500 })
+		.withMessage("Comment text cannot exceed 500 characters"),
+];
+
+const replayValidator = [
+	body("replayBody")
+		.isString()
+		.trim()
+		.notEmpty()
+		.withMessage("Reply text is required")
+		.isLength({ max: 500 })
+		.withMessage("Reply text cannot exceed 500 characters"),
+];
+
+const updateProfileValidator = [
+	body("firstName")
+		.optional()
+		.isString()
+		.isLength({ min: 3, max: 20 })
+		.trim()
+		.withMessage("First name must be between 3 and 20 characters"),
+	body("lastName")
+		.optional()
+		.isString()
+		.isLength({ min: 3, max: 20 })
+		.trim()
+		.withMessage("Last name must be between 3 and 20 characters"),
+	body("phoneNumber")
+		.optional()
+		.isMobilePhone()
+		.withMessage("Please enter a valid phone number"),
+	body("city").optional().trim().notEmpty().withMessage("City is required"),
+	body("country")
+		.optional()
+		.trim()
+		.notEmpty()
+		.withMessage("Country is required"),
+	body("major").optional().trim().notEmpty().withMessage("Major is required"),
+	body("bio")
+		.optional()
+		.isString()
+		.trim()
+		.isLength({ max: 160 })
+		.withMessage("Bio cannot exceed 160 characters"),
+];
+
+export {
+	regestrationValidator,
+	fileValidation,
+	postValidator,
+	commentValidator,
+	replayValidator,
+	updateProfileValidator,
+};

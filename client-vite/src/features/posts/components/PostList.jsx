@@ -1,4 +1,7 @@
 import React, { useState, useRef } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { toast } from "react-hot-toast";
 import { useUser } from "../../../shared/hooks/useUser.js";
 import { useTheme } from "../../../providers/ThemeProvider";
@@ -34,8 +37,11 @@ import {
 
 import PostItem from "./PostItem";
 
+const postSchema = z.object({
+	text: z.string().max(2000, "Post cannot exceed 2000 characters"),
+});
+
 function PostList() {
-	const [text, setText] = useState("");
 	const [files, setFiles] = useState([]);
 	const [previewUrls, setPreviewUrls] = useState([]);
 	const [uploadProgress, setUploadProgress] = useState(0);
@@ -52,6 +58,22 @@ function PostList() {
 	const { mutate: addPostMutation } = useAddPost();
 	const { mutate: likePostMutation } = useLikePost();
 	const { mutate: sharePostMutation } = useSharePost();
+
+	const {
+		control,
+		handleSubmit: handleFormSubmit,
+		reset,
+		watch,
+		formState: { errors, isValid },
+	} = useForm({
+		resolver: zodResolver(postSchema),
+		defaultValues: {
+			text: "",
+		},
+		mode: "onChange",
+	});
+
+	const text = watch("text");
 
 	const posts = postsData?.data || [];
 
@@ -85,23 +107,22 @@ function PostList() {
 		sharePostMutation(id);
 	};
 
-	const handleSubmit = (e) => {
-		if (e) e.preventDefault();
-		if (!text.trim() && files.length === 0) return;
+	const onSubmit = (data) => {
+		if (!data.text.trim() && files.length === 0) return;
 
 		setIsUploading(true);
 		setUploadProgress(0);
 
 		let postData;
 		if (files.length === 0) {
-			postData = { text };
+			postData = { text: data.text };
 		} else {
-			const data = new FormData();
+			const formData = new FormData();
 			files.forEach((f) => {
-				data.append("fileUp", f);
+				formData.append("fileUp", f);
 			});
-			if (text) data.append("text", text);
-			postData = data;
+			if (data.text) formData.append("text", data.text);
+			postData = formData;
 		}
 
 		addPostMutation(
@@ -112,7 +133,7 @@ function PostList() {
 			{
 				onSuccess: () => {
 					toast.success("Post created successfully!");
-					setText("");
+					reset();
 					setFiles([]);
 					setPreviewUrls([]);
 					setIsUploading(false);
@@ -161,22 +182,33 @@ function PostList() {
 			<div className="p-4 border-b dark:border-gray-800">
 				<div className="flex gap-4">
 					<Avatar src={user?.image?.secure_url} />
-					<form className="flex-1" onSubmit={handleSubmit}>
+					<form className="flex-1" onSubmit={handleFormSubmit(onSubmit)}>
 						<div className="mb-2 emoji-input-container">
-							<InputEmoji
-								value={text}
-								onChange={setText}
-								cleanOnEnter
-								onEnter={handleSubmit}
-								placeholder="What's on your mind?"
-								fontSize={16}
-								fontFamily="inherit"
-								borderColor="transparent"
-								theme={darkMode ? "dark" : "light"}
-								background={darkMode ? "#1f2937" : "#f9fafb"}
-								color={darkMode ? "#f3f4f6" : "#1f2937"}
-								placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
+							<Controller
+								name="text"
+								control={control}
+								render={({ field }) => (
+									<InputEmoji
+										value={field.value}
+										onChange={field.onChange}
+										cleanOnEnter
+										onEnter={() => handleFormSubmit(onSubmit)()}
+										placeholder="What's on your mind?"
+										fontSize={16}
+										fontFamily="inherit"
+										borderColor="transparent"
+										theme={darkMode ? "dark" : "light"}
+										background={darkMode ? "#1f2937" : "#f9fafb"}
+										color={darkMode ? "#f3f4f6" : "#1f2937"}
+										placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
+									/>
+								)}
 							/>
+							{errors.text && (
+								<p className="text-xs text-red-500 mt-1 px-2">
+									{errors.text.message}
+								</p>
+							)}
 						</div>
 
 						{/* Image Previews */}

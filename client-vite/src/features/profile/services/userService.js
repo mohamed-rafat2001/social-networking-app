@@ -75,3 +75,17 @@ export const deleteProfileImage = async () => {
 	const response = await apiApp.delete("/user/profileImg");
 	return response.data;
 };
+
+export const updateProfile = async (userData) => {
+	const response = await apiApp.patch("/user/profile", userData);
+	return response.data;
+};
+
+export const updateProfileImageDirect = async (formData) => {
+	const response = await apiApp.post("/user/profileImg", formData, {
+		headers: {
+			"Content-Type": "multipart/form-data",
+		},
+	});
+	return response.data;
+};
