@@ -77,7 +77,7 @@ const ProfileHeader = ({
 							<Avatar
 								src={user.image?.secure_url}
 								size="2xl"
-								className="ring-4 ring-white dark:ring-gray-900 shadow-2xl transition-transform duration-300 group-hover:scale-105"
+								className="ring-4 ring-white dark:ring-gray-900 shadow-2xl transition-transform duration-300 group-hover:scale-105 cursor-pointer"
 								isActive={onlineUsers?.some(
 									(u) => String(u.userId) === String(user._id)
 								)}
@@ -148,9 +148,14 @@ const ProfileHeader = ({
 				</div>
 				{/* User Info Title */}
 				<div className="text-center md:text-left">
-					<h1 className="text-4xl font-black text-gray-900 dark:text-white mb-1">
-						{user.firstName} {user.lastName}
-					</h1>
+					<div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-1">
+						<h1 className="text-4xl font-black text-gray-900 dark:text-white">
+							{user.firstName} {user.lastName}
+						</h1>
+						<span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary uppercase tracking-wider w-fit">
+							{user.userType}
+						</span>
+					</div>
 					<p className="text-lg text-primary font-bold">@{user.username}</p>
 				</div>
 			</div>

@@ -124,6 +124,7 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 							.profile-emoji-input .react-input-emoji--input {
 								background: transparent !important;
 								padding: 12px 0 !important;
+								color: ${darkMode ? "white" : "#1f2937"} !important;
 							}
 						`}
 					</style>
@@ -138,7 +139,7 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 						borderColor="transparent"
 						background="transparent"
 						placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
-						color={darkMode ? "#f3f4f6" : "#1f2937"}
+						color={darkMode ? "#ffffff" : "#1f2937"}
 					/>
 				</div>
 

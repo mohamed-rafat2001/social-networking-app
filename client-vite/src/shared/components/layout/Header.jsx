@@ -207,13 +207,14 @@ const Header = ({ onMenuClick }) => {
 											{user.firstName}
 										</p>
 										<p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">
-											Student
+											{user.userType}
 										</p>
 									</div>
 									<Avatar
 										src={user.image?.secure_url}
 										size="md"
 										isActive={onlineUsers.some((u) => u.userId === user._id)}
+										className="cursor-pointer"
 									/>
 								</button>
 
@@ -232,13 +233,17 @@ const Header = ({ onMenuClick }) => {
 											>
 												<Link
 													to={`/profile/${user._id}`}
+													onClick={() => setShowUserMenu(false)}
 													className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 												>
 													<HiUserCircle size={20} className="text-gray-400" />
 													<span className="font-medium">My Profile</span>
 												</Link>
 												<button
-													onClick={handleLogout}
+													onClick={() => {
+														handleLogout();
+														setShowUserMenu(false);
+													}}
 													className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
 												>
 													<HiLogout size={20} />
