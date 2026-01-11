@@ -238,6 +238,9 @@ const allPosts = catchAsync(async (req, res, next) => {
 	let queryFilter = {};
 	const feed = req.query.feed || "for-you";
 
+	console.log("Feed type requested:", feed);
+	console.log("Query parameters:", req.query);
+
 	// "Following" feed: only posts and shares from followed users
 	if (feed === "following" && req.user) {
 		const following = await Follow.find({ follower: req.user._id });
@@ -245,8 +248,17 @@ const allPosts = catchAsync(async (req, res, next) => {
 		// Include user's own posts in their following feed
 		followingIds.push(req.user._id);
 		queryFilter = { userId: { $in: followingIds } };
+	} else if (feed === "following" && !req.user) {
+		// If following feed requested but not logged in, return empty or redirect
+		return res.status(200).json({
+			status: "success",
+			results: 0,
+			data: [],
+		});
 	}
 	// "For You" feed: show all posts (default behavior, queryFilter remains {})
+
+	console.log("Final queryFilter:", JSON.stringify(queryFilter));
 
 	const postsFeatures = new ApiFeatures(Posts.find(queryFilter), req.query)
 		.filter()
@@ -277,22 +289,27 @@ const allPosts = catchAsync(async (req, res, next) => {
 			.filter((s) => s.sharePost)
 			.map((s) => {
 				const hasNote = !!s.note;
+				const sharePostObj = s.sharePost.toObject
+					? s.sharePost.toObject()
+					: s.sharePost;
 				return {
-					...s.sharePost.toObject(),
+					...sharePostObj,
 					_id: s._id,
-					originalPostId: s.sharePost._id,
+					originalPostId: s.sharePost._id || s.sharePost,
 					shareNote: s.note,
 					shareDate: s.createdAt,
 					type: "share",
 					sharedBy: s.userId,
 					// If has note, use share's own stats, otherwise use original post's stats
-					views: hasNote ? s.views : s.sharePost.views,
-					likes: hasNote ? s.likes : s.sharePost.likes,
-					likesNumber: hasNote ? s.likesNumber : s.sharePost.likesNumber,
-					comments: hasNote ? s.comments : s.sharePost.comments,
-					shares: hasNote ? [] : s.sharePost.shares,
-					unLikes: hasNote ? s.unLikes : s.sharePost.unLikes,
-					unLikesNumber: hasNote ? s.unLikesNumber : s.sharePost.unLikesNumber,
+					views: hasNote ? s.views : s.sharePost.views || 0,
+					likes: hasNote ? s.likes : s.sharePost.likes || [],
+					likesNumber: hasNote ? s.likesNumber : s.sharePost.likesNumber || 0,
+					comments: hasNote ? s.comments : s.sharePost.comments || [],
+					shares: hasNote ? [] : s.sharePost.shares || [],
+					unLikes: hasNote ? s.unLikes : s.sharePost.unLikes || [],
+					unLikesNumber: hasNote
+						? s.unLikesNumber
+						: s.sharePost.unLikesNumber || 0,
 				};
 			}),
 	].sort((a, b) => {

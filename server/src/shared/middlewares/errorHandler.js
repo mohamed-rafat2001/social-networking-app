@@ -57,7 +57,7 @@ export const globalErrorHandler = (err, req, res, next) => {
 	}
 
 	if (process.env.NODE_ENV === "development") {
-		// Development: Send full error details
+		// Development: Send full error details for easier debugging
 		res.status(err.statusCode).json({
 			status: err.status,
 			error: err,
@@ -65,7 +65,7 @@ export const globalErrorHandler = (err, req, res, next) => {
 			stack: err.stack,
 		});
 	} else {
-		// Production: Hide sensitive details
+		// Production: Hide sensitive details from BOTH the response and server logs
 		let error = { ...err };
 		error.message = err.message;
 		error.name = err.name;
@@ -78,6 +78,11 @@ export const globalErrorHandler = (err, req, res, next) => {
 		if (error.name === "JsonWebTokenError") error = handleJWTError();
 		if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
 
+		// Log only basic info to server console in production
+		if (!error.isOperational) {
+			console.error("ERROR 💥", error.message || "Internal Server Error");
+		}
+
 		// If operational, send friendly message. Otherwise send generic message.
 		if (error.isOperational) {
 			res.status(error.statusCode).json({
@@ -85,13 +90,10 @@ export const globalErrorHandler = (err, req, res, next) => {
 				message: error.message,
 			});
 		} else {
-			// Programming or other unknown errors: don't leak error details
-			console.error("ERROR 💥", err);
+			// Programming or other unknown errors: don't leak error details to the client
 			res.status(500).json({
 				status: "error",
-				message: error.message || "Something went very wrong!",
-				// Temporarily include error name for debugging in production
-				errorType: error.name,
+				message: "Something went wrong!",
 			});
 		}
 	}

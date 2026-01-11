@@ -5,12 +5,12 @@ import { useUser } from "../../../shared/hooks/useUser";
 import { getToken } from "../../../shared/utils/helpers";
 
 export const usePosts = (feedType = "for-you") => {
-	const token = getToken();
+	const { user } = useUser();
 	return useQuery({
 		queryKey: ["posts", feedType],
 		queryFn: () => postService.getPosts(feedType),
 		refetchInterval: 10000,
-		enabled: !!token,
+		enabled: true, // Always allow fetching posts, server handles auth if needed
 	});
 };
 

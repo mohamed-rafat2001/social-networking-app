@@ -10,12 +10,11 @@ import { handelValidation } from "../../shared/middlewares/handelValidation.js";
 
 const router = express.Router();
 
-router.use(protect);
-
 router
 	.route("/")
 	.get(postsController.allPosts)
 	.post(
+		protect,
 		fileUpload(fileValidation.image).array("fileUp", 10),
 		postValidator,
 		handelValidation(),
