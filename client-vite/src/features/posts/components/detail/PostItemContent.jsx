@@ -1,10 +1,33 @@
 import React from "react";
 import { formatDistanceToNow } from "date-fns";
-import { ImageGallery, Avatar } from "../../../../shared/components/ui";
+import { motion } from "framer-motion";
+import {
+	HiChatAlt2,
+	HiRefresh,
+	HiHeart,
+	HiChartBar,
+} from "react-icons/hi";
+import { ImageGallery, Avatar, cn } from "../../../../shared/components/ui";
 
-const PostItemContent = ({ post, isShare }) => {
+const PostItemContent = ({
+	post,
+	isShare,
+	onLike,
+	onRepost,
+	onRepostWithNote,
+	onComment,
+	user,
+}) => {
 	const originalAuthor = post.userId;
 	const originalDate = post.createdAt;
+	const originalPost = post.originalPost || post;
+
+	const isLiked = originalPost.likes?.some(
+		(like) => (like._id || like) === user?._id
+	);
+	const isShared = originalPost.shares?.some(
+		(share) => (share.userId?._id || share.userId) === user?._id
+	);
 
 	return (
 		<>
@@ -54,6 +77,53 @@ const PostItemContent = ({ post, isShare }) => {
 							className="rounded-lg shadow-sm"
 						/>
 					)}
+
+					{/* Nested Original Post Actions */}
+					<div className="flex items-center justify-between text-gray-400 dark:text-gray-500 mt-4 px-1">
+						<button
+							className="flex items-center gap-1 hover:text-primary transition-colors group"
+							onClick={onComment}
+						>
+							<HiChatAlt2 size={16} />
+							<span className="text-[12px]">
+								{originalPost.comments?.length || 0}
+							</span>
+						</button>
+
+						<button
+							className={cn(
+								"flex items-center gap-1 hover:text-green-500 transition-colors group",
+								isShared && "text-green-500"
+							)}
+							onClick={(e) => {
+								e.stopPropagation();
+								onRepost();
+							}}
+						>
+							<HiRefresh size={16} />
+							<span className="text-[12px]">
+								{originalPost.shares?.length || 0}
+							</span>
+						</button>
+
+						<button
+							className={cn(
+								"flex items-center gap-1 hover:text-pink-500 transition-colors group",
+								isLiked && "text-pink-500"
+							)}
+							onClick={onLike}
+						>
+							<HiHeart size={16} />
+							<span className="text-[12px]">
+								{originalPost.likes?.length || 0}
+							</span>
+						</button>
+
+						<div className="flex items-center gap-1">
+							<HiChartBar size={16} />
+							<span className="text-[12px]">{originalPost.views || 0}</span>
+						</div>
+					</div>
 				</div>
 			) : (
 				<>

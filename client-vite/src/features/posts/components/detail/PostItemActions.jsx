@@ -46,9 +46,8 @@ const PostItemActions = ({
 				)}
 			</motion.button>
 
-			{/* Only show share button if it's not a share with a note */}
-			{(!isShare || !hasNote) && (
-				<div className="flex items-center">
+			{/* Share button */}
+			<div className="flex items-center">
 					<Dropdown
 						align="left"
 						trigger={
@@ -90,7 +89,6 @@ const PostItemActions = ({
 						</DropdownItem>
 					</Dropdown>
 				</div>
-			)}
 
 			<motion.button
 				className={cn(

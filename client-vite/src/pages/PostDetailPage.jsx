@@ -150,6 +150,13 @@ function PostDetailPage() {
 				isShare={isShare}
 				setIsEditModalOpen={setIsEditModalOpen}
 				setIsDeleteModalOpen={setIsDeleteModalOpen}
+				onLike={(e) => {
+					e?.stopPropagation();
+					likePost(post.originalPostId || post._id);
+				}}
+				onRepost={handleShare}
+				onComment={() => navigate(`/posts/${post.originalPostId || post._id}`)}
+				user={user}
 			/>
 
 			<PostDetailActions

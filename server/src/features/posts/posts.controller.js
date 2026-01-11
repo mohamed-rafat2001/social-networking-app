@@ -128,6 +128,7 @@ const singlePost = catchAsync(async (req, res, next) => {
 				unLikesNumber: hasNote
 					? sharedPost.unLikesNumber
 					: sharedPost.sharePost.unLikesNumber,
+				originalPost: sharedPost.sharePost.toObject(),
 			};
 		}
 	}
@@ -354,6 +355,7 @@ const allPosts = catchAsync(async (req, res, next) => {
 						unLikesNumber: hasNote
 							? s.unLikesNumber
 							: s.sharePost.unLikesNumber || 0,
+						originalPost: sharePostObj,
 					};
 				} catch (err) {
 					return null;

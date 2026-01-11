@@ -165,7 +165,20 @@ function PostItem({ post, index }) {
 								setIsDeleteModalOpen={setIsDeleteModalOpen}
 							/>
 
-							<PostItemContent post={post} isShare={isShare} />
+							<PostItemContent
+								post={post}
+								isShare={isShare}
+								onLike={(e) => {
+									e.stopPropagation();
+									likePost(post.originalPostId || post._id);
+								}}
+								onRepost={handleRepost}
+								onRepostWithNote={() => setIsRepostModalOpen(true)}
+								onComment={() =>
+									navigate(`/posts/${post.originalPostId || post._id}`)
+								}
+								user={user}
+							/>
 
 							<PostItemActions
 								post={post}

@@ -41,51 +41,49 @@ const PostDetailActions = ({
 				)}
 			</motion.button>
 
-			{/* Only show share button if it's not a share with a note */}
-			{(!isShare || !hasNote) && (
-				<div className="flex items-center">
-					<Dropdown
-						align="left"
-						trigger={
-							<motion.button
-								className={cn(
-									"flex items-center gap-1.5 transition-all duration-200 hover:text-green-500 group",
-									isShared && "text-green-500"
-								)}
-								whileHover={{ scale: 1.05 }}
-							>
-								<div className="p-2 rounded-full group-hover:bg-green-50 dark:group-hover:bg-green-900/20 transition-colors">
-									<HiRefresh size={19} />
-								</div>
-								{showStats && (
-									<span className="text-[13px] font-medium opacity-80 group-hover:opacity-100">
-										{post.shares?.length || 0}
-									</span>
-								)}
-							</motion.button>
-						}
+			{/* Share button */}
+			<div className="flex items-center">
+				<Dropdown
+					align="left"
+					trigger={
+						<motion.button
+							className={cn(
+								"flex items-center gap-1.5 transition-all duration-200 hover:text-green-500 group",
+								isShared && "text-green-500"
+							)}
+							whileHover={{ scale: 1.05 }}
+						>
+							<div className="p-2 rounded-full group-hover:bg-green-50 dark:group-hover:bg-green-900/20 transition-colors">
+								<HiRefresh size={19} />
+							</div>
+							{showStats && (
+								<span className="text-[13px] font-medium opacity-80 group-hover:opacity-100">
+									{post.shares?.length || 0}
+								</span>
+							)}
+						</motion.button>
+					}
+				>
+					<DropdownItem
+						icon={HiRefresh}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleShare();
+						}}
 					>
-						<DropdownItem
-							icon={HiRefresh}
-							onClick={(e) => {
-								e.stopPropagation();
-								handleShare();
-							}}
-						>
-							Repost
-						</DropdownItem>
-						<DropdownItem
-							icon={HiOutlineChatAlt}
-							onClick={(e) => {
-								e.stopPropagation();
-								setIsRepostModalOpen(true);
-							}}
-						>
-							Repost with note
-						</DropdownItem>
-					</Dropdown>
-				</div>
-			)}
+						Repost
+					</DropdownItem>
+					<DropdownItem
+						icon={HiOutlineChatAlt}
+						onClick={(e) => {
+							e.stopPropagation();
+							setIsRepostModalOpen(true);
+						}}
+					>
+						Repost with note
+					</DropdownItem>
+				</Dropdown>
+			</div>
 
 			<motion.button
 				className={cn(
