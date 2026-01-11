@@ -154,7 +154,14 @@ const disLikeComm = errorHandler(async (req, res, next) => {
 });
 
 const postComments = errorHandler(async (req, res, next) => {
-	const postId = req.params.id;
+	let postId = req.params.id;
+
+	// Check if it's a share without a note
+	const share = await Share.findById(postId);
+	if (share && !share.note) {
+		postId = share.sharePost;
+	}
+
 	const comments = await Comment.find({ postId })
 		.populate("userId")
 		.populate({

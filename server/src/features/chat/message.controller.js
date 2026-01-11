@@ -4,6 +4,7 @@ import cloudinary from "../../shared/utils/cloudinary.js";
 import appError from "../../shared/utils/appError.js";
 import errorHandler from "../../shared/middlewares/errorHandler.js";
 import * as factory from "../../shared/utils/handlerFactory.js";
+import { createNotification } from "../notifications/notification.controller.js";
 
 const createMessage = errorHandler(async (req, res, next) => {
 	const senderId = req.user._id;
@@ -51,15 +52,33 @@ const createMessage = errorHandler(async (req, res, next) => {
 	}
 
 	// Update latest message in chat
-	await Chat.findByIdAndUpdate(chatId, {
+	const chat = await Chat.findByIdAndUpdate(chatId, {
 		latestMessage: message._id,
 	});
+
+	// Create notification for the recipient
+	const recipientId = chat.members.find(
+		(memberId) => memberId.toString() !== senderId.toString()
+	);
+
+	if (recipientId) {
+		await createNotification({
+			recipient: recipientId,
+			sender: senderId,
+			type: "message",
+			content: content || "Sent an attachment",
+		});
+	}
 
 	res.status(200).json({ status: "success", data: message });
 });
 
 //chat messgaes
-const ChatMessages = factory.getAll(Message, {}, { id: "chatId" });
+const ChatMessages = errorHandler(async (req, res, next) => {
+	const chatId = req.params.id;
+	const messages = await Message.find({ chatId }).sort({ createdAt: 1 });
+	res.status(200).json({ status: "success", results: messages.length, data: messages });
+});
 
 const deleteMessage = errorHandler(async (req, res, next) => {
 	const messageId = req.params.id;
@@ -102,6 +121,20 @@ const deleteMessage = errorHandler(async (req, res, next) => {
 
 const updateMessage = factory.updateOneByOwner(Message, "senderId");
 
+const markMessagesAsRead = errorHandler(async (req, res, next) => {
+	const chatId = req.params.id;
+	const userId = req.user._id;
+
+	await Message.updateMany(
+		{ chatId, senderId: { $ne: userId }, read: false },
+		{ read: true }
+	);
+
+	res
+		.status(200)
+		.json({ status: "success", message: "Messages marked as read" });
+});
+
 const deleteAllMessagesFromChat = errorHandler(async (req, res, next) => {
 	const chatId = req.params.id;
 	const senderId = req.user._id;
@@ -121,6 +154,7 @@ export {
 	createMessage,
 	deleteMessage,
 	updateMessage,
+	markMessagesAsRead,
 	deleteAllMessagesFromChat,
 	ChatMessages,
 };

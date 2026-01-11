@@ -77,7 +77,6 @@ function PostDetailPage() {
 	const isShare = post.type === "share";
 	const isOwner =
 		user?._id === (isShare ? post.sharedBy?._id : post.userId?._id);
-	const showStats = !isShare || !!post.shareNote;
 
 	const handleLike = () => {
 		likePost(post._id);
@@ -163,7 +162,11 @@ function PostDetailPage() {
 			/>
 
 			{/* Comments Section */}
-			<CommentList postId={post._id} comments={post.comments} />
+			<CommentList
+				postId={post._id}
+				comments={post.comments}
+				recipientId={post.userId?._id || post.userId}
+			/>
 
 			{/* Modals */}
 			<Modal

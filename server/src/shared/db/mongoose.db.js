@@ -3,7 +3,12 @@ import mongoose from "mongoose";
 const connectDB = async () => {
 	try {
 		// Try connecting to 127.0.0.1 first
-		const dbUrl = process.env.DB_URL || "mongodb://127.0.0.1:27017/social-app";
+		let dbUrl = process.env.DB_URL || "mongodb://127.0.0.1:27017/social-app";
+
+		if (process.env.DB_PASSWORD && dbUrl.includes("<db_password>")) {
+			dbUrl = dbUrl.replace("<db_password>", process.env.DB_PASSWORD);
+		}
+
 		const conn = await mongoose.connect(dbUrl);
 		console.log(`MongoDB Connected: ${conn.connection.host}`);
 	} catch (error) {

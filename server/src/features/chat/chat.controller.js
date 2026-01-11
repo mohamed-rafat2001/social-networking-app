@@ -81,14 +81,26 @@ const findUserChats = errorHandler(async (req, res, next) => {
 		return next(error);
 	}
 
-	const formattedChats = chats.map((chat) => {
-		const chatObj = chat.toObject();
-		chatObj.users = chatObj.members;
-		if (chatObj.latestMessage) {
-			chatObj.latestMessage.sender = chatObj.latestMessage.senderId;
-		}
-		return chatObj;
-	});
+	const formattedChats = await Promise.all(
+		chats.map(async (chat) => {
+			const chatObj = chat.toObject();
+			chatObj.users = chatObj.members;
+
+			// Count unread messages for this user in this chat
+			const unreadCount = await Message.countDocuments({
+				chatId: chat._id,
+				senderId: { $ne: userId },
+				read: false,
+			});
+
+			chatObj.unreadCount = unreadCount;
+
+			if (chatObj.latestMessage) {
+				chatObj.latestMessage.sender = chatObj.latestMessage.senderId;
+			}
+			return chatObj;
+		})
+	);
 
 	res.status(200).json({ status: "success", data: formattedChats });
 });

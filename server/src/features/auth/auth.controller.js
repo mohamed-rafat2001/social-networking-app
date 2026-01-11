@@ -30,7 +30,6 @@ const sendToken = (user, statusCode, res) => {
 		status: "success",
 		data: {
 			user,
-			token,
 		},
 	});
 };

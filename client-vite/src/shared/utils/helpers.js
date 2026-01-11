@@ -1,25 +1,20 @@
 export const storeToken = (value) => {
-	localStorage.setItem("token", JSON.stringify(value));
+	// Token is now stored in HTTP-only cookies
 };
 
 export const getToken = () => {
-  const token = localStorage.getItem('token');
-  try {
-    return token ? JSON.parse(token) : null;
-  } catch (error) {
-    console.error('Error parsing token from localStorage', error);
-    return null;
-  }
+	// Token is inaccessible from JavaScript (HTTP-only)
+	return "secure-cookie"; // Return a dummy string to keep existing 'enabled' logic working if needed, or null
 };
 
 export const removeToken = () => {
-  localStorage.removeItem('token');
+	localStorage.removeItem("token");
 };
 
 export const formatDate = (date) => {
-  if (!date) return '';
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(date));
+	if (!date) return "";
+	return new Intl.DateTimeFormat("en-US", {
+		month: "long",
+		year: "numeric",
+	}).format(new Date(date));
 };

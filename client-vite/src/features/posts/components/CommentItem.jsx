@@ -116,7 +116,11 @@ function CommentItem({ comment, postId }) {
 	};
 
 	const handleLike = () => {
-		likeComment({ commentId: comment._id, postId });
+		likeComment({
+			commentId: comment._id,
+			postId,
+			commentAuthorId: comment.userId?._id || comment.userId,
+		});
 	};
 
 	const handleReplySubmit = () => {
@@ -128,6 +132,7 @@ function CommentItem({ comment, postId }) {
 				commentId: comment._id,
 				replyData: { replayBody: textToSubmit },
 				postId,
+				commentAuthorId: comment.userId?._id || comment.userId,
 			},
 			{
 				onSuccess: () => {
@@ -320,7 +325,11 @@ function CommentItem({ comment, postId }) {
 										<div className="flex gap-4 items-center">
 											<button
 												onClick={() =>
-													likeReply({ replyId: reply._id, postId })
+													likeReply({
+														replyId: reply._id,
+														postId,
+														replyAuthorId: reply.userId?._id || reply.userId,
+													})
 												}
 												className={cn(
 													"flex items-center gap-1 hover:text-pink-500 group transition-colors",

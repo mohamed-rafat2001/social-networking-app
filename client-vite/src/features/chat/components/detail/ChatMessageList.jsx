@@ -38,7 +38,9 @@ const ChatMessageList = ({
 				</div>
 			) : (
 				messages.map((msg) => {
-					const isMe = msg.sender === currentUser?._id;
+					const isMe =
+						String(msg.senderId) === String(currentUser?._id) ||
+						String(msg.sender) === String(currentUser?._id);
 					return (
 						<div
 							key={msg._id}

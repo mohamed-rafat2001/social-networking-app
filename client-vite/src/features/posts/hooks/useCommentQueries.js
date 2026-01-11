@@ -10,27 +10,66 @@ export const useAddComment = () => {
 
 	return useMutation({
 		mutationFn: commentService.addComment,
-		onSuccess: (response, { postId }) => {
+		onSuccess: (response, { postId, postAuthorId }) => {
 			queryClient.invalidateQueries(["post", postId]);
 			queryClient.invalidateQueries(["posts"]);
 
 			// Emit socket event for notification
 			const comment = response.data;
-			// We need the post author's ID. The server response might not have it directly
-			// but we can pass it from the component if needed, or assume the server handles it.
-			// For now, let's just invalidate and hope the server-side createNotification is enough
-			// for the next refresh. To get real-time toast, we'd need the recipientId here.
+
+			if (
+				socket &&
+				postAuthorId &&
+				String(postAuthorId) !== String(currentUser?._id)
+			) {
+				socket.emit("sendNotification", {
+					recipientId: postAuthorId,
+					notification: {
+						_id: Date.now().toString(),
+						type: "comment",
+						sender: currentUser,
+						post: { _id: postId },
+						content: comment.commentBody,
+						createdAt: new Date(),
+						read: false,
+					},
+				});
+			}
 		},
 	});
 };
 
 export const useLikeComment = () => {
 	const queryClient = useQueryClient();
+	const { socket } = useSocket();
+	const { user: currentUser } = useUser();
+
 	return useMutation({
 		mutationFn: commentService.likeComment,
-		onSuccess: (data, { postId }) => {
+		onSuccess: (response, { postId, commentAuthorId, commentId }) => {
 			if (postId) {
 				queryClient.invalidateQueries(["post", postId]);
+			}
+
+			// Emit socket event for notification
+			const comment = response.data;
+			if (
+				socket &&
+				commentAuthorId &&
+				String(commentAuthorId) !== String(currentUser?._id) &&
+				comment.like.some((id) => String(id) === String(currentUser?._id))
+			) {
+				socket.emit("sendNotification", {
+					recipientId: commentAuthorId,
+					notification: {
+						_id: Date.now().toString(),
+						type: "like",
+						sender: currentUser,
+						post: { _id: postId },
+						createdAt: new Date(),
+						read: false,
+					},
+				});
 			}
 		},
 	});
@@ -38,24 +77,72 @@ export const useLikeComment = () => {
 
 export const useAddReply = () => {
 	const queryClient = useQueryClient();
+	const { socket } = useSocket();
+	const { user: currentUser } = useUser();
+
 	return useMutation({
 		mutationFn: commentService.addReply,
-		onSuccess: (data, { postId }) => {
+		onSuccess: (response, { postId, commentAuthorId, commentId }) => {
 			if (postId) {
 				queryClient.invalidateQueries(["post", postId]);
 			}
 			queryClient.invalidateQueries(["posts"]);
+
+			// Emit socket event for notification
+			const reply = response.data;
+			if (
+				socket &&
+				commentAuthorId &&
+				String(commentAuthorId) !== String(currentUser?._id)
+			) {
+				socket.emit("sendNotification", {
+					recipientId: commentAuthorId,
+					notification: {
+						_id: Date.now().toString(),
+						type: "comment",
+						sender: currentUser,
+						post: { _id: postId },
+						content: reply.replayBody,
+						createdAt: new Date(),
+						read: false,
+					},
+				});
+			}
 		},
 	});
 };
 
 export const useLikeReply = () => {
 	const queryClient = useQueryClient();
+	const { socket } = useSocket();
+	const { user: currentUser } = useUser();
+
 	return useMutation({
 		mutationFn: commentService.likeReply,
-		onSuccess: (data, { postId }) => {
+		onSuccess: (response, { postId, replyAuthorId, replyId }) => {
 			if (postId) {
 				queryClient.invalidateQueries(["post", postId]);
+			}
+
+			// Emit socket event for notification
+			const reply = response.data;
+			if (
+				socket &&
+				replyAuthorId &&
+				String(replyAuthorId) !== String(currentUser?._id) &&
+				reply.like.some((id) => String(id) === String(currentUser?._id))
+			) {
+				socket.emit("sendNotification", {
+					recipientId: replyAuthorId,
+					notification: {
+						_id: Date.now().toString(),
+						type: "like",
+						sender: currentUser,
+						post: { _id: postId },
+						createdAt: new Date(),
+						read: false,
+					},
+				});
 			}
 		},
 	});

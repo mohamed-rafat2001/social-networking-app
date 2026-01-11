@@ -1,16 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { storeToken, getToken } from "../../../shared/utils/helpers";
 import * as userService from "../../profile/services/userService";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useUser } from "../../../shared/hooks/useUser";
 
 export const useCurrentUser = () => {
-	const token = getToken();
 	return useQuery({
 		queryKey: ["currentUser"],
 		queryFn: userService.getCurrentUser,
 		retry: false,
-		enabled: !!token,
 	});
 };
 
@@ -18,10 +15,7 @@ export const useLogin = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: userService.login,
-		onSuccess: async (data) => {
-			if (data.data?.token) {
-				storeToken(data.data.token);
-			}
+		onSuccess: async () => {
 			await queryClient.invalidateQueries(["currentUser"]);
 		},
 	});
@@ -31,10 +25,7 @@ export const useSignUp = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: userService.signup,
-		onSuccess: async (data) => {
-			if (data.data?.token) {
-				storeToken(data.data.token);
-			}
+		onSuccess: async () => {
 			await queryClient.invalidateQueries(["currentUser"]);
 		},
 	});
@@ -50,10 +41,7 @@ export const useResetPassword = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: userService.resetPassword,
-		onSuccess: async (data) => {
-			if (data.data?.token) {
-				storeToken(data.data.token);
-			}
+		onSuccess: async () => {
 			await queryClient.invalidateQueries(["currentUser"]);
 		},
 	});

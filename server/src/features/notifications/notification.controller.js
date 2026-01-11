@@ -14,7 +14,18 @@ const getNotifications = errorHandler(async (req, res, next) => {
 	});
 });
 
-const markAsRead = factory.updateOne(Notification);
+const markAsRead = errorHandler(async (req, res, next) => {
+	const notification = await Notification.findByIdAndUpdate(
+		req.params.id,
+		{ read: true },
+		{ new: true }
+	);
+
+	res.status(200).json({
+		status: "success",
+		data: notification,
+	});
+});
 
 const deleteNotification = factory.deleteOne(Notification);
 

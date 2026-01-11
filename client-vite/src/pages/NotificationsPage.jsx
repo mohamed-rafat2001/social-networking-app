@@ -5,12 +5,13 @@ import { useNotifications } from "../features/notifications/hooks/useNotificatio
 
 const NotificationsPage = () => {
 	const { notifications, markAsRead } = useNotifications();
-	
-	const unreadCount = notifications?.filter(n => !n.read).length || 0;
+
+	const unreadCount =
+		notifications?.filter((n) => !n.read && n.type !== "message").length || 0;
 
 	const handleMarkAllAsRead = () => {
-		notifications?.forEach(n => {
-			if (!n.read) markAsRead(n._id);
+		notifications?.forEach((n) => {
+			if (!n.read && n.type !== "message") markAsRead(n._id);
 		});
 	};
 
@@ -26,13 +27,13 @@ const NotificationsPage = () => {
 							Notifications
 						</h1>
 						<p className="text-sm text-gray-500 dark:text-gray-400">
-							{unreadCount > 0 
-								? `You have ${unreadCount} unread notifications` 
+							{unreadCount > 0
+								? `You have ${unreadCount} unread notifications`
 								: "You're all caught up!"}
 						</p>
 					</div>
 				</div>
-				
+
 				{unreadCount > 0 && (
 					<button
 						onClick={handleMarkAllAsRead}
@@ -45,7 +46,7 @@ const NotificationsPage = () => {
 			</div>
 
 			<div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-				<NotificationList />
+				<NotificationList filterType="general" />
 			</div>
 		</div>
 	);

@@ -122,6 +122,7 @@ const singlePost = errorHandler(async (req, res, next) => {
 					? sharedPost.likesNumber
 					: sharedPost.sharePost.likesNumber,
 				comments: hasNote ? sharedPost.comments : sharedPost.sharePost.comments,
+				shares: hasNote ? [] : sharedPost.sharePost.shares,
 				unLikes: hasNote ? sharedPost.unLikes : sharedPost.sharePost.unLikes,
 				unLikesNumber: hasNote
 					? sharedPost.unLikesNumber
@@ -287,6 +288,7 @@ const allPosts = errorHandler(async (req, res, next) => {
 					likes: hasNote ? s.likes : s.sharePost.likes,
 					likesNumber: hasNote ? s.likesNumber : s.sharePost.likesNumber,
 					comments: hasNote ? s.comments : s.sharePost.comments,
+					shares: hasNote ? [] : s.sharePost.shares,
 					unLikes: hasNote ? s.unLikes : s.sharePost.unLikes,
 					unLikesNumber: hasNote ? s.unLikesNumber : s.sharePost.unLikesNumber,
 				};

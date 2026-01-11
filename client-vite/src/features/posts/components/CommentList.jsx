@@ -48,26 +48,12 @@ function CommentList({ comments, postId, recipientId }) {
 			{
 				postId,
 				commentData: { commentBody: data.text },
+				postAuthorId: recipientId,
 			},
 			{
 				onSuccess: () => {
 					reset();
 					toast.success("Comment added!");
-
-					// Emit socket event for notification
-					if (socket && recipientId && recipientId !== user?._id) {
-						socket.emit("sendNotification", {
-							recipientId,
-							notification: {
-								type: "comment",
-								sender: user,
-								post: { _id: postId },
-								content: data.text,
-								createdAt: new Date(),
-								read: false,
-							},
-						});
-					}
 				},
 				onError: (error) => {
 					toast.error(error.response?.data?.message || "Failed to add comment");

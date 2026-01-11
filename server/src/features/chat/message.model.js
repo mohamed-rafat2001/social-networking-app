@@ -11,6 +11,7 @@ const messageSchema = new mongoose.Schema(
 				secure_url: String,
 			},
 		],
+		read: { type: Boolean, default: false },
 	},
 	{ timestamps: true }
 );

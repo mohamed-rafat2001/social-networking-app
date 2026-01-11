@@ -5,6 +5,7 @@ import {
 	useCreateMessage,
 	useDeleteMessage,
 	useUpdateMessage,
+	useMarkAsRead,
 } from "../hooks/useMessageQueries";
 import { useSingleChat, useDeleteChat } from "../hooks/useChatQueries";
 import { Spinner, ConfirmModal } from "../../../shared/components/ui";
@@ -12,6 +13,7 @@ import { useUser } from "../../../shared/hooks/useUser";
 import { useTheme } from "../../../providers/ThemeProvider";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
 import ChatHeader from "./detail/ChatHeader";
 import ChatMessageList from "./detail/ChatMessageList";
 import ChatFilePreview from "./detail/ChatFilePreview";
@@ -48,6 +50,13 @@ const ChatWindow = () => {
 	const { mutate: deleteMessage } = useDeleteMessage();
 	const { mutate: updateMessage } = useUpdateMessage();
 	const { mutate: deleteChat } = useDeleteChat();
+	const { mutate: markAsRead } = useMarkAsRead();
+
+	useEffect(() => {
+		if (chatId) {
+			markAsRead(chatId);
+		}
+	}, [chatId, messages?.length, markAsRead]);
 
 	const otherUser = chat?.users?.find((u) => u._id !== currentUser?._id);
 
@@ -133,12 +142,20 @@ const ChatWindow = () => {
 	const handleSend = () => {
 		if (!text.trim() && selectedFiles.length === 0) return;
 
+		const currentText = text;
+		const currentFiles = [...selectedFiles];
+		const currentPreviews = [...previewUrls];
+
 		const formData = new FormData();
 		if (text.trim()) formData.append("content", text);
 		selectedFiles.forEach((file) => {
 			formData.append("file", file);
 		});
 
+		// Clear inputs immediately for better UX
+		setText("");
+		setSelectedFiles([]);
+		setPreviewUrls([]);
 		setUploadProgress(1);
 
 		sendMessage(
@@ -148,22 +165,50 @@ const ChatWindow = () => {
 				onUploadProgress: (progress) => {
 					setUploadProgress(progress);
 				},
+				optimisticMessage: {
+					_id: `temp-${Date.now()}`,
+					content: currentText,
+					file: currentPreviews.map((url) => ({ secure_url: url })),
+					senderId: currentUser?._id,
+					sender: currentUser?._id,
+					createdAt: new Date().toISOString(),
+				},
 			},
 			{
 				onSuccess: (response) => {
 					if (socket && otherUser?._id) {
+						// Send real-time message
 						socket.emit("sendMessage", {
 							newMessage: response.data,
 							userId: otherUser._id,
 						});
+
+						// Send real-time notification
+						socket.emit("sendNotification", {
+							recipientId: otherUser._id,
+							notification: {
+								_id: Date.now().toString(),
+								type: "message",
+								sender: currentUser,
+								content:
+									currentText ||
+									(currentFiles.length > 0 ? "Sent an attachment" : ""),
+								createdAt: new Date(),
+								read: false,
+							},
+						});
 					}
-					setText("");
-					setSelectedFiles([]);
-					setPreviewUrls([]);
 					setUploadProgress(0);
 				},
-				onError: () => {
+				onError: (error) => {
 					setUploadProgress(0);
+					// Restore text if failed
+					setText(currentText);
+					setSelectedFiles(currentFiles);
+					setPreviewUrls(currentPreviews);
+					toast.error(
+						error.response?.data?.message || "Failed to send message"
+					);
 				},
 			}
 		);

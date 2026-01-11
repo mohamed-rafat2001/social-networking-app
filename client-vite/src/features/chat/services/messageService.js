@@ -36,3 +36,8 @@ export const deleteMessage = async (messageId) => {
 	const response = await apiApp.delete(`/messages/delete/${messageId}`);
 	return response.data;
 };
+
+export const markMessagesAsRead = async (chatId) => {
+	const response = await apiApp.patch(`/messages/read/${chatId}`);
+	return response.data;
+};

@@ -2,14 +2,11 @@ import axios from "axios";
 import { getToken, removeToken } from "../utils/helpers";
 
 const apiApp = axios.create({
-	baseURL: "http://localhost:4000",
+	baseURL: import.meta.env.VITE_API_URL || "http://localhost:4000",
+	withCredentials: true,
 });
 
 apiApp.interceptors.request.use((req) => {
-	const token = getToken();
-	if (token) {
-		req.headers.Authorization = `Bearer ${token}`;
-	}
 	return req;
 });
 

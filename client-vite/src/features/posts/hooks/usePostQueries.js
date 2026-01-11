@@ -46,16 +46,19 @@ export const useLikePost = () => {
 			queryClient.invalidateQueries(["post", postId]);
 
 			const post = response.data;
+			const postAuthorId = post.userId?._id || post.userId;
+
 			// If it's a new like (not an unlike) and not our own post
 			if (
 				socket &&
 				post &&
-				post.userId !== currentUser?._id &&
-				post.likes.includes(currentUser?._id)
+				String(postAuthorId) !== String(currentUser?._id) &&
+				post.likes.some((id) => String(id) === String(currentUser?._id))
 			) {
 				socket.emit("sendNotification", {
-					recipientId: post.userId,
+					recipientId: postAuthorId,
 					notification: {
+						_id: Date.now().toString(),
 						type: "like",
 						sender: currentUser,
 						post: { _id: postId },
@@ -75,17 +78,26 @@ export const useSharePost = () => {
 
 	return useMutation({
 		mutationFn: postService.sharePost,
-		onSuccess: (response, { postId }) => {
+		onSuccess: (response, { postId, recipientId }) => {
 			queryClient.invalidateQueries(["posts"]);
 			queryClient.invalidateQueries(["post", postId]);
 
-			const shareData = response.data;
-			if (socket && shareData && shareData.userId !== currentUser?._id) {
-				// We need the original post author ID.
-				// Since we don't have it easily here, we'll assume the server
-				// already created the notification and we just need to notify the UI if possible.
-				// However, for the toast to show up for the OTHER user, we MUST have their recipientId.
-				// For now, let's just trigger the invalidation.
+			if (
+				socket &&
+				recipientId &&
+				String(recipientId) !== String(currentUser?._id)
+			) {
+				socket.emit("sendNotification", {
+					recipientId: recipientId,
+					notification: {
+						_id: Date.now().toString(),
+						type: "share",
+						sender: currentUser,
+						post: { _id: postId },
+						createdAt: new Date(),
+						read: false,
+					},
+				});
 			}
 		},
 	});

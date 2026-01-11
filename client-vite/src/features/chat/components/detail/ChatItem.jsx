@@ -107,7 +107,8 @@ const ChatItem = ({
 					>
 						{lastMessage ? (
 							<>
-								{lastMessage.sender === currentUser?._id && (
+								{String(lastMessage.sender || lastMessage.senderId) ===
+									String(currentUser?._id) && (
 									<span className="text-gray-400 dark:text-gray-500 font-normal">
 										You:{" "}
 									</span>

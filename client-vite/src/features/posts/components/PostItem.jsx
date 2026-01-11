@@ -57,8 +57,10 @@ function PostItem({ post, index }) {
 	};
 
 	const handleRepost = () => {
+		const originalPostId = post.originalPostId || post._id;
+		const recipientId = post.userId?._id || post.userId;
 		sharePost(
-			{ postId: post.originalPostId || post._id },
+			{ postId: originalPostId, recipientId },
 			{
 				onSuccess: () => {
 					toast.success("Reposted successfully");
@@ -72,8 +74,10 @@ function PostItem({ post, index }) {
 
 	const handleRepostWithNote = () => {
 		if (!repostNote.trim()) return;
+		const originalPostId = post.originalPostId || post._id;
+		const recipientId = post.userId?._id || post.userId;
 		sharePost(
-			{ postId: post.originalPostId || post._id, note: repostNote },
+			{ postId: originalPostId, note: repostNote, recipientId },
 			{
 				onSuccess: () => {
 					setIsRepostModalOpen(false);
@@ -96,7 +100,7 @@ function PostItem({ post, index }) {
 		const observer = new IntersectionObserver(
 			(entries) => {
 				if (entries[0].isIntersecting && !viewIncremented.current) {
-					incrementView(post.originalPostId || post._id);
+					incrementView(post._id);
 					viewIncremented.current = true;
 				}
 			},

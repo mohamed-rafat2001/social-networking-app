@@ -21,7 +21,7 @@ const Sidebar = ({ onMobileItemClick }) => {
 	const unreadNotificationsCount =
 		notifications?.filter((n) => !n.isRead && !n.read)?.length || 0;
 	const unreadMessagesCount =
-		chats?.filter((c) => c.unreadCount > 0)?.length || 0;
+		chats?.reduce((acc, chat) => acc + (chat.unreadCount || 0), 0) || 0;
 
 	const navItems = [
 		{ name: "Home Feed", icon: HiHome, path: "/feed" },

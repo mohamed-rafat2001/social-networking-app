@@ -1,5 +1,4 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { Avatar } from "../../../../shared/components/ui";
 import {
@@ -11,7 +10,13 @@ import {
 	HiOutlineAtSymbol,
 } from "react-icons/hi";
 
-const NotificationItem = ({ notification, markAsRead, onlineUsers }) => {
+const NotificationItem = ({
+	notification,
+	markAsRead,
+	onlineUsers,
+	onClose,
+}) => {
+	const navigate = useNavigate();
 	const getIcon = (type) => {
 		switch (type) {
 			case "like":
@@ -24,14 +29,38 @@ const NotificationItem = ({ notification, markAsRead, onlineUsers }) => {
 				return <HiOutlineShare className="text-pink-500" />;
 			case "mention":
 				return <HiOutlineAtSymbol className="text-yellow-500" />;
+			case "message":
+				return <HiOutlineChatAlt2 className="text-blue-500" />;
 			default:
 				return <HiOutlineBell className="text-gray-500" />;
 		}
 	};
 
+	const handleClick = () => {
+		// Mark as read
+		if (!notification.read) {
+			markAsRead(notification._id);
+		}
+
+		// Close dropdown if onClose prop is provided
+		if (onClose) onClose();
+
+		// Navigate based on type
+		if (notification.type === "follow") {
+			navigate(`/profile/${notification.sender._id}`);
+		} else if (notification.type === "message") {
+			navigate(`/messages`);
+		} else if (notification.post) {
+			const postId = notification.post._id || notification.post;
+			navigate(`/posts/${postId}`);
+		} else {
+			navigate(`/profile/${notification.sender._id}`);
+		}
+	};
+
 	return (
 		<div
-			onClick={() => !notification.read && markAsRead(notification._id)}
+			onClick={handleClick}
 			className={`flex gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer ${
 				!notification.read ? "bg-blue-50/50 dark:bg-blue-900/10" : ""
 			}`}
@@ -51,19 +80,16 @@ const NotificationItem = ({ notification, markAsRead, onlineUsers }) => {
 
 			<div className="flex-1 min-w-0">
 				<p className="text-sm text-gray-900 dark:text-white leading-snug">
-					<Link
-						to={`/profile/${notification.sender._id}`}
-						className="font-bold hover:underline"
-						onClick={(e) => e.stopPropagation()}
-					>
+					<span className="font-bold">
 						{notification.sender.firstName} {notification.sender.lastName}
-					</Link>{" "}
+					</span>{" "}
 					<span className="text-gray-600 dark:text-gray-400">
 						{notification.type === "like" && "liked your post"}
 						{notification.type === "comment" && "commented on your post"}
 						{notification.type === "follow" && "started following you"}
 						{notification.type === "mention" && "mentioned you in a post"}
 						{notification.type === "share" && "shared your post"}
+						{notification.type === "message" && "sent you a message"}
 					</span>
 				</p>
 

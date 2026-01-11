@@ -39,33 +39,29 @@ const NotificationManager = () => {
 				case "share":
 					message = `${senderName} shared your post`;
 					break;
+				case "message":
+					message = `${senderName} sent you a message`;
+					break;
 				default:
 					message = `New notification from ${senderName}`;
 			}
 
-			toast.success(message, {
-				icon: "🔔",
-				duration: 4000,
-			});
+			// Don't show toast if already in chat with this user
+			const isInChat = location.pathname.includes(notification.chatId);
+			if (!isInChat) {
+				toast.success(message, {
+					icon: notification.type === "message" ? "💬" : "🔔",
+					duration: 4000,
+				});
+			}
 		};
 
 		const handleMessage = (newMessage) => {
 			const isInChat = location.pathname === `/messages/${newMessage.chatId}`;
 
 			if (!isInChat) {
-				const senderName = newMessage.senderName || "Someone";
-				toast.success(
-					`New message from ${senderName}: ${newMessage.content.substring(
-						0,
-						30
-					)}${newMessage.content.length > 30 ? "..." : ""}`,
-					{
-						icon: "💬",
-						duration: 4000,
-					}
-				);
-
 				queryClient.invalidateQueries(["chats"]);
+				queryClient.invalidateQueries(["notifications"]);
 			}
 		};
 

@@ -19,5 +19,6 @@ router
 
 router.delete("/delete/:id", messageController.deleteMessage);
 router.patch("/update/:id", messageController.updateMessage);
+router.patch("/read/:id", messageController.markMessagesAsRead);
 
 export default router;

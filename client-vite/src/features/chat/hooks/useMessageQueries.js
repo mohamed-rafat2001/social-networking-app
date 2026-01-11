@@ -14,9 +14,52 @@ export const useCreateMessage = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: messageService.createMessage,
-		onSuccess: (data, variables) => {
-			queryClient.invalidateQueries(["messages", variables.chatId]);
+		onMutate: async (variables) => {
+			const { chatId, optimisticMessage } = variables;
+			if (!optimisticMessage) return;
+
+			// Cancel any outgoing refetches
+			await queryClient.cancelQueries({ queryKey: ["messages", chatId] });
+
+			// Snapshot the previous value
+			const previousMessages = queryClient.getQueryData(["messages", chatId]);
+
+			// Optimistically update to the new value
+			queryClient.setQueryData(["messages", chatId], (old) => {
+				const oldData = old?.data || [];
+				return { ...old, data: [...oldData, optimisticMessage] };
+			});
+
+			return { previousMessages };
+		},
+		onError: (err, variables, context) => {
+			if (context?.previousMessages) {
+				queryClient.setQueryData(
+					["messages", variables.chatId],
+					context.previousMessages
+				);
+			}
+		},
+		onSuccess: (response, variables) => {
+			const { chatId, optimisticMessage } = variables;
+			if (optimisticMessage) {
+				queryClient.setQueryData(["messages", chatId], (old) => {
+					const oldData = old?.data || [];
+					return {
+						...old,
+						data: oldData.map((m) =>
+							m._id === optimisticMessage._id ? response.data : m
+						),
+					};
+				});
+			} else {
+				queryClient.invalidateQueries(["messages", chatId]);
+			}
 			queryClient.invalidateQueries(["chats"]);
+		},
+		onSettled: (data, error, variables) => {
+			// Invalidate to ensure we are in sync, though success already handles the swap
+			// queryClient.invalidateQueries(["messages", variables.chatId]);
 		},
 	});
 };
@@ -38,6 +81,16 @@ export const useDeleteMessage = () => {
 		mutationFn: messageService.deleteMessage,
 		onSuccess: () => {
 			queryClient.invalidateQueries(["messages"]);
+			queryClient.invalidateQueries(["chats"]);
+		},
+	});
+};
+
+export const useMarkAsRead = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: messageService.markMessagesAsRead,
+		onSuccess: () => {
 			queryClient.invalidateQueries(["chats"]);
 		},
 	});
