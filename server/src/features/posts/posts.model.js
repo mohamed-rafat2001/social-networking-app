@@ -70,4 +70,5 @@ postsSchema.methods.toJSON = function () {
 };
 
 const Posts = mongoose.model("Posts", postsSchema);
+export { Posts };
 export default Posts;

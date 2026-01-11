@@ -1,4 +1,4 @@
-import User from "../../features/auth/user.model.js";
+import { User } from "../../features/auth/user.model.js";
 import jwt from "jsonwebtoken";
 import { AppError } from "../utils/appError.js";
 

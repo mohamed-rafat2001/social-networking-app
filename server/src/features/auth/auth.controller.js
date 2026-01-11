@@ -1,7 +1,7 @@
-import User from "./user.model.js";
-import Follow from "../follow/follow.model.js";
-import Posts from "../posts/posts.model.js";
-import Share from "../posts/sharePost.model.js";
+import { User } from "./user.model.js";
+import { Follow } from "../follow/follow.model.js";
+import { Posts } from "../posts/posts.model.js";
+import { Share } from "../posts/sharePost.model.js";
 import bcryptjs from "bcryptjs";
 import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 import { AppError } from "../../shared/utils/appError.js";

@@ -52,4 +52,5 @@ const shareSchema = new mongoose.Schema(
 );
 
 const Share = mongoose.model("Share", shareSchema);
+export { Share };
 export default Share;
