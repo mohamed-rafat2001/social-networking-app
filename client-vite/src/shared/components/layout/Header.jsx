@@ -136,7 +136,7 @@ const Header = ({ onMenuClick }) => {
 						</div>
 						<input
 							type="text"
-							placeholder="Search for projects, students, or topics..."
+							placeholder="Search for groups, students, or topics..."
 							className="w-full bg-gray-100 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-700 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 rounded-2xl py-2 pl-10 pr-4 text-sm transition-all outline-none dark:text-white"
 						/>
 					</div>

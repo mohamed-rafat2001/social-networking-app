@@ -76,7 +76,7 @@ const Majors = () => {
 						className="text-lg text-gray-600 dark:text-gray-400"
 					>
 						Join thousands of students across all engineering departments
-						already sharing insights and collaborating on projects.
+						already sharing insights and collaborating in groups.
 					</motion.p>
 				</div>
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useUser } from "../shared/hooks/useUser";
 

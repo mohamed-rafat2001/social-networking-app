@@ -38,7 +38,7 @@ const Sidebar = ({ onMobileItemClick }) => {
 			path: "/messages",
 			badge: unreadMessagesCount,
 		},
-		{ name: "Projects", icon: HiCollection, path: "/projects" },
+		{ name: "Groups", icon: HiCollection, path: "/groups" },
 		{ name: "Bookmarks", icon: HiBookmark, path: "/bookmarks" },
 		{ name: "My Profile", icon: HiUser, path: `/profile/${user?._id}` },
 	];
@@ -75,7 +75,7 @@ const Sidebar = ({ onMobileItemClick }) => {
 
 			<div className="pt-6 mt-6 border-t border-gray-100 dark:border-gray-800 px-4">
 				<h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">
-					Study Groups
+					prefered groups
 				</h4>
 				<div className="space-y-3">
 					<button className="flex items-center gap-3 w-full text-left group">

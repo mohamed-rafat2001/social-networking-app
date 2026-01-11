@@ -22,7 +22,7 @@ const Features = () => {
 		{
 			name: "Real-time Collaboration",
 			description:
-				"Chat and share ideas instantly with study groups and project partners in real-time.",
+				"Chat and share ideas instantly with prefered groups and project partners in real-time.",
 			icon: HiChatAlt2,
 			color: "bg-purple-500",
 			shadow: "shadow-purple-500/20",
@@ -36,9 +36,9 @@ const Features = () => {
 			shadow: "shadow-indigo-500/20",
 		},
 		{
-			name: "Project Showcase",
+			name: "Group Showcase",
 			description:
-				"Display your engineering projects and portfolios to get feedback and attract teammates.",
+				"Display your engineering groups and portfolios to get feedback and attract teammates.",
 			icon: HiCloudUpload,
 			color: "bg-green-500",
 			shadow: "shadow-green-500/20",

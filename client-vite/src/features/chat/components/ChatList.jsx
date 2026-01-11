@@ -79,8 +79,8 @@ const ChatList = () => {
 							No conversations yet
 						</h3>
 						<p className="text-gray-500 dark:text-gray-400 max-w-xs mb-6">
-							Start a conversation with other students to collaborate on
-							projects or study together.
+							Start a conversation with other students to collaborate in
+							groups or study together.
 						</p>
 						<button
 							onClick={() => setShowNewChat(true)}
