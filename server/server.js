@@ -5,10 +5,19 @@ process.on("uncaughtException", (err) => {
 });
 
 import "dotenv/config";
+import http from "http";
 import { app } from "./app.js";
+import { initSocket } from "./src/shared/utils/socket.js";
 
 const port = process.env.PORT || 4000;
-const server = app.listen(port, () => console.log(`server running ${port}`));
+const httpServer = http.createServer(app);
+
+// Initialize Socket.io
+initSocket(httpServer);
+
+const server = httpServer.listen(port, () =>
+	console.log(`server running on port ${port}`)
+);
 
 process.on("unhandledRejection", (err) => {
 	console.log("UNHANDLED REJECTION! 💥 Shutting down...");

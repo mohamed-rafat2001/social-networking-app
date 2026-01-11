@@ -11,9 +11,13 @@ export const SocketProvider = ({ children }) => {
 
 	useEffect(() => {
 		if (user?._id) {
-			const newSocket = io(
-				import.meta.env.VITE_SOCKET_URL || "http://localhost:5000"
-			);
+			const socketUrl =
+				import.meta.env.VITE_SOCKET_URL ||
+				import.meta.env.VITE_API_URL ||
+				"http://localhost:4000/";
+			const newSocket = io(socketUrl, {
+				withCredentials: true,
+			});
 
 			newSocket.emit("addUser", user._id);
 

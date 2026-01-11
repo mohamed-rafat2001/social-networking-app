@@ -20,17 +20,16 @@ EngiConnect is a comprehensive social networking platform designed specifically 
 
 ## 📁 Project Structure
 
-The repository is organized into three main directories:
+The repository is organized into two main directories:
 
 | Directory                       | Description                                               |
 | :------------------------------ | :-------------------------------------------------------- |
 | [`client-vite/`](./client-vite) | The React frontend application powered by Vite.           |
-| [`server/`](./server)           | The Express.js REST API handling data and business logic. |
-| [`socket/`](./socket)           | The standalone Socket.io server for real-time features.   |
+| [`server/`](./server)           | The Express.js REST API and Socket.io server.             |
 
 ## ⚙️ Quick Start
 
-To run the entire application locally, you will need to start three separate processes:
+To run the entire application locally, you will need to start two separate processes:
 
 ### 1. Prerequisites
 
@@ -40,20 +39,12 @@ To run the entire application locally, you will need to start three separate pro
 
 ### 2. Setup & Installation
 
-#### Backend (API Server)
+#### Backend (API & Socket Server)
 
 ```bash
 cd server
 npm install
 # Configure .env file (see server/README.md)
-npm start
-```
-
-#### Real-time (Socket Server)
-
-```bash
-cd socket
-npm install
 npm start
 ```
 
@@ -71,7 +62,6 @@ Each directory requires its own `.env` configuration. Please refer to the indivi
 
 - [Server Environment Variables](./server/README.md#🌐-environment-variables)
 - [Client Environment Variables](./client-vite/README.md#🌐-configuration--environment)
-- [Socket Configuration](./socket/README.md#🌐-configuration)
 
 ---
 

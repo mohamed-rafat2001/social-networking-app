@@ -85,7 +85,7 @@ The application expects the following environment variables. Create a `.env` fil
 
 ```env
 VITE_API_URL=http://localhost:4000
-VITE_SOCKET_URL=http://localhost:5000
+VITE_SOCKET_URL=http://localhost:4000
 ```
 
 - **VITE_API_URL**: The base URL for the backend Express API.
