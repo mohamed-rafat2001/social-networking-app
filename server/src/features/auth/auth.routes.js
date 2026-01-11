@@ -54,4 +54,4 @@ router
 router.get("/user", authController.user);
 router.get("/:userId", authController.user);
 
-export default router;
+export { router as userRouter };

@@ -12,4 +12,4 @@ router.post("/addChannel", youtubeController.addChannel);
 router.get("/myChannels", youtubeController.getMyChannels);
 router.delete("/deleteChannel/:id", youtubeController.deleteChannel);
 
-export default router;
+export { router as youtubeRouter };

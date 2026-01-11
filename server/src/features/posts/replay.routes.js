@@ -38,4 +38,4 @@ router.patch("/replay/like/:id", protect, replayController.likeOnReplay);
 // dislike for post
 router.patch("/replay/disLike/:id", protect, replayController.disLikeReplay);
 
-export default router;
+export { router as replayRouter };

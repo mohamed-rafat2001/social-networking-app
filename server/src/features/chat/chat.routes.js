@@ -11,4 +11,4 @@ router.get("/", chatController.findUserChats);
 router.get("/:id", chatController.findChat);
 router.delete("/:id", chatController.deleteChat);
 
-export default router;
+export { router as chatRouter };

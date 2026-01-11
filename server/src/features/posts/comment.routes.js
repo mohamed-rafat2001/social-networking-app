@@ -41,4 +41,4 @@ router
 	//delete comment
 	.delete(protect, commentController.deleteComment);
 
-export default router;
+export { router as commentRouter };

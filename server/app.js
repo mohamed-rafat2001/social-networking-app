@@ -8,18 +8,18 @@ import mongoSanitize from "express-mongo-sanitize";
 import hpp from "hpp";
 
 // Features
-import userRouter from "./src/features/auth/auth.routes.js";
-import followRouter from "./src/features/follow/follow.routes.js";
-import blockRouter from "./src/features/block/block.routes.js";
-import adminRouter from "./src/features/admin/admin.routes.js";
-import postsRouter from "./src/features/posts/posts.routes.js";
-import youtubeRouter from "./src/features/youtube/youtube.routes.js";
-import commentRouter from "./src/features/posts/comment.routes.js";
-import replayRouter from "./src/features/posts/replay.routes.js";
-import shareRouter from "./src/features/posts/sharePost.routes.js";
-import chatRouter from "./src/features/chat/chat.routes.js";
-import messageRouter from "./src/features/chat/message.routes.js";
-import notificationRouter from "./src/features/notifications/notification.routes.js";
+import { userRouter } from "./src/features/auth/auth.routes.js";
+import { followRouter } from "./src/features/follow/follow.routes.js";
+import { blockRouter } from "./src/features/block/block.routes.js";
+import { adminRouter } from "./src/features/admin/admin.routes.js";
+import { postsRouter } from "./src/features/posts/posts.routes.js";
+import { youtubeRouter } from "./src/features/youtube/youtube.routes.js";
+import { commentRouter } from "./src/features/posts/comment.routes.js";
+import { replayRouter } from "./src/features/posts/replay.routes.js";
+import { shareRouter } from "./src/features/posts/sharePost.routes.js";
+import { chatRouter } from "./src/features/chat/chat.routes.js";
+import { messageRouter } from "./src/features/chat/message.routes.js";
+import { notificationRouter } from "./src/features/notifications/notification.routes.js";
 
 import { globalErrorHandler } from "./src/shared/middlewares/errorHandler.js";
 import "./src/shared/db/mongoose.db.js";
@@ -59,7 +59,9 @@ app.use(
 			"Authorization",
 			"X-Requested-With",
 			"Accept",
+			"Range",
 		],
+		exposedHeaders: ["Content-Range", "Accept-Ranges"],
 	})
 );
 
@@ -89,12 +91,10 @@ app.use("/messages", messageRouter);
 app.use("/notifications", notificationRouter);
 
 app.all("*", (req, res, next) => {
-	res
-		.status(404)
-		.json({
-			status: "fail",
-			message: `Can't find ${req.originalUrl} on this server!`,
-		});
+	res.status(404).json({
+		status: "fail",
+		message: `Can't find ${req.originalUrl} on this server!`,
+	});
 });
 
 // Global Error Handler

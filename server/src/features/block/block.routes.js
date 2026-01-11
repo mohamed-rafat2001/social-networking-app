@@ -10,4 +10,4 @@ router.post("/block/:userId", blockController.blockUser);
 router.post("/unblock/:userId", blockController.unblockUser);
 router.get("/", blockController.getBlockedUsers);
 
-export default router;
+export { router as blockRouter };

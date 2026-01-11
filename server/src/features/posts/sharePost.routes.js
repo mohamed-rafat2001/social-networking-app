@@ -32,4 +32,4 @@ router
 	//singleShare
 	.get(protect, sharePostController.singleShare);
 
-export default router;
+export { router as shareRouter };

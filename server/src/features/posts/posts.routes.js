@@ -34,4 +34,4 @@ router.post("/:id/like", postsController.likeOnPost);
 router.post("/:id/unlike", postsController.unLikeOnPost);
 router.patch("/:id/increment-view", postsController.incrementView);
 
-export default router;
+export { router as postsRouter };

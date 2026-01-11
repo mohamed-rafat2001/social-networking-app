@@ -32,4 +32,4 @@ router.patch(
 	adminController.blockAndUnblock
 );
 
-export default router;
+export { router as adminRouter };
