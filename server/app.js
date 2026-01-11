@@ -47,9 +47,27 @@ const allowedOrigins = [
 app.use(
 	cors({
 		origin: function (origin, callback) {
-			if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+			// In development, allow all origins
+			if (process.env.NODE_ENV !== "production") {
+				return callback(null, true);
+			}
+
+			// allow requests with no origin (like mobile apps or curl requests)
+			if (!origin) return callback(null, true);
+
+			// Check if origin is allowed
+			const isAllowed = allowedOrigins.some((allowed) => {
+				if (allowed === origin) return true;
+				// Handle potential trailing slashes
+				if (allowed.replace(/\/$/, "") === origin.replace(/\/$/, ""))
+					return true;
+				return false;
+			});
+
+			if (isAllowed) {
 				callback(null, true);
 			} else {
+				console.log("Origin not allowed by CORS:", origin);
 				callback(new AppError("Not allowed by CORS", 403));
 			}
 		},
@@ -65,6 +83,9 @@ app.use(
 		exposedHeaders: ["Content-Range", "Accept-Ranges"],
 	})
 );
+
+// Handle preflight requests for all routes
+app.options("*", cors());
 
 // Body parser
 app.use(express.json({ limit: "10kb" }));

@@ -7,11 +7,24 @@ export const initSocket = (server) => {
 	io = new Server(server, {
 		path: "/socket.io/",
 		cors: {
-			origin: [
-				"http://localhost:5173",
-				"http://localhost:3000",
-				process.env.CLIENT_URL,
-			].filter(Boolean),
+			origin: function (origin, callback) {
+				const allowedOrigins = [
+					"http://localhost:5173",
+					"http://localhost:3000",
+					"https://social-networking-app.netlify.app",
+					process.env.CLIENT_URL,
+				].filter(Boolean);
+
+				if (process.env.NODE_ENV !== "production") {
+					return callback(null, true);
+				}
+
+				if (!origin || allowedOrigins.includes(origin)) {
+					callback(null, true);
+				} else {
+					callback(new Error("Not allowed by CORS"));
+				}
+			},
 			methods: ["GET", "POST"],
 			credentials: true,
 		},
