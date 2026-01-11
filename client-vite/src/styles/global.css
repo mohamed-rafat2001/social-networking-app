@@ -29,8 +29,7 @@
 	[role="link"],
 	[role="menuitem"],
 	[role="tab"],
-	[role="option"],
-	.cursor-pointer {
+	[role="option"] {
 		@apply cursor-pointer;
 	}
 }
@@ -45,7 +44,7 @@
 		@apply hover:bg-black hover:bg-opacity-[0.03] transition-colors duration-200;
 	}
 
-	.porfile-image {
+	.profile-image {
 		@apply rounded-full object-cover;
 		width: 40px;
 		height: 40px;
