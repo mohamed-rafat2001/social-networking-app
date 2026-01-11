@@ -1,31 +1,37 @@
-import axios from "axios";
 import Youtube from "./youtube.model.js";
 import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 
 export const getChannelPlaylists = catchAsync(async (req, res) => {
 	try {
-		const options = {
-			method: "GET",
-			url: "https://youtube-v31.p.rapidapi.com/playlists",
-			params: {
-				channelId: req.params.id,
-				part: "snippet",
-				maxResults: "50",
-			},
-			headers: {
-				"X-RapidAPI-Key": "8123f5d07dmshc2cdd47ae4902c2p12b5c3jsn33f860a35954",
-				"X-RapidAPI-Host": "youtube-v31.p.rapidapi.com",
-			},
-		};
-		const playList = [];
-		const response = await axios.request(options);
-		response.data.items.map((el) => {
-			playList.push({
-				id: el.id,
-				title: el.snippet.title,
-				img: el.snippet.thumbnails.default.url,
-			});
+		const params = new URLSearchParams({
+			channelId: req.params.id,
+			part: "snippet",
+			maxResults: "50",
 		});
+
+		const response = await fetch(
+			`https://youtube-v31.p.rapidapi.com/playlists?${params}`,
+			{
+				method: "GET",
+				headers: {
+					"X-RapidAPI-Key":
+						"8123f5d07dmshc2cdd47ae4902c2p12b5c3jsn33f860a35954",
+					"X-RapidAPI-Host": "youtube-v31.p.rapidapi.com",
+				},
+			}
+		);
+
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+
+		const data = await response.json();
+		const playList = data.items.map((el) => ({
+			id: el.id,
+			title: el.snippet.title,
+			img: el.snippet.thumbnails.default.url,
+		}));
+
 		res.send(playList);
 	} catch (err) {
 		res.send(err.message);
@@ -34,28 +40,35 @@ export const getChannelPlaylists = catchAsync(async (req, res) => {
 
 export const getPlaylistItems = catchAsync(async (req, res) => {
 	try {
-		const options = {
-			method: "GET",
-			url: "https://youtube-v31.p.rapidapi.com/playlistItems",
-			params: {
-				playlistId: req.params.id,
-				part: "snippet",
-				maxResults: "50",
-			},
-			headers: {
-				"X-RapidAPI-Key": "8123f5d07dmshc2cdd47ae4902c2p12b5c3jsn33f860a35954",
-				"X-RapidAPI-Host": "youtube-v31.p.rapidapi.com",
-			},
-		};
-		const response = await axios.request(options);
-		const videos = [];
-		response.data.items.map((ele) => {
-			videos.push({
-				videoUrl: `https://www.youtube.com/watch?v=${ele.snippet.resourceId.videoId}&list=${ele.snippet.playlistId}`,
-				title: ele.snippet.title,
-				img: ele.snippet.thumbnails.default.url,
-			});
+		const params = new URLSearchParams({
+			playlistId: req.params.id,
+			part: "snippet",
+			maxResults: "50",
 		});
+
+		const response = await fetch(
+			`https://youtube-v31.p.rapidapi.com/playlistItems?${params}`,
+			{
+				method: "GET",
+				headers: {
+					"X-RapidAPI-Key":
+						"8123f5d07dmshc2cdd47ae4902c2p12b5c3jsn33f860a35954",
+					"X-RapidAPI-Host": "youtube-v31.p.rapidapi.com",
+				},
+			}
+		);
+
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+
+		const data = await response.json();
+		const videos = data.items.map((ele) => ({
+			videoUrl: `https://www.youtube.com/watch?v=${ele.snippet.resourceId.videoId}&list=${ele.snippet.playlistId}`,
+			title: ele.snippet.title,
+			img: ele.snippet.thumbnails.default.url,
+		}));
+
 		res.send(videos);
 	} catch (error) {
 		console.error(error);
@@ -68,21 +81,31 @@ export const addChannel = catchAsync(async (req, res) => {
 		const link = req.body.url;
 		const ind = link.indexOf("list=");
 		const playListId = link.slice(ind + 5);
-		const options = {
-			method: "GET",
-			url: "https://youtube-v31.p.rapidapi.com/playlistItems",
-			params: {
-				playlistId: playListId,
-				part: "snippet",
-			},
-			headers: {
-				"X-RapidAPI-Key": "8123f5d07dmshc2cdd47ae4902c2p12b5c3jsn33f860a35954",
-				"X-RapidAPI-Host": "youtube-v31.p.rapidapi.com",
-			},
-		};
-		const response = await axios.request(options);
-		const channelId = response.data.items[0].snippet.channelId;
-		const channelTitle = response.data.items[0].snippet.channelTitle;
+
+		const params = new URLSearchParams({
+			playlistId: playListId,
+			part: "snippet",
+		});
+
+		const response = await fetch(
+			`https://youtube-v31.p.rapidapi.com/playlistItems?${params}`,
+			{
+				method: "GET",
+				headers: {
+					"X-RapidAPI-Key":
+						"8123f5d07dmshc2cdd47ae4902c2p12b5c3jsn33f860a35954",
+					"X-RapidAPI-Host": "youtube-v31.p.rapidapi.com",
+				},
+			}
+		);
+
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+
+		const data = await response.json();
+		const channelId = data.items[0].snippet.channelId;
+		const channelTitle = data.items[0].snippet.channelTitle;
 		const channelExist = await Youtube.findOne({ userId: req.user._id });
 
 		if (!channelExist) {
