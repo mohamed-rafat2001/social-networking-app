@@ -14,8 +14,9 @@ export const SocketProvider = ({ children }) => {
 			const socketUrl =
 				import.meta.env.VITE_SOCKET_URL ||
 				import.meta.env.VITE_API_URL ||
-				"http://localhost:4000/";
+				window.location.origin;
 			const newSocket = io(socketUrl, {
+				path: "/socket.io/",
 				withCredentials: true,
 			});
 
