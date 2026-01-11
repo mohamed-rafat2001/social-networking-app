@@ -328,7 +328,13 @@ const user = catchAsync(async (req, res, next) => {
 		req.params.userId !== "user" &&
 		req.params.userId !== "undefined"
 			? req.params.userId
-			: req.user._id;
+			: req.user?._id;
+
+	if (!userId) {
+		return next(
+			new AppError("You are not logged in or user ID is missing", "fail", 401)
+		);
+	}
 
 	const userData = await User.findById(userId);
 
@@ -357,15 +363,17 @@ const user = catchAsync(async (req, res, next) => {
 	// Combine posts and shared posts
 	const allUserPosts = [
 		...posts.map((p) => ({ ...p.toObject(), type: "post" })),
-		...sharedPosts.map((s) => ({
-			...s.sharePost.toObject(),
-			_id: s._id,
-			originalPostId: s.sharePost._id,
-			shareNote: s.note,
-			shareDate: s.createdAt,
-			type: "share",
-			sharedBy: userData,
-		})),
+		...sharedPosts
+			.filter((s) => s.sharePost)
+			.map((s) => ({
+				...s.sharePost.toObject(),
+				_id: s._id,
+				originalPostId: s.sharePost._id,
+				shareNote: s.note,
+				shareDate: s.createdAt,
+				type: "share",
+				sharedBy: userData,
+			})),
 	].sort((a, b) => {
 		const dateA = a.type === "share" ? a.shareDate : a.createdAt;
 		const dateB = b.type === "share" ? b.shareDate : b.createdAt;
@@ -378,7 +386,7 @@ const user = catchAsync(async (req, res, next) => {
 	userObj.posts = allUserPosts;
 
 	userObj.isFollowing = followers.some(
-		(f) => f.follower._id.toString() === req.user._id.toString()
+		(f) => f.follower && f.follower._id.toString() === req.user?._id.toString()
 	);
 
 	res.status(200).json({ status: "success", data: userObj });
