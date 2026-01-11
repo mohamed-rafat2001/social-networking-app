@@ -3,6 +3,8 @@ import { Server } from "socket.io";
 
 const port = process.env.PORT || 5000;
 const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+const isDev =
+	process.env.MODE === "DEV" || process.env.NODE_ENV === "development";
 
 const io = new Server({
 	cors: {
@@ -14,7 +16,7 @@ const io = new Server({
 let onLineUsers = [];
 
 io.on("connection", (socket) => {
-	console.log("New socket connection established:", socket.id);
+	if (isDev) console.log("New socket connection established:", socket.id);
 
 	socket.on("addUser", (userId) => {
 		if (userId && !onLineUsers.some((user) => user.userId === userId)) {
@@ -47,15 +49,15 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("error", (err) => {
-		console.error("Socket error:", err);
+		if (isDev) console.error("Socket error:", err);
 	});
 
 	socket.on("disconnect", () => {
 		onLineUsers = onLineUsers.filter((user) => user.socketId !== socket.id);
 		io.emit("getUsersOnLine", onLineUsers);
-		console.log("Socket disconnected:", socket.id);
+		if (isDev) console.log("Socket disconnected:", socket.id);
 	});
 });
 
 io.listen(port);
-console.log(`Socket.io server running on port ${port}`);
+if (isDev) console.log(`Socket.io server running on port ${port}`);
