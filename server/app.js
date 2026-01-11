@@ -24,7 +24,7 @@ import { notificationRouter } from "./src/features/notifications/notification.ro
 import { globalErrorHandler } from "./src/shared/middlewares/errorHandler.js";
 import "./src/shared/db/mongoose.db.js";
 
-const app = express();
+export const app = express();
 
 // 1) SECURITY MIDDLEWARES
 // Relaxed security for serverless to prevent startup timeouts
