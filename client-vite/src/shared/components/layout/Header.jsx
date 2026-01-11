@@ -76,7 +76,7 @@ const Header = ({ onMenuClick }) => {
 	];
 
 	return (
-		<header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+		<header className="sticky top-0 z-[100] bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
 			<div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
 				{/* Left Section: Mobile Menu & Logo */}
 				<div className="flex items-center gap-2 sm:gap-4 shrink-0">
@@ -207,6 +207,7 @@ const Header = ({ onMenuClick }) => {
 														<NotificationList
 															filterType="messages"
 															onClose={() => setShowMessages(false)}
+															hideHeader={true}
 														/>
 													</div>
 												</motion.div>
@@ -266,6 +267,7 @@ const Header = ({ onMenuClick }) => {
 														<NotificationList
 															filterType="general"
 															onClose={() => setShowNotifications(false)}
+															hideHeader={true}
 														/>
 													</div>
 												</motion.div>

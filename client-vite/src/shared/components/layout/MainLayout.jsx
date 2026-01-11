@@ -26,14 +26,14 @@ const MainLayout = () => {
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
 							onClick={() => setIsMobileSidebarOpen(false)}
-							className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] lg:hidden"
+							className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] lg:hidden"
 						/>
 						<motion.div
 							initial={{ x: "-100%" }}
 							animate={{ x: 0 }}
 							exit={{ x: "-100%" }}
 							transition={{ type: "spring", damping: 25, stiffness: 200 }}
-							className="fixed inset-y-0 left-0 w-72 bg-white dark:bg-gray-900 z-[70] lg:hidden shadow-2xl p-4 flex flex-col"
+							className="fixed inset-y-0 left-0 w-72 bg-white dark:bg-gray-900 z-[210] lg:hidden shadow-2xl p-4 flex flex-col"
 						>
 							<div className="flex items-center justify-between mb-6 px-2">
 								<span className="text-xl font-black tracking-tight text-gray-900 dark:text-white">

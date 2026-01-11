@@ -63,13 +63,13 @@ export const ImageModal = ({
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
-				className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
+				className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
 				onClick={onClose}
 			>
 				{/* Close Button */}
 				<button
 					onClick={onClose}
-					className="absolute top-6 right-6 z-[110] p-3 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
+					className="absolute top-6 right-6 z-[1010] p-3 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
 				>
 					<HiOutlineX size={28} />
 				</button>
@@ -77,7 +77,7 @@ export const ImageModal = ({
 				{/* Download Button */}
 				<button
 					onClick={handleDownload}
-					className="absolute top-6 right-20 z-[110] p-3 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
+					className="absolute top-6 right-20 z-[1010] p-3 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
 				>
 					<HiOutlineDownload size={24} />
 				</button>
@@ -86,7 +86,7 @@ export const ImageModal = ({
 				{images.length > 1 && (
 					<button
 						onClick={handlePrevious}
-						className="absolute left-6 z-[110] p-4 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all"
+						className="absolute left-6 z-[1010] p-4 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all"
 					>
 						<HiOutlineChevronLeft size={36} />
 					</button>
@@ -120,7 +120,7 @@ export const ImageModal = ({
 				{images.length > 1 && (
 					<button
 						onClick={handleNext}
-						className="absolute right-6 z-[110] p-4 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all"
+						className="absolute right-6 z-[1010] p-4 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-all"
 					>
 						<HiOutlineChevronRight size={36} />
 					</button>

@@ -4,7 +4,7 @@ import { useSocket } from "../../../shared/hooks/useSocket";
 import { HiOutlineBell } from "react-icons/hi";
 import NotificationItem from "./detail/NotificationItem";
 
-const NotificationList = ({ filterType, onClose }) => {
+const NotificationList = ({ filterType, onClose, hideHeader = false }) => {
 	const { notifications, isLoading, markAsRead, markAllAsRead } =
 		useNotifications();
 	const { onlineUsers } = useSocket();
@@ -54,19 +54,21 @@ const NotificationList = ({ filterType, onClose }) => {
 
 	return (
 		<div className="flex flex-col h-full">
-			<div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
-				<h2 className="text-lg font-bold text-gray-900 dark:text-white">
-					{filterType === "messages" ? "Messages" : "Notifications"}
-				</h2>
-				{unreadCount > 0 && (
-					<button
-						onClick={() => markAllAsRead?.()}
-						className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-					>
-						Mark all as read
-					</button>
-				)}
-			</div>
+			{!hideHeader && (
+				<div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
+					<h2 className="text-lg font-bold text-gray-900 dark:text-white">
+						{filterType === "messages" ? "Messages" : "Notifications"}
+					</h2>
+					{unreadCount > 0 && (
+						<button
+							onClick={() => markAllAsRead?.()}
+							className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+						>
+							Mark all as read
+						</button>
+					)}
+				</div>
+			)}
 			<div className="flex-1 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-800">
 				{filteredNotifications.map((notification) => (
 					<NotificationItem
