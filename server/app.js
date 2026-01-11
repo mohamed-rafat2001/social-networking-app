@@ -77,18 +77,18 @@ app.use(hpp());
 app.get("/ping", (req, res) => res.send("pong"));
 
 // Routes
-app.use("api/v1/user", userRouter);
-app.use("api/v1/follows", followRouter);
-app.use("api/v1/blocks", blockRouter);
-app.use("api/v1/admin", adminRouter);
-app.use("api/v1/posts", postsRouter);
-app.use("api/v1/youtube", youtubeRouter);
-app.use("api/v1/comments", commentRouter);
-app.use("api/v1/replays", replayRouter);
-app.use("api/v1/shares", shareRouter);
-app.use("api/v1/chats", chatRouter);
-app.use("api/v1/messages", messageRouter);
-app.use("api/v1/notifications", notificationRouter);
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/follows", followRouter);
+app.use("/api/v1/blocks", blockRouter);
+app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/posts", postsRouter);
+app.use("/api/v1/youtube", youtubeRouter);
+app.use("/api/v1/comments", commentRouter);
+app.use("/api/v1/replays", replayRouter);
+app.use("/api/v1/shares", shareRouter);
+app.use("/api/v1/chats", chatRouter);
+app.use("/api/v1/messages", messageRouter);
+app.use("/api/v1/notifications", notificationRouter);
 
 app.all("*", (req, res, next) => {
 	res.status(404).json({

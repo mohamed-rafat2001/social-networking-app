@@ -1,8 +1,7 @@
 import axios from "axios";
-import { getToken, removeToken } from "../utils/helpers";
 
 const apiApp = axios.create({
-	baseURL: `${import.meta.env.VITE_API_URL}api/v1` || "http://localhost:4000",
+	baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:4000/"}api/v1`,
 	withCredentials: true,
 });
 
