@@ -224,14 +224,34 @@ function PostList() {
 						<div className="mb-2 emoji-input-container relative z-[60]">
 							<style>
 								{`
+									.emoji-input-container .react-input-emoji--container {
+										background: transparent !important;
+										border: none !important;
+										margin-bottom: 0 !important;
+									}
+									.emoji-input-container .react-input-emoji--wrapper {
+										background: transparent !important;
+										border: none !important;
+										padding: 0 !important;
+									}
+									.emoji-input-container .react-input-emoji--input {
+										background: transparent !important;
+										padding: 8px 0 !important;
+										color: ${darkMode ? "white" : "#1f2937"} !important;
+										min-height: 40px !important;
+										max-height: 120px !important;
+										overflow-y: auto !important;
+										font-size: 20px !important;
+									}
+									.emoji-input-container .react-input-emoji--button {
+										padding: 8px !important;
+										z-index: 100 !important;
+									}
 									.emoji-input-container .react-input-emoji--picker-wrapper {
 										z-index: 1000 !important;
 										position: absolute !important;
 										bottom: 100% !important;
 										right: 0 !important;
-									}
-									.emoji-input-container .react-input-emoji--button {
-										z-index: 100 !important;
 									}
 								`}
 							</style>
@@ -245,12 +265,12 @@ function PostList() {
 										cleanOnEnter
 										onEnter={() => handleFormSubmit(onSubmit)()}
 										placeholder="What's on your mind?"
-										fontSize={16}
+										fontSize={20}
 										fontFamily="inherit"
 										borderColor="transparent"
 										theme={darkMode ? "dark" : "light"}
-										background={darkMode ? "#1f2937" : "#f9fafb"}
-										color={darkMode ? "#f3f4f6" : "#1f2937"}
+										background="transparent"
+										color={darkMode ? "#ffffff" : "#1f2937"}
 										placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
 									/>
 								)}

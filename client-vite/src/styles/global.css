@@ -14,6 +14,25 @@
 	a {
 		@apply no-underline text-inherit;
 	}
+
+	a,
+	button,
+	select,
+	summary,
+	label[for],
+	input[type="button"],
+	input[type="submit"],
+	input[type="reset"],
+	input[type="checkbox"],
+	input[type="radio"],
+	[role="button"],
+	[role="link"],
+	[role="menuitem"],
+	[role="tab"],
+	[role="option"],
+	.cursor-pointer {
+		@apply cursor-pointer;
+	}
 }
 
 @layer components {

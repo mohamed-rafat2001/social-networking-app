@@ -71,27 +71,29 @@ const PostItemModals = ({
 					<div className="flex gap-3">
 						<Avatar src={user?.image?.secure_url} size="md" />
 						<div className="flex-1">
-							<div className="repost-emoji-input emoji-input-container rounded-xl relative z-[60]">
+							<div className="repost-emoji-input emoji-input-container relative z-[60]">
 								<style>
 									{`
 										.repost-emoji-input .react-input-emoji--container {
-											background: ${darkMode ? "#1f2937" : "#ffffff"} !important;
-											border: 1px solid ${darkMode ? "#374151" : "#e5e7eb"} !important;
-											margin: 0 !important;
+											background: transparent !important;
+											border: none !important;
+											margin-bottom: 0 !important;
 										}
 										.repost-emoji-input .react-input-emoji--wrapper {
 											background: transparent !important;
 											border: none !important;
+											padding: 0 !important;
 										}
 										.repost-emoji-input .react-input-emoji--input {
 											background: transparent !important;
-											padding: 12px !important;
-											color: ${darkMode ? "#ffffff" : "#000000"} !important;
+											padding: 8px 0 !important;
+											color: ${darkMode ? "white" : "#1f2937"} !important;
+											min-height: 40px !important;
 											max-height: 120px !important;
 											overflow-y: auto !important;
 										}
 										.repost-emoji-input .react-input-emoji--button {
-											padding: 10px !important;
+											padding: 8px !important;
 											z-index: 100 !important;
 										}
 										.repost-emoji-input .react-input-emoji--picker-wrapper {
@@ -111,6 +113,8 @@ const PostItemModals = ({
 									fontFamily="inherit"
 									borderColor="transparent"
 									background="transparent"
+									color={darkMode ? "#ffffff" : "#1f2937"}
+									placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
 								/>
 							</div>
 						</div>

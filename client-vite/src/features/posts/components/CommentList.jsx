@@ -70,17 +70,36 @@ function CommentList({ comments, postId, recipientId }) {
 					<Avatar src={user?.image?.secure_url} size="md" />
 					<div className="flex-1 min-w-0">
 						<form onSubmit={handleSubmit(onSubmit)}>
-							<div className="emoji-input-container bg-gray-50 dark:bg-gray-800/50 rounded-2xl focus-within:bg-white dark:focus-within:bg-gray-800 border border-transparent focus-within:border-primary/20 transition-all px-2 relative z-[60]">
+							<div className="emoji-input-container relative z-[60]">
 								<style>
 									{`
+										.emoji-input-container .react-input-emoji--container {
+											background: transparent !important;
+											border: none !important;
+											margin-bottom: 0 !important;
+										}
+										.emoji-input-container .react-input-emoji--wrapper {
+											background: transparent !important;
+											border: none !important;
+											padding: 0 !important;
+										}
+										.emoji-input-container .react-input-emoji--input {
+											background: transparent !important;
+											padding: 8px 0 !important;
+											color: ${darkMode ? "white" : "#1f2937"} !important;
+											min-height: 40px !important;
+											max-height: 120px !important;
+											overflow-y: auto !important;
+										}
+										.emoji-input-container .react-input-emoji--button {
+											padding: 8px !important;
+											z-index: 100 !important;
+										}
 										.emoji-input-container .react-input-emoji--picker-wrapper {
 											z-index: 1000 !important;
 											position: absolute !important;
 											bottom: 100% !important;
 											right: 0 !important;
-										}
-										.emoji-input-container .react-input-emoji--button {
-											z-index: 100 !important;
 										}
 									`}
 								</style>
@@ -98,8 +117,8 @@ function CommentList({ comments, postId, recipientId }) {
 											fontFamily="inherit"
 											borderColor="transparent"
 											theme={darkMode ? "dark" : "light"}
-											background={darkMode ? "#1f2937" : "#f9fafb"}
-											color={darkMode ? "#f3f4f6" : "#1f2937"}
+											background="transparent"
+											color={darkMode ? "#ffffff" : "#1f2937"}
 											placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
 										/>
 									)}
