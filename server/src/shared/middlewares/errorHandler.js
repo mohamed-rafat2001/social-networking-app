@@ -23,7 +23,7 @@ export const globalErrorHandler = (err, req, res, next) => {
 		err.statusCode = 500;
 	}
 
-	if (process.env.MODE === "DEV" || process.env.NODE_ENV === "development") {
+	if (process.env.NODE_ENV === "development") {
 		// Development: Send full error details
 		res.status(err.statusCode).json({
 			status: err.status,

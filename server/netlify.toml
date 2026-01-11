@@ -4,7 +4,7 @@
   publish = "public"
 
 [build.environment]
-  SECRETS_SCAN_OMIT_KEYS = "VITE_API_URL,VITE_SOCKET_URL,PORT,NODE_ENV,MODE"
+  SECRETS_SCAN_OMIT_KEYS = "VITE_API_URL,VITE_SOCKET_URL,PORT,NODE_ENV"
 
 [[redirects]]
   from = "/*"

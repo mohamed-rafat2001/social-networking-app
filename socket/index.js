@@ -3,8 +3,7 @@ import { Server } from "socket.io";
 
 const port = process.env.PORT || 5000;
 const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-const isDev =
-	process.env.MODE === "DEV" || process.env.NODE_ENV === "development";
+const isDev = process.env.NODE_ENV === "development";
 
 const io = new Server({
 	cors: {

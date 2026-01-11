@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 const connectDB = async () => {
 	const dbUrl = process.env.DB_URL;
-	const isDev =
-		process.env.MODE === "DEV" || process.env.NODE_ENV === "development";
+	const isDev = process.env.NODE_ENV === "development";
 
 	if (!dbUrl && !isDev) {
 		console.error("DB_URL is not defined in production environment!");

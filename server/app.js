@@ -22,45 +22,59 @@ import messageRouter from "./src/features/chat/message.routes.js";
 import notificationRouter from "./src/features/notifications/notification.routes.js";
 
 import { globalErrorHandler } from "./src/shared/middlewares/errorHandler.js";
+import "./src/shared/db/mongoose.db.js";
 
 const app = express();
 
-mongoose.set("strictQuery", true);
-
-// 1) GLOBAL MIDDLEWARES
-// Set security HTTP headers
-app.use(helmet());
-
-// Limit requests from same API
-const limiter = rateLimit({
-	max: 1000,
-	windowMs: 60 * 60 * 1000,
-	message: "Too many requests from this IP, please try again in an hour!",
-});
-// Apply to all routes
-app.use(limiter);
-
-// Body parser, reading data from body into req.body
-app.use(express.json({ limit: "10kb" }));
-app.use(cookieParser());
-
-// Data sanitization against NoSQL query injection
-app.use(mongoSanitize());
-
-// Prevent parameter pollution
-app.use(hpp());
-
+// 1) SECURITY MIDDLEWARES
+// Relaxed security for serverless to prevent startup timeouts
 app.use(
-	cors({
-		origin: [
-			"http://localhost:5173",
-			"http://localhost:3000",
-			process.env.CLIENT_URL,
-		].filter(Boolean),
-		credentials: true,
+	helmet({
+		crossOriginResourcePolicy: false,
+		contentSecurityPolicy: false,
 	})
 );
 
+// CORS - Explicit configuration for your Netlify domains
+const allowedOrigins = [
+	"http://localhost:5173",
+	"http://localhost:3000",
+	"https://social-networking-app.netlify.app",
+	process.env.CLIENT_URL,
+].filter(Boolean);
+
+app.use(
+	cors({
+		origin: function (origin, callback) {
+			if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+				callback(null, true);
+			} else {
+				callback(new Error("Not allowed by CORS"));
+			}
+		},
+		credentials: true,
+		methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+		allowedHeaders: [
+			"Content-Type",
+			"Authorization",
+			"X-Requested-With",
+			"Accept",
+		],
+	})
+);
+
+// Body parser
+app.use(express.json({ limit: "10kb" }));
+app.use(cookieParser());
+
+// Data sanitization
+app.use(mongoSanitize());
+app.use(hpp());
+
+// Health check for Netlify to see if the function is alive
+app.get("/ping", (req, res) => res.send("pong"));
+
+// Routes
 app.use("/user", userRouter);
 app.use("/follows", followRouter);
 app.use("/blocks", blockRouter);
@@ -74,11 +88,13 @@ app.use("/chats", chatRouter);
 app.use("/messages", messageRouter);
 app.use("/notifications", notificationRouter);
 
-// Database Connection
-import "./src/shared/db/mongoose.db.js";
-
 app.all("*", (req, res, next) => {
-	res.status(404).json({ status: "fail", message: "this route not defined" });
+	res
+		.status(404)
+		.json({
+			status: "fail",
+			message: `Can't find ${req.originalUrl} on this server!`,
+		});
 });
 
 // Global Error Handler
