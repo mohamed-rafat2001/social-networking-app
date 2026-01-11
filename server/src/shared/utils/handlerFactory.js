@@ -1,6 +1,6 @@
 import { catchAsync as errorHandler } from "../middlewares/errorHandler.js";
 import { AppError } from "./appError.js";
-import APIFeatures from "./apiFeatures.js";
+import { ApiFeatures as APIFeatures } from "./apiFeatures.js";
 
 export const deleteOne = (Model) =>
 	errorHandler(async (req, res, next) => {

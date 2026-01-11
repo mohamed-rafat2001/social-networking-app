@@ -2,7 +2,7 @@ import Share from "./sharePost.model.js";
 import Post from "./posts.model.js";
 import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 import { AppError } from "../../shared/utils/appError.js";
-import cloudinary from "../../shared/utils/cloudinary.js";
+import { cloudinary } from "../../shared/utils/cloudinary.js";
 import { createNotification } from "../notifications/notification.controller.js";
 import * as factory from "../../shared/utils/handlerFactory.js";
 

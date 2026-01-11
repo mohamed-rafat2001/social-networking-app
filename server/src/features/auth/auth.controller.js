@@ -5,9 +5,9 @@ import Share from "../posts/sharePost.model.js";
 import bcryptjs from "bcryptjs";
 import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 import { AppError } from "../../shared/utils/appError.js";
-import Email from "../../shared/utils/sendEmail.js";
-import cloudinary from "../../shared/utils/cloudinary.js";
-import apiFeatures from "../../shared/utils/apiFeatures.js";
+import { sendEmail as Email } from "../../shared/utils/sendEmail.js";
+import { cloudinary } from "../../shared/utils/cloudinary.js";
+import { ApiFeatures as apiFeatures } from "../../shared/utils/apiFeatures.js";
 
 const sendToken = (user, statusCode, res) => {
 	const token = user.createToken();

@@ -1,12 +1,12 @@
 import express from "express";
 import { user as protect } from "../../shared/middlewares/auth.middleware.js";
-import fileUpload from "../../shared/utils/multer.js";
+import { fileUpload } from "../../shared/utils/multer.js";
 import {
 	fileValidation,
 	commentValidator,
 } from "../../shared/validations/validations.js";
 import * as commentController from "./comment.controller.js";
-import handelValidation from "../../shared/middlewares/handelValidation.js";
+import { handelValidation } from "../../shared/middlewares/handelValidation.js";
 
 const router = express.Router();
 
@@ -32,7 +32,12 @@ router
 	// single comment
 	.get(protect, commentController.singleComment)
 	//update comment
-	.patch(protect, commentValidator, handelValidation(), commentController.updateComment)
+	.patch(
+		protect,
+		commentValidator,
+		handelValidation(),
+		commentController.updateComment
+	)
 	//delete comment
 	.delete(protect, commentController.deleteComment);
 

@@ -1,13 +1,13 @@
 import express from "express";
 import * as authController from "./auth.controller.js";
 import { user as protect } from "../../shared/middlewares/auth.middleware.js";
-import handelValidation from "../../shared/middlewares/handelValidation.js";
+import { handelValidation } from "../../shared/middlewares/handelValidation.js";
 import {
 	regestrationValidator,
 	fileValidation,
 	updateProfileValidator,
 } from "../../shared/validations/validations.js";
-import fileUpload from "../../shared/utils/multer.js";
+import { fileUpload } from "../../shared/utils/multer.js";
 
 const router = express.Router();
 

@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 
-const handelValidation = () => {
+export const handelValidation = () => {
 	return (req, res, next) => {
 		const result = validationResult(req);
 		if (result.errors.length) {
@@ -13,5 +13,3 @@ const handelValidation = () => {
 		next();
 	};
 };
-
-export default handelValidation;
