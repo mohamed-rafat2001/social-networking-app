@@ -245,13 +245,41 @@ const allPosts = catchAsync(async (req, res, next) => {
 			follower: req.user._id,
 		}).select("following");
 
-		const followingIds = following.map((f) => f.following).filter(Boolean);
+		const followingIds = [
+			...new Set(
+				following
+					.map((f) => f.following)
+					.filter(Boolean)
+					.map((id) => id.toString())
+			),
+		]
+			.filter((id) => id !== req.user._id.toString())
+			.map((id) => new mongoose.Types.ObjectId(id));
 
-		// Include user's own posts in their following feed
-		followingIds.push(req.user._id);
+		console.log(
+			`allPosts: User ${req.user._id} follows ${followingIds.length} users:`,
+			followingIds
+		);
+
+		if (followingIds.length === 0) {
+			return res.status(200).json({
+				status: "success",
+				results: 0,
+				data: [],
+			});
+		}
 
 		queryFilter = { userId: { $in: followingIds } };
+	} else if (feed === "following" && !req.user) {
+		console.log("allPosts: Following feed requested but no user logged in");
+		return res.status(200).json({
+			status: "success",
+			results: 0,
+			data: [],
+		});
 	}
+
+	console.log("allPosts: Base queryFilter:", JSON.stringify(queryFilter));
 
 	const postsQuery = Posts.find(queryFilter);
 	const sharesQuery = Share.find(queryFilter);
@@ -267,6 +295,15 @@ const allPosts = catchAsync(async (req, res, next) => {
 		.sort()
 		.limitFields()
 		.paginate();
+
+	console.log(
+		"allPosts: Final Posts Query filter:",
+		JSON.stringify(postsFeatures.query.getFilter())
+	);
+	console.log(
+		"allPosts: Final Shares Query filter:",
+		JSON.stringify(sharesFeatures.query.getFilter())
+	);
 
 	const [posts, sharedPosts] = await Promise.all([
 		postsFeatures.query.populate("userId"),
