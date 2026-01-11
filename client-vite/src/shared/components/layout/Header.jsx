@@ -17,7 +17,7 @@ import { useNotifications } from "../../../features/notifications/hooks/useNotif
 import NotificationList from "../../../features/notifications/components/NotificationList";
 import { useChats } from "../../../features/chat/hooks/useChatQueries";
 import { Avatar, Button, cn } from "../ui";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as userService from "../../../features/profile/services/userService";
 import { removeToken } from "../../utils/helpers";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,14 +40,25 @@ const Header = ({ onMenuClick }) => {
 	const [showNotifications, setShowNotifications] = useState(false);
 	const [showMessages, setShowMessages] = useState(false);
 	const [showMobileMenu, setShowMobileMenu] = useState(false);
+	const [showMobileSearch, setShowMobileSearch] = useState(false);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [showSearchResults, setShowSearchResults] = useState(false);
 
 	const userMenuRef = useRef(null);
 	const notificationsRef = useRef(null);
 	const messagesRef = useRef(null);
+	const searchRef = useRef(null);
 
 	useClickOutside(userMenuRef, () => setShowUserMenu(false));
 	useClickOutside(notificationsRef, () => setShowNotifications(false));
 	useClickOutside(messagesRef, () => setShowMessages(false));
+	useClickOutside(searchRef, () => setShowSearchResults(false));
+
+	const { data: searchResults, isLoading: isSearching } = useQuery({
+		queryKey: ["users-search", searchTerm],
+		queryFn: () => userService.searchUsers(searchTerm),
+		enabled: searchTerm.trim().length >= 2,
+	});
 
 	const isLandingPage = location.pathname === "/";
 
@@ -129,20 +140,91 @@ const Header = ({ onMenuClick }) => {
 
 				{/* Search Bar (Only for logged in users) */}
 				{user && (
-					<div className="flex-1 max-w-md relative hidden md:block">
+					<div
+						className="flex-1 max-w-md relative hidden md:block"
+						ref={searchRef}
+					>
 						<div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
 							<HiSearch size={20} />
 						</div>
 						<input
 							type="text"
-							placeholder="Search for groups, students, or topics..."
-							className="w-full bg-gray-100 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-700 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 rounded-2xl py-2 pl-10 pr-4 text-sm transition-all outline-none dark:text-white"
+							value={searchTerm}
+							onChange={(e) => {
+								setSearchTerm(e.target.value);
+								setShowSearchResults(true);
+							}}
+							onFocus={() => setShowSearchResults(true)}
+							placeholder="Search for people, groups, or topics..."
+							className="w-full bg-gray-100 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-700 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 rounded-2xl py-2.5 pl-10 pr-4 text-sm transition-all outline-none dark:text-white"
 						/>
+
+						{/* Search Results Dropdown */}
+						<AnimatePresence>
+							{showSearchResults && searchTerm.trim().length >= 2 && (
+								<motion.div
+									initial={{ opacity: 0, y: 10 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 10 }}
+									className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-50"
+								>
+									<div className="max-h-[400px] overflow-y-auto p-2">
+										{isSearching ? (
+											<div className="flex items-center justify-center py-8">
+												<div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+											</div>
+										) : searchResults?.data?.length > 0 ? (
+											<div className="space-y-1">
+												<p className="px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+													People
+												</p>
+												{searchResults.data.map((user) => (
+													<Link
+														key={user._id}
+														to={`/profile/${user._id}`}
+														onClick={() => {
+															setShowSearchResults(false);
+															setSearchTerm("");
+														}}
+														className="flex items-center gap-3 p-2.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-xl transition-colors group"
+													>
+														<Avatar src={user.image?.secure_url} size="md" />
+														<div className="flex-1 min-w-0">
+															<p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors truncate">
+																{user.firstName} {user.lastName}
+															</p>
+															<p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+																@{user.username}
+															</p>
+														</div>
+													</Link>
+												))}
+											</div>
+										) : (
+											<div className="text-center py-8 text-gray-500 dark:text-gray-400">
+												<p className="text-sm">
+													No users found for "{searchTerm}"
+												</p>
+											</div>
+										)}
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
 					</div>
 				)}
 
 				{/* Navigation Actions */}
 				<div className="flex items-center gap-2 sm:gap-4">
+					{user && (
+						<button
+							onClick={() => setShowMobileSearch(true)}
+							className="md:hidden p-2 text-gray-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
+						>
+							<HiSearch size={24} />
+						</button>
+					)}
+
 					<button
 						onClick={toggleDarkMode}
 						className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
@@ -370,6 +452,87 @@ const Header = ({ onMenuClick }) => {
 					)}
 				</div>
 			</div>
+
+			{/* Mobile Search Overlay */}
+			<AnimatePresence>
+				{showMobileSearch && (
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						className="fixed inset-0 z-[200] bg-white dark:bg-gray-900 md:hidden p-4"
+					>
+						<div className="flex items-center gap-4 mb-4">
+							<button
+								onClick={() => setShowMobileSearch(false)}
+								className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+							>
+								<HiX size={24} />
+							</button>
+							<div className="flex-1 relative">
+								<div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+									<HiSearch size={20} />
+								</div>
+								<input
+									type="text"
+									autoFocus
+									value={searchTerm}
+									onChange={(e) => setSearchTerm(e.target.value)}
+									placeholder="Search for people..."
+									className="w-full bg-gray-100 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-700 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 rounded-2xl py-2.5 pl-10 pr-4 text-sm transition-all outline-none dark:text-white"
+								/>
+							</div>
+						</div>
+
+						<div className="overflow-y-auto max-h-[calc(100vh-100px)]">
+							{searchTerm.trim().length >= 2 ? (
+								isSearching ? (
+									<div className="flex items-center justify-center py-8">
+										<div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+									</div>
+								) : searchResults?.data?.length > 0 ? (
+									<div className="space-y-1">
+										<p className="px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+											People
+										</p>
+										{searchResults.data.map((user) => (
+											<Link
+												key={user._id}
+												to={`/profile/${user._id}`}
+												onClick={() => {
+													setShowMobileSearch(false);
+													setSearchTerm("");
+												}}
+												className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-2xl transition-colors group"
+											>
+												<Avatar src={user.image?.secure_url} size="md" />
+												<div className="flex-1 min-w-0">
+													<p className="font-bold text-gray-900 dark:text-white truncate">
+														{user.firstName} {user.lastName}
+													</p>
+													<p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+														@{user.username}
+													</p>
+												</div>
+											</Link>
+										))}
+									</div>
+								) : (
+									<div className="text-center py-12 text-gray-500 dark:text-gray-400">
+										<HiSearch size={48} className="mx-auto mb-4 opacity-20" />
+										<p>No users found for "{searchTerm}"</p>
+									</div>
+								)
+							) : (
+								<div className="text-center py-12 text-gray-400 dark:text-gray-500">
+									<HiSearch size={48} className="mx-auto mb-4 opacity-20" />
+									<p>Type at least 2 characters to search</p>
+								</div>
+							)}
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
 
 			{/* Mobile Menu */}
 			<AnimatePresence>
