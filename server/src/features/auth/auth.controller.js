@@ -55,7 +55,7 @@ const signUp = catchAsync(async (req, res, next) => {
 		userType,
 	} = req.body;
 
-	const user = new User({
+	const newUser = new User({
 		firstName,
 		lastName,
 		email,
@@ -69,8 +69,8 @@ const signUp = catchAsync(async (req, res, next) => {
 		role: "user",
 	});
 
-	await user.save();
-	sendToken(user, 201, res);
+	await newUser.save();
+	sendToken(newUser, 201, res);
 });
 
 const profileImg = catchAsync(async (req, res, next) => {
@@ -117,22 +117,22 @@ const deleteProfileImg = catchAsync(async (req, res, next) => {
 
 const login = catchAsync(async (req, res, next) => {
 	const email = req.body.email;
-	const user = await User.findOne({ email });
-	if (!user) {
+	const existingUser = await User.findOne({ email });
+	if (!existingUser) {
 		const error = new AppError("email or password is wrong", "fail", 401);
 		return next(error);
 	}
-	const pass = await bcryptjs.compare(req.body.password, user.password);
+	const pass = await bcryptjs.compare(req.body.password, existingUser.password);
 	if (!pass) {
 		const error = new AppError("email or password is wrong", "fail", 401);
 		return next(error);
 	}
 
 	// Set user as active on login
-	user.isActive = true;
-	await user.save();
+	existingUser.isActive = true;
+	await existingUser.save();
 
-	sendToken(user, 200, res);
+	sendToken(existingUser, 200, res);
 });
 
 const logout = (req, res) => {
@@ -261,14 +261,14 @@ const forgotPass = catchAsync(async (req, res, next) => {
 	}
 
 	// find the user using email
-	const user = await User.findOne({ email });
-	if (!user) {
+	const existingUser = await User.findOne({ email });
+	if (!existingUser) {
 		return next(new AppError("user not found", "fail", 404));
 	}
 
 	// create passwordResetToken
-	const resetCode = user.createPasswordResetCode();
-	await user.save({ validateBeforeSave: false });
+	const resetCode = existingUser.createPasswordResetCode();
+	await existingUser.save({ validateBeforeSave: false });
 
 	// sendEmail to user contain the uniqeCode
 	if (!resetCode) {
@@ -277,18 +277,18 @@ const forgotPass = catchAsync(async (req, res, next) => {
 
 	try {
 		await Email({
-			email: user.email,
+			email: existingUser.email,
 			subject: "password reset token",
 			html: passwordResetCodeTemplate(
 				resetCode,
-				`${user.firstName} ${user.lastName}`,
-				user.passwordResetExpires
+				`${existingUser.firstName} ${existingUser.lastName}`,
+				existingUser.passwordResetExpires
 			),
 		});
 	} catch (err) {
-		user.passwordResetCode = undefined;
-		user.passwordResetExpires = undefined;
-		await user.save({ validateBeforeSave: false });
+		existingUser.passwordResetCode = undefined;
+		existingUser.passwordResetExpires = undefined;
+		await existingUser.save({ validateBeforeSave: false });
 		return next(new AppError("Error sending the email", "fail", 500));
 	}
 
@@ -311,22 +311,22 @@ const resetPassword = catchAsync(async (req, res, next) => {
 	}
 
 	// find the user using resetCode
-	const user = await User.findOne({
+	const existingUser = await User.findOne({
 		passwordResetCode: resetCode,
 		passwordResetExpires: { $gt: Date.now() },
 	});
 
-	if (!user) {
+	if (!existingUser) {
 		return next(new AppError("invalid or expired reset code", "fail", 400));
 	}
 
 	// update the user password
-	user.password = password;
-	user.passwordResetCode = undefined;
-	user.passwordResetExpires = undefined;
-	await user.save();
+	existingUser.password = password;
+	existingUser.passwordResetCode = undefined;
+	existingUser.passwordResetExpires = undefined;
+	await existingUser.save();
 
-	sendToken(user, 200, res);
+	sendToken(existingUser, 200, res);
 });
 
 const user = catchAsync(async (req, res, next) => {
