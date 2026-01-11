@@ -176,31 +176,41 @@ const Header = ({ onMenuClick }) => {
 
 									<AnimatePresence>
 										{showMessages && (
-											<motion.div
-												initial={{ opacity: 0, y: 10, scale: 0.95 }}
-												animate={{ opacity: 1, y: 0, scale: 1 }}
-												exit={{ opacity: 0, y: 10, scale: 0.95 }}
-												className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 z-[10000] overflow-hidden"
-											>
-												<div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
-													<h3 className="font-bold text-gray-900 dark:text-white">
-														Messages
-													</h3>
-													<Link
-														to="/messages"
-														onClick={() => setShowMessages(false)}
-														className="text-xs font-bold text-primary hover:underline"
-													>
-														Open Chats
-													</Link>
-												</div>
-												<div className="max-h-[400px] overflow-y-auto">
-													<NotificationList
-														filterType="messages"
-														onClose={() => setShowMessages(false)}
-													/>
-												</div>
-											</motion.div>
+											<>
+												{/* Backdrop for Messages */}
+												<motion.div
+													initial={{ opacity: 0 }}
+													animate={{ opacity: 1 }}
+													exit={{ opacity: 0 }}
+													className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[99999]"
+													onClick={() => setShowMessages(false)}
+												/>
+												<motion.div
+													initial={{ opacity: 0, y: 10, scale: 0.95 }}
+													animate={{ opacity: 1, y: 0, scale: 1 }}
+													exit={{ opacity: 0, y: 10, scale: 0.95 }}
+													className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 z-[100000] overflow-hidden"
+												>
+													<div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
+														<h3 className="font-bold text-gray-900 dark:text-white">
+															Messages
+														</h3>
+														<Link
+															to="/messages"
+															onClick={() => setShowMessages(false)}
+															className="text-xs font-bold text-primary hover:underline"
+														>
+															Open Chats
+														</Link>
+													</div>
+													<div className="max-h-[400px] overflow-y-auto">
+														<NotificationList
+															filterType="messages"
+															onClose={() => setShowMessages(false)}
+														/>
+													</div>
+												</motion.div>
+											</>
 										)}
 									</AnimatePresence>
 								</div>
@@ -225,31 +235,41 @@ const Header = ({ onMenuClick }) => {
 
 									<AnimatePresence>
 										{showNotifications && (
-											<motion.div
-												initial={{ opacity: 0, y: 10, scale: 0.95 }}
-												animate={{ opacity: 1, y: 0, scale: 1 }}
-												exit={{ opacity: 0, y: 10, scale: 0.95 }}
-												className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 z-[10000] overflow-hidden"
-											>
-												<div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
-													<h3 className="font-bold text-gray-900 dark:text-white">
-														Notifications
-													</h3>
-													<Link
-														to="/notifications"
-														onClick={() => setShowNotifications(false)}
-														className="text-xs font-bold text-primary hover:underline"
-													>
-														View All
-													</Link>
-												</div>
-												<div className="max-h-[400px] overflow-y-auto">
-													<NotificationList
-														filterType="general"
-														onClose={() => setShowNotifications(false)}
-													/>
-												</div>
-											</motion.div>
+											<>
+												{/* Backdrop for Notifications */}
+												<motion.div
+													initial={{ opacity: 0 }}
+													animate={{ opacity: 1 }}
+													exit={{ opacity: 0 }}
+													className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[99999]"
+													onClick={() => setShowNotifications(false)}
+												/>
+												<motion.div
+													initial={{ opacity: 0, y: 10, scale: 0.95 }}
+													animate={{ opacity: 1, y: 0, scale: 1 }}
+													exit={{ opacity: 0, y: 10, scale: 0.95 }}
+													className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 z-[100000] overflow-hidden"
+												>
+													<div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
+														<h3 className="font-bold text-gray-900 dark:text-white">
+															Notifications
+														</h3>
+														<Link
+															to="/notifications"
+															onClick={() => setShowNotifications(false)}
+															className="text-xs font-bold text-primary hover:underline"
+														>
+															View All
+														</Link>
+													</div>
+													<div className="max-h-[400px] overflow-y-auto">
+														<NotificationList
+															filterType="general"
+															onClose={() => setShowNotifications(false)}
+														/>
+													</div>
+												</motion.div>
+											</>
 										)}
 									</AnimatePresence>
 								</div>
@@ -278,31 +298,41 @@ const Header = ({ onMenuClick }) => {
 
 								<AnimatePresence>
 									{showUserMenu && (
-										<motion.div
-											initial={{ opacity: 0, y: 10, scale: 0.95 }}
-											animate={{ opacity: 1, y: 0, scale: 1 }}
-											exit={{ opacity: 0, y: 10, scale: 0.95 }}
-											className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-[10000]"
-										>
-											<Link
-												to={`/profile/${user._id}`}
+										<>
+											{/* Backdrop for User Menu */}
+											<motion.div
+												initial={{ opacity: 0 }}
+												animate={{ opacity: 1 }}
+												exit={{ opacity: 0 }}
+												className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[99999]"
 												onClick={() => setShowUserMenu(false)}
-												className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+											/>
+											<motion.div
+												initial={{ opacity: 0, y: 10, scale: 0.95 }}
+												animate={{ opacity: 1, y: 0, scale: 1 }}
+												exit={{ opacity: 0, y: 10, scale: 0.95 }}
+												className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-[100000]"
 											>
-												<HiUserCircle size={20} className="text-gray-400" />
-												<span className="font-medium">My Profile</span>
-											</Link>
-											<button
-												onClick={() => {
-													handleLogout();
-													setShowUserMenu(false);
-												}}
-												className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-											>
-												<HiLogout size={20} />
-												<span className="font-medium">Sign Out</span>
-											</button>
-										</motion.div>
+												<Link
+													to={`/profile/${user._id}`}
+													onClick={() => setShowUserMenu(false)}
+													className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+												>
+													<HiUserCircle size={20} className="text-gray-400" />
+													<span className="font-medium">My Profile</span>
+												</Link>
+												<button
+													onClick={() => {
+														handleLogout();
+														setShowUserMenu(false);
+													}}
+													className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+												>
+													<HiLogout size={20} />
+													<span className="font-medium">Sign Out</span>
+												</button>
+											</motion.div>
+										</>
 									)}
 								</AnimatePresence>
 							</div>
