@@ -6,7 +6,15 @@ const handleCastErrorDB = (err) => {
 };
 
 const handleDuplicateFieldsDB = (err) => {
-	const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
+	let value = "";
+	if (err.errmsg) {
+		const match = err.errmsg.match(/(["'])(\\?.)*?\1/);
+		value = match ? match[0] : "unknown";
+	} else if (err.keyValue) {
+		value = JSON.stringify(err.keyValue);
+	} else {
+		value = "unknown";
+	}
 	const message = `Duplicate field value: ${value}. Please use another value!`;
 	return new AppError(message, 400);
 };
@@ -60,10 +68,13 @@ export const globalErrorHandler = (err, req, res, next) => {
 		// Production: Hide sensitive details
 		let error = { ...err };
 		error.message = err.message;
+		error.name = err.name;
+		error.code = err.code;
 
 		if (error.name === "CastError") error = handleCastErrorDB(error);
 		if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-		if (error.name === "ValidationError") error = handleValidationErrorDB(error);
+		if (error.name === "ValidationError")
+			error = handleValidationErrorDB(error);
 		if (error.name === "JsonWebTokenError") error = handleJWTError();
 		if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
 
@@ -78,7 +89,9 @@ export const globalErrorHandler = (err, req, res, next) => {
 			console.error("ERROR 💥", err);
 			res.status(500).json({
 				status: "error",
-				message: "Something went very wrong!",
+				message: error.message || "Something went very wrong!",
+				// Temporarily include error name for debugging in production
+				errorType: error.name,
 			});
 		}
 	}
