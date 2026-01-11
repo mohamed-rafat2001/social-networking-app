@@ -22,7 +22,6 @@ import { messageRouter } from "./src/features/chat/message.routes.js";
 import { notificationRouter } from "./src/features/notifications/notification.routes.js";
 
 import { globalErrorHandler } from "./src/shared/middlewares/errorHandler.js";
-import "./src/shared/db/mongoose.db.js";
 
 import { AppError } from "./src/shared/utils/appError.js";
 
