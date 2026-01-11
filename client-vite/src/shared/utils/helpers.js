@@ -4,7 +4,7 @@ export const storeToken = (value) => {
 
 export const getToken = () => {
 	// Token is inaccessible from JavaScript (HTTP-only)
-	return "secure-cookie"; // Return a dummy string to keep existing 'enabled' logic working if needed, or null
+	return null;
 };
 
 export const removeToken = () => {
