@@ -1,8 +1,8 @@
 import axios from "axios";
 import Youtube from "./youtube.model.js";
-import errorHandler from "../../shared/middlewares/errorHandler.js";
+import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 
-export const getChannelPlaylists = errorHandler(async (req, res) => {
+export const getChannelPlaylists = catchAsync(async (req, res) => {
 	try {
 		const options = {
 			method: "GET",
@@ -32,7 +32,7 @@ export const getChannelPlaylists = errorHandler(async (req, res) => {
 	}
 });
 
-export const getPlaylistItems = errorHandler(async (req, res) => {
+export const getPlaylistItems = catchAsync(async (req, res) => {
 	try {
 		const options = {
 			method: "GET",
@@ -63,7 +63,7 @@ export const getPlaylistItems = errorHandler(async (req, res) => {
 	}
 });
 
-export const addChannel = errorHandler(async (req, res) => {
+export const addChannel = catchAsync(async (req, res) => {
 	try {
 		const link = req.body.url;
 		const ind = link.indexOf("list=");
@@ -101,7 +101,7 @@ export const addChannel = errorHandler(async (req, res) => {
 	}
 });
 
-export const getMyChannels = errorHandler(async (req, res) => {
+export const getMyChannels = catchAsync(async (req, res) => {
 	try {
 		const channels = await Youtube.findOne({ userId: req.user._id });
 		res.status(200).send(channels);
@@ -110,7 +110,7 @@ export const getMyChannels = errorHandler(async (req, res) => {
 	}
 });
 
-export const deleteChannel = errorHandler(async (req, res) => {
+export const deleteChannel = catchAsync(async (req, res) => {
 	try {
 		const channel = await Youtube.findOneAndUpdate(
 			{ userId: req.user._id },

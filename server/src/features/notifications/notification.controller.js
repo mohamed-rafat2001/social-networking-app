@@ -1,8 +1,8 @@
 import Notification from "./notification.model.js";
-import errorHandler from "../../shared/middlewares/errorHandler.js";
+import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 import * as factory from "../../shared/utils/handlerFactory.js";
 
-const getNotifications = errorHandler(async (req, res, next) => {
+const getNotifications = catchAsync(async (req, res, next) => {
 	const notifications = await Notification.find({ recipient: req.user._id })
 		.populate("sender", "firstName lastName image")
 		.populate("post", "content")
@@ -14,7 +14,7 @@ const getNotifications = errorHandler(async (req, res, next) => {
 	});
 });
 
-const markAsRead = errorHandler(async (req, res, next) => {
+const markAsRead = catchAsync(async (req, res, next) => {
 	const notification = await Notification.findByIdAndUpdate(
 		req.params.id,
 		{ read: true },
@@ -29,7 +29,7 @@ const markAsRead = errorHandler(async (req, res, next) => {
 
 const deleteNotification = factory.deleteOne(Notification);
 
-const markAllAsRead = errorHandler(async (req, res, next) => {
+const markAllAsRead = catchAsync(async (req, res, next) => {
 	await Notification.updateMany(
 		{ recipient: req.user._id, read: false },
 		{ read: true }

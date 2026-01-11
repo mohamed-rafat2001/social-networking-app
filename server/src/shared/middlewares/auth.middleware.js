@@ -1,6 +1,6 @@
 import User from "../../features/auth/user.model.js";
 import jwt from "jsonwebtoken";
-import appError from "../utils/appError.js";
+import { AppError } from "../utils/appError.js";
 
 const user = async (req, res, next) => {
 	let token;
@@ -9,7 +9,7 @@ const user = async (req, res, next) => {
 	}
 
 	if (!token) {
-		const error = appError.Error("token is required", "fail", 401);
+		const error = new AppError("token is required", "fail", 401);
 		return next(error);
 	}
 
@@ -17,13 +17,13 @@ const user = async (req, res, next) => {
 		const verifyToken = jwt.verify(token, process.env.USER_KEY_TOKEN);
 		const userData = await User.findById(verifyToken.id);
 		if (!userData) {
-			const error = appError.Error("user not found", "fail", 401);
+			const error = new AppError("user not found", "fail", 401);
 			return next(error);
 		}
 		req.user = userData;
 		next();
 	} catch (e) {
-		const error = appError.Error("invalid token", "fail", 401);
+		const error = new AppError("invalid token", "fail", 401);
 		return next(error);
 	}
 };
@@ -31,7 +31,7 @@ const user = async (req, res, next) => {
 const allowTo = (...roles) => {
 	return async (req, res, next) => {
 		if (!roles.includes(req.user.role)) {
-			const error = appError.Error("you not authorize", "fail", 401);
+			const error = new AppError("you not authorize", "fail", 401);
 			return next(error);
 		}
 		next();

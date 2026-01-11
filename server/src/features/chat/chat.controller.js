@@ -2,23 +2,22 @@ import Chat from "./chat.model.js";
 import Message from "./message.model.js";
 import User from "../auth/user.model.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
-import appError from "../../shared/utils/appError.js";
-import errorHandler from "../../shared/middlewares/errorHandler.js";
-
+import { AppError } from "../../shared/utils/appError.js";
+import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 
 //create chat
-const createChat = errorHandler(async (req, res, next) => {
+const createChat = catchAsync(async (req, res, next) => {
 	const userId = req.user._id;
 	const secondId = req.body.secondId;
 
 	if (!secondId) {
-		const error = appError.Error("secondId is required", "fail", 400);
+		const error = new AppError("secondId is required", "fail", 400);
 		return next(error);
 	}
 
 	const findSecondId = await User.findById(secondId);
 	if (!findSecondId) {
-		const error = appError.Error("user not found", "fail", 404);
+		const error = new AppError("user not found", "fail", 404);
 		return next(error);
 	}
 
@@ -46,7 +45,7 @@ const createChat = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: chatObj });
 });
 
-const findChat = errorHandler(async (req, res, next) => {
+const findChat = catchAsync(async (req, res, next) => {
 	const _id = req.params.id;
 	const chat = await Chat.findById(_id).populate(
 		"members",
@@ -54,7 +53,7 @@ const findChat = errorHandler(async (req, res, next) => {
 	);
 
 	if (!chat) {
-		const error = appError.Error("chat not found", "fail", 404);
+		const error = new AppError("chat not found", "fail", 404);
 		return next(error);
 	}
 
@@ -64,7 +63,7 @@ const findChat = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: chatObj });
 });
 
-const findUserChats = errorHandler(async (req, res, next) => {
+const findUserChats = catchAsync(async (req, res, next) => {
 	const userId = req.user._id;
 	const chats = await Chat.find({
 		members: { $in: [userId] },
@@ -77,7 +76,7 @@ const findUserChats = errorHandler(async (req, res, next) => {
 		.sort({ updatedAt: -1 });
 
 	if (!chats) {
-		const error = appError.Error("chats not found", "fail", 404);
+		const error = new AppError("chats not found", "fail", 404);
 		return next(error);
 	}
 
@@ -105,7 +104,7 @@ const findUserChats = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: formattedChats });
 });
 
-const deleteChat = errorHandler(async (req, res, next) => {
+const deleteChat = catchAsync(async (req, res, next) => {
 	const chatId = req.params.id;
 	const userId = req.user._id;
 
@@ -116,7 +115,7 @@ const deleteChat = errorHandler(async (req, res, next) => {
 	});
 
 	if (!chat) {
-		const error = appError.Error(
+		const error = new AppError(
 			"Chat not found or you don't have permission to delete it",
 			"fail",
 			404

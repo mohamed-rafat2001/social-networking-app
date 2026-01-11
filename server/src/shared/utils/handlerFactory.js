@@ -1,5 +1,5 @@
-import errorHandler from "../middlewares/errorHandler.js";
-import appError from "./appError.js";
+import { catchAsync as errorHandler } from "../middlewares/errorHandler.js";
+import { AppError } from "./appError.js";
 import APIFeatures from "./apiFeatures.js";
 
 export const deleteOne = (Model) =>
@@ -7,9 +7,7 @@ export const deleteOne = (Model) =>
 		const doc = await Model.findByIdAndDelete(req.params.id);
 
 		if (!doc) {
-			return next(
-				appError.Error("No document found with that ID", "fail", 404)
-			);
+			return next(new AppError("No document found with that ID", "fail", 404));
 		}
 
 		res.status(200).json({
@@ -27,7 +25,7 @@ export const deleteOneByOwner = (Model, ownerField = "userId") =>
 
 		if (!doc) {
 			return next(
-				appError.Error(
+				new AppError(
 					"No document found with that ID or you don't have permission",
 					"fail",
 					404
@@ -49,9 +47,7 @@ export const updateOne = (Model) =>
 		});
 
 		if (!doc) {
-			return next(
-				appError.Error("No document found with that ID", "fail", 404)
-			);
+			return next(new AppError("No document found with that ID", "fail", 404));
 		}
 
 		res.status(200).json({
@@ -73,7 +69,7 @@ export const updateOneByOwner = (Model, ownerField = "userId") =>
 
 		if (!doc) {
 			return next(
-				appError.Error(
+				new AppError(
 					"No document found with that ID or you don't have permission",
 					"fail",
 					404
@@ -105,9 +101,7 @@ export const getOne = (Model, popOptions) =>
 		const doc = await query;
 
 		if (!doc) {
-			return next(
-				appError.Error("No document found with that ID", "fail", 404)
-			);
+			return next(new AppError("No document found with that ID", "fail", 404));
 		}
 
 		res.status(200).json({

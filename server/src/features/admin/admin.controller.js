@@ -1,6 +1,6 @@
 import User from "../auth/user.model.js";
-import errorHandler from "../../shared/middlewares/errorHandler.js";
-import appError from "../../shared/utils/appError.js";
+import { catchAsync } from "../../shared/middlewares/errorHandler.js";
+import { AppError } from "../../shared/utils/appError.js";
 import * as factory from "../../shared/utils/handlerFactory.js";
 
 const Admins = factory.getAll(User, { role: "admin" });
@@ -8,11 +8,11 @@ const Users = factory.getAll(User, { role: "user" });
 const singleUser = factory.getOne(User);
 const deleteUser = factory.deleteOne(User);
 
-const blockAndUnblock = errorHandler(async (req, res, next) => {
+const blockAndUnblock = catchAsync(async (req, res, next) => {
 	const _id = req.params.id;
 	const findUser = await User.findById(_id);
 	if (!findUser) {
-		return next(appError.Error("user not found", "fail", 404));
+		return next(new AppError("user not found", "fail", 404));
 	}
 
 	if (findUser.block === false) {

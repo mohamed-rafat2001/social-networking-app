@@ -1,16 +1,16 @@
 import Message from "./message.model.js";
 import Chat from "./chat.model.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
-import appError from "../../shared/utils/appError.js";
-import errorHandler from "../../shared/middlewares/errorHandler.js";
+import { AppError } from "../../shared/utils/appError.js";
+import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 import * as factory from "../../shared/utils/handlerFactory.js";
 import { createNotification } from "../notifications/notification.controller.js";
 
-const createMessage = errorHandler(async (req, res, next) => {
+const createMessage = catchAsync(async (req, res, next) => {
 	const senderId = req.user._id;
 	const chatId = req.params.id;
 	if (!chatId) {
-		const error = appError.Error("no chat found", "fail", 404);
+		const error = new AppError("no chat found", "fail", 404);
 		return next(error);
 	}
 
@@ -35,7 +35,7 @@ const createMessage = errorHandler(async (req, res, next) => {
 			messageData.file = files;
 		} catch (uploadError) {
 			console.error("Cloudinary upload error in chat:", uploadError);
-			const error = appError.Error(
+			const error = new AppError(
 				`Failed to upload chat files: ${uploadError.message}`,
 				"fail",
 				500
@@ -47,7 +47,7 @@ const createMessage = errorHandler(async (req, res, next) => {
 	const message = await Message.create(messageData);
 
 	if (!message) {
-		const error = appError.Error("message not sent", "fail", 400);
+		const error = new AppError("message not sent", "fail", 400);
 		return next(error);
 	}
 
@@ -74,20 +74,22 @@ const createMessage = errorHandler(async (req, res, next) => {
 });
 
 //chat messgaes
-const ChatMessages = errorHandler(async (req, res, next) => {
+const ChatMessages = catchAsync(async (req, res, next) => {
 	const chatId = req.params.id;
 	const messages = await Message.find({ chatId }).sort({ createdAt: 1 });
-	res.status(200).json({ status: "success", results: messages.length, data: messages });
+	res
+		.status(200)
+		.json({ status: "success", results: messages.length, data: messages });
 });
 
-const deleteMessage = errorHandler(async (req, res, next) => {
+const deleteMessage = catchAsync(async (req, res, next) => {
 	const messageId = req.params.id;
 	const userId = req.user._id;
 
 	const message = await Message.findOne({ _id: messageId, senderId: userId });
 
 	if (!message) {
-		const error = appError.Error(
+		const error = new AppError(
 			"Message not found or you don't have permission to delete it",
 			"fail",
 			404
@@ -121,7 +123,7 @@ const deleteMessage = errorHandler(async (req, res, next) => {
 
 const updateMessage = factory.updateOneByOwner(Message, "senderId");
 
-const markMessagesAsRead = errorHandler(async (req, res, next) => {
+const markMessagesAsRead = catchAsync(async (req, res, next) => {
 	const chatId = req.params.id;
 	const userId = req.user._id;
 
@@ -135,12 +137,12 @@ const markMessagesAsRead = errorHandler(async (req, res, next) => {
 		.json({ status: "success", message: "Messages marked as read" });
 });
 
-const deleteAllMessagesFromChat = errorHandler(async (req, res, next) => {
+const deleteAllMessagesFromChat = catchAsync(async (req, res, next) => {
 	const chatId = req.params.id;
 	const senderId = req.user._id;
 	const message = await Message.find({ chatId, senderId }).deleteMany();
 	if (!message) {
-		const error = appError.Error(
+		const error = new AppError(
 			"messages not deleted or not founded",
 			"fail",
 			404

@@ -1,11 +1,11 @@
 import Replay from "./replay.model.js";
 import Comment from "./comment.model.js";
-import errorHandler from "../../shared/middlewares/errorHandler.js";
-import appError from "../../shared/utils/appError.js";
+import { catchAsync } from "../../shared/middlewares/errorHandler.js";
+import { AppError } from "../../shared/utils/appError.js";
 import * as factory from "../../shared/utils/handlerFactory.js";
 import { createNotification } from "../notifications/notification.controller.js";
 
-const addReplay = errorHandler(async (req, res, next) => {
+const addReplay = catchAsync(async (req, res, next) => {
 	const commentId = req.params.id; // comment id
 	const userId = req.user._id; // user id
 	const replay = new Replay({ ...req.body, commentId, userId });
@@ -14,7 +14,7 @@ const addReplay = errorHandler(async (req, res, next) => {
 	}).populate("userId");
 
 	if (!comment) {
-		const error = appError.Error("comment not found", "fail", 404);
+		const error = new AppError("comment not found", "fail", 404);
 		return next(error);
 	}
 	await replay.save();
@@ -38,7 +38,7 @@ const singleReplay = factory.getOne(Replay);
 const updateReplay = factory.updateOne(Replay);
 const deleteReplay = factory.deleteOne(Replay);
 
-const likeOnReplay = errorHandler(async (req, res, next) => {
+const likeOnReplay = catchAsync(async (req, res, next) => {
 	const _id = req.params.id; // replay id
 	const replay = await Replay.findById(_id);
 	const isLiked = replay.like.find(
@@ -73,7 +73,7 @@ const likeOnReplay = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: like });
 });
 
-const disLikeReplay = errorHandler(async (req, res, next) => {
+const disLikeReplay = catchAsync(async (req, res, next) => {
 	const _id = req.params.id; // post id
 	const replay = await Replay.findById(_id);
 	const isDisLiked = replay.disLike.find(

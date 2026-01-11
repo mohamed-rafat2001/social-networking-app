@@ -1,20 +1,20 @@
 import Block from "./block.model.js";
 import User from "../auth/user.model.js";
-import errorHandler from "../../shared/middlewares/errorHandler.js";
-import appError from "../../shared/utils/appError.js";
+import { catchAsync } from "../../shared/middlewares/errorHandler.js";
+import { AppError } from "../../shared/utils/appError.js";
 
 // Block a user
-const blockUser = errorHandler(async (req, res, next) => {
+const blockUser = catchAsync(async (req, res, next) => {
 	const userToBlockId = req.params.userId;
 	const currentUserId = req.user._id;
 
 	if (userToBlockId === currentUserId.toString()) {
-		return next(appError.Error("You cannot block yourself", "fail", 400));
+		return next(new AppError("You cannot block yourself", "fail", 400));
 	}
 
 	const userToBlock = await User.findById(userToBlockId);
 	if (!userToBlock) {
-		return next(appError.Error("User not found", "fail", 404));
+		return next(new AppError("User not found", "fail", 404));
 	}
 
 	let blockList = await Block.findOne({ userId: currentUserId });
@@ -28,7 +28,7 @@ const blockUser = errorHandler(async (req, res, next) => {
 		await User.findByIdAndUpdate(currentUserId, { blockListId: blockList._id });
 	} else {
 		if (blockList.blockedUsers.includes(userToBlockId)) {
-			return next(appError.Error("User already blocked", "fail", 400));
+			return next(new AppError("User already blocked", "fail", 400));
 		}
 		blockList.blockedUsers.push(userToBlockId);
 		await blockList.save();
@@ -40,14 +40,14 @@ const blockUser = errorHandler(async (req, res, next) => {
 });
 
 // Unblock a user
-const unblockUser = errorHandler(async (req, res, next) => {
+const unblockUser = catchAsync(async (req, res, next) => {
 	const userToUnblockId = req.params.userId;
 	const currentUserId = req.user._id;
 
 	const blockList = await Block.findOne({ userId: currentUserId });
 
 	if (!blockList || !blockList.blockedUsers.includes(userToUnblockId)) {
-		return next(appError.Error("User is not blocked", "fail", 400));
+		return next(new AppError("User is not blocked", "fail", 400));
 	}
 
 	blockList.blockedUsers = blockList.blockedUsers.filter(
@@ -61,7 +61,7 @@ const unblockUser = errorHandler(async (req, res, next) => {
 });
 
 // Get blocked users list
-const getBlockedUsers = errorHandler(async (req, res, next) => {
+const getBlockedUsers = catchAsync(async (req, res, next) => {
 	const currentUserId = req.user._id;
 
 	const blockList = await Block.findOne({ userId: currentUserId }).populate(

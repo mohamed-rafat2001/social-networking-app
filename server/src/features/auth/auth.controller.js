@@ -3,8 +3,8 @@ import Follow from "../follow/follow.model.js";
 import Posts from "../posts/posts.model.js";
 import Share from "../posts/sharePost.model.js";
 import bcryptjs from "bcryptjs";
-import errorHandler from "../../shared/middlewares/errorHandler.js";
-import appError from "../../shared/utils/appError.js";
+import { catchAsync } from "../../shared/middlewares/errorHandler.js";
+import { AppError } from "../../shared/utils/appError.js";
 import Email from "../../shared/utils/sendEmail.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
 import apiFeatures from "../../shared/utils/apiFeatures.js";
@@ -34,7 +34,7 @@ const sendToken = (user, statusCode, res) => {
 	});
 };
 
-const signUp = errorHandler(async (req, res, next) => {
+const signUp = catchAsync(async (req, res, next) => {
 	const {
 		firstName,
 		lastName,
@@ -66,7 +66,7 @@ const signUp = errorHandler(async (req, res, next) => {
 	sendToken(user, 201, res);
 });
 
-const profileImg = errorHandler(async (req, res, next) => {
+const profileImg = catchAsync(async (req, res, next) => {
 	let newImageData = null;
 
 	// Update image if file is uploaded
@@ -99,7 +99,7 @@ const profileImg = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: req.user });
 });
 
-const deleteProfileImg = errorHandler(async (req, res, next) => {
+const deleteProfileImg = catchAsync(async (req, res, next) => {
 	if (req.user.image?.public_id) {
 		await cloudinary.uploader.destroy(req.user.image.public_id);
 	}
@@ -108,16 +108,16 @@ const deleteProfileImg = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: req.user });
 });
 
-const login = errorHandler(async (req, res, next) => {
+const login = catchAsync(async (req, res, next) => {
 	const email = req.body.email;
 	const user = await User.findOne({ email });
 	if (!user) {
-		const error = appError.Error("email or password is wrong", "fail", 401);
+		const error = new AppError("email or password is wrong", "fail", 401);
 		return next(error);
 	}
 	const pass = await bcryptjs.compare(req.body.password, user.password);
 	if (!pass) {
-		const error = appError.Error("email or password is wrong", "fail", 401);
+		const error = new AppError("email or password is wrong", "fail", 401);
 		return next(error);
 	}
 
@@ -136,7 +136,7 @@ const logout = (req, res) => {
 	res.status(200).json({ status: "success" });
 };
 
-const profile = errorHandler(async (req, res, next) => {
+const profile = catchAsync(async (req, res, next) => {
 	const query = req.query;
 
 	const postsFeatures = new apiFeatures(
@@ -189,7 +189,7 @@ const profile = errorHandler(async (req, res, next) => {
 	});
 });
 
-const updateProfile = errorHandler(async (req, res, next) => {
+const updateProfile = catchAsync(async (req, res, next) => {
 	const allowedUpdates = [
 		"firstName",
 		"lastName",
@@ -209,7 +209,7 @@ const updateProfile = errorHandler(async (req, res, next) => {
 	);
 
 	if (!isValidOperation) {
-		const error = appError.Error("Invalid updates!", "fail", 400);
+		const error = new AppError("Invalid updates!", "fail", 400);
 		return next(error);
 	}
 
@@ -218,10 +218,10 @@ const updateProfile = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: req.user });
 });
 
-const deleteAcount = errorHandler(async (req, res, next) => {
+const deleteAcount = catchAsync(async (req, res, next) => {
 	const user = await User.deleteOne(req.user);
 	if (!user) {
-		const error = appError.Error("user not found", "fail", 404);
+		const error = new AppError("user not found", "fail", 404);
 		return next(error);
 	}
 	res.status(200).json({ status: "success", data: user });
@@ -246,17 +246,17 @@ const passwordResetCodeTemplate = (code, name, expires) => {
 	`;
 };
 
-const forgotPass = errorHandler(async (req, res, next) => {
+const forgotPass = catchAsync(async (req, res, next) => {
 	const { email } = req.body;
 
 	if (!email) {
-		return next(appError.Error("please provide email", "fail", 400));
+		return next(new AppError("please provide email", "fail", 400));
 	}
 
 	// find the user using email
 	const user = await User.findOne({ email });
 	if (!user) {
-		return next(appError.Error("user not found", "fail", 404));
+		return next(new AppError("user not found", "fail", 404));
 	}
 
 	// create passwordResetToken
@@ -265,7 +265,7 @@ const forgotPass = errorHandler(async (req, res, next) => {
 
 	// sendEmail to user contain the uniqeCode
 	if (!resetCode) {
-		return next(appError.Error("something went wrong", "fail", 500));
+		return next(new AppError("something went wrong", "fail", 500));
 	}
 
 	try {
@@ -282,24 +282,24 @@ const forgotPass = errorHandler(async (req, res, next) => {
 		user.passwordResetCode = undefined;
 		user.passwordResetExpires = undefined;
 		await user.save({ validateBeforeSave: false });
-		return next(appError.Error("Error sending the email", "fail", 500));
+		return next(new AppError("Error sending the email", "fail", 500));
 	}
 
 	res.status(200).json({ status: "success", data: "please check your email" });
 });
 
-const resetPassword = errorHandler(async (req, res, next) => {
+const resetPassword = catchAsync(async (req, res, next) => {
 	// get resetCode and password from req.body
 	const { code: resetCode, password, confirmPassword } = req.body;
 
 	// check if resetCode and password are provided
 	if (!resetCode || !password || !confirmPassword) {
-		return next(appError.Error("please provide all fields", "fail", 400));
+		return next(new AppError("please provide all fields", "fail", 400));
 	}
 
 	if (password !== confirmPassword) {
 		return next(
-			appError.Error("password and confirm password not match", "fail", 400)
+			new AppError("password and confirm password not match", "fail", 400)
 		);
 	}
 
@@ -310,7 +310,7 @@ const resetPassword = errorHandler(async (req, res, next) => {
 	});
 
 	if (!user) {
-		return next(appError.Error("invalid or expired reset code", "fail", 400));
+		return next(new AppError("invalid or expired reset code", "fail", 400));
 	}
 
 	// update the user password
@@ -322,7 +322,7 @@ const resetPassword = errorHandler(async (req, res, next) => {
 	sendToken(user, 200, res);
 });
 
-const user = errorHandler(async (req, res, next) => {
+const user = catchAsync(async (req, res, next) => {
 	const userId =
 		req.params.userId &&
 		req.params.userId !== "user" &&
@@ -333,7 +333,7 @@ const user = errorHandler(async (req, res, next) => {
 	const userData = await User.findById(userId);
 
 	if (!userData) {
-		const error = appError.Error("no user", "fail", 404);
+		const error = new AppError("no user", "fail", 404);
 		return next(error);
 	}
 
@@ -384,7 +384,7 @@ const user = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: userObj });
 });
 
-const searchUsers = errorHandler(async (req, res, next) => {
+const searchUsers = catchAsync(async (req, res, next) => {
 	const searchTerm = req.query.name;
 	if (!searchTerm) {
 		return res.status(200).json({ status: "success", data: [] });

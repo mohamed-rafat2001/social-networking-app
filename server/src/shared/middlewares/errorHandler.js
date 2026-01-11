@@ -49,5 +49,3 @@ export const globalErrorHandler = (err, req, res, next) => {
 		}
 	}
 };
-
-export default catchAsync;

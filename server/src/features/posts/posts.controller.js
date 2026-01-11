@@ -3,12 +3,12 @@ import Share from "./sharePost.model.js";
 import Follow from "../follow/follow.model.js";
 import ApiFeatures from "../../shared/utils/apiFeatures.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
-import errorHandler from "../../shared/middlewares/errorHandler.js";
-import appError from "../../shared/utils/appError.js";
+import { catchAsync } from "../../shared/middlewares/errorHandler.js";
+import { AppError } from "../../shared/utils/appError.js";
 import { createNotification } from "../notifications/notification.controller.js";
 import * as factory from "../../shared/utils/handlerFactory.js";
 
-const addPost = errorHandler(async (req, res, next) => {
+const addPost = catchAsync(async (req, res, next) => {
 	let post;
 	if (req.files && req.files.length > 0) {
 		const uploadPromises = req.files.map((file) =>
@@ -27,7 +27,7 @@ const addPost = errorHandler(async (req, res, next) => {
 			post = new Posts({ ...req.body, userId: req.user._id, fileUp: files });
 		} catch (uploadError) {
 			console.error("Cloudinary upload error:", uploadError);
-			const error = appError.Error(
+			const error = new AppError(
 				`Failed to upload images: ${uploadError.message}`,
 				"fail",
 				500
@@ -39,7 +39,7 @@ const addPost = errorHandler(async (req, res, next) => {
 	}
 
 	if (!post) {
-		const error = appError.Error("not add post", "fail", 404);
+		const error = new AppError("not add post", "fail", 404);
 		return next(error);
 	}
 
@@ -58,7 +58,7 @@ const addPost = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: post });
 });
 
-const singlePost = errorHandler(async (req, res, next) => {
+const singlePost = catchAsync(async (req, res, next) => {
 	const _id = req.params.id; // post or share id
 	let post = await Posts.findById(_id)
 		.populate("userId")
@@ -132,13 +132,13 @@ const singlePost = errorHandler(async (req, res, next) => {
 	}
 
 	if (!post) {
-		const error = appError.Error("post not found", "fail", 404);
+		const error = new AppError("post not found", "fail", 404);
 		return next(error);
 	}
 	res.status(200).json({ status: "success", data: post });
 });
 
-const incrementView = errorHandler(async (req, res, next) => {
+const incrementView = catchAsync(async (req, res, next) => {
 	let _id = req.params.id;
 
 	// Check if it's a share
@@ -163,13 +163,13 @@ const incrementView = errorHandler(async (req, res, next) => {
 		{ new: true }
 	);
 	if (!post) {
-		const error = appError.Error("post not found", "fail", 404);
+		const error = new AppError("post not found", "fail", 404);
 		return next(error);
 	}
 	res.status(200).json({ status: "success", data: post });
 });
 
-const updatePost = errorHandler(async (req, res, next) => {
+const updatePost = catchAsync(async (req, res, next) => {
 	const _id = req.params.id; // post or share id
 	let posts = await Posts.findOneAndUpdate(
 		{ _id, userId: req.user._id },
@@ -190,13 +190,13 @@ const updatePost = errorHandler(async (req, res, next) => {
 	}
 
 	if (!posts) {
-		const error = appError.Error("post not found", "fail", 404);
+		const error = new AppError("post not found", "fail", 404);
 		return next(error);
 	}
 	res.status(200).json({ status: "success", data: posts });
 });
 
-const deletePost = errorHandler(async (req, res, next) => {
+const deletePost = catchAsync(async (req, res, next) => {
 	const _id = req.params.id; // id for post or share
 	let post = await Posts.findOne({ userId: req.user._id, _id });
 
@@ -214,7 +214,7 @@ const deletePost = errorHandler(async (req, res, next) => {
 	}
 
 	if (!post) {
-		const error = appError.Error(
+		const error = new AppError(
 			"Post not found or you don't have permission to delete it",
 			"fail",
 			404
@@ -234,7 +234,7 @@ const deletePost = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: post });
 });
 
-const allPosts = errorHandler(async (req, res, next) => {
+const allPosts = catchAsync(async (req, res, next) => {
 	let queryFilter = {};
 
 	// If following feed is requested, filter by followed users
@@ -308,7 +308,7 @@ const allPosts = errorHandler(async (req, res, next) => {
 
 const postsForUser = factory.getAll(Posts);
 
-const likeOnPost = errorHandler(async (req, res, next) => {
+const likeOnPost = catchAsync(async (req, res, next) => {
 	let _id = req.params.id; //post id
 	let Model = Posts;
 
@@ -325,7 +325,7 @@ const likeOnPost = errorHandler(async (req, res, next) => {
 
 	const doc = await Model.findById(_id);
 	if (!doc) {
-		const error = appError.Error("post not found", "fail", 404);
+		const error = new AppError("post not found", "fail", 404);
 		return next(error);
 	}
 
@@ -374,7 +374,7 @@ const likeOnPost = errorHandler(async (req, res, next) => {
 	}
 });
 
-const unLikeOnPost = errorHandler(async (req, res, next) => {
+const unLikeOnPost = catchAsync(async (req, res, next) => {
 	let _id = req.params.id; //post id
 	let Model = Posts;
 
@@ -391,7 +391,7 @@ const unLikeOnPost = errorHandler(async (req, res, next) => {
 
 	const doc = await Model.findById(_id);
 	if (!doc) {
-		const error = appError.Error("post not found", "fail", 404);
+		const error = new AppError("post not found", "fail", 404);
 		return next(error);
 	}
 

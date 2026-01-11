@@ -1,4 +1,4 @@
-class AppError extends Error {
+export class AppError extends Error {
 	constructor(message, statusCode) {
 		super(message);
 
@@ -11,14 +11,8 @@ class AppError extends Error {
 }
 
 /**
- * Compatibility wrapper for existing usage: appError.Error(msg, status, code)
- * Note: It's better to use 'new AppError(message, statusCode)' directly.
+ * Compatibility wrapper for existing usage: AppError.Error(msg, status, code)
  */
-const appErrorLegacy = {
-	Error: (message, status, code) => {
-		return new AppError(message, code);
-	},
+AppError.Error = (message, status, code) => {
+	return new AppError(message, code);
 };
-
-export { AppError };
-export default appErrorLegacy;

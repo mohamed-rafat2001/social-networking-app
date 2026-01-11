@@ -1,17 +1,17 @@
 import Share from "./sharePost.model.js";
 import Post from "./posts.model.js";
-import errorHandler from "../../shared/middlewares/errorHandler.js";
+import { catchAsync } from "../../shared/middlewares/errorHandler.js";
+import { AppError } from "../../shared/utils/appError.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
-import appError from "../../shared/utils/appError.js";
 import { createNotification } from "../notifications/notification.controller.js";
 import * as factory from "../../shared/utils/handlerFactory.js";
 
-const sharePost = errorHandler(async (req, res, next) => {
+const sharePost = catchAsync(async (req, res, next) => {
 	let postId = req.params.id;
 	const userId = req.user._id;
 
 	if (!postId) {
-		return next(appError.Error("Post ID is required", "fail", 400));
+		return next(new AppError("Post ID is required", "fail", 400));
 	}
 
 	// 1. Try to see if it's already a share, if so, get the original post ID
@@ -27,7 +27,7 @@ const sharePost = errorHandler(async (req, res, next) => {
 	// 2. Check if the original post exists
 	const originalPost = await Post.findById(postId);
 	if (!originalPost) {
-		return next(appError.Error("Original post not found", "fail", 404));
+		return next(new AppError("Original post not found", "fail", 404));
 	}
 
 	// 3. Check if user already shared this original post
@@ -66,7 +66,7 @@ const sharePost = errorHandler(async (req, res, next) => {
 	sharePO = new Share(shareData);
 
 	if (!sharePO) {
-		return next(appError.Error("Failed to create share object", "fail", 400));
+		return next(new AppError("Failed to create share object", "fail", 400));
 	}
 
 	// 5. Save share and update original post
@@ -107,7 +107,7 @@ const sharePost = errorHandler(async (req, res, next) => {
 	res.status(201).json({ status: "success", data: sharePO });
 });
 
-const deleteShare = errorHandler(async (req, res, next) => {
+const deleteShare = catchAsync(async (req, res, next) => {
 	const postId = req.params.id; //post id
 	const userId = req.user._id; //user id
 
@@ -117,7 +117,7 @@ const deleteShare = errorHandler(async (req, res, next) => {
 	});
 
 	if (!sharePO) {
-		const error = appError.Error("Share not found", "fail", 404);
+		const error = new AppError("Share not found", "fail", 404);
 		return next(error);
 	}
 

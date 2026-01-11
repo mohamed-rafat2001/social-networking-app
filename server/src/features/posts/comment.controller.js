@@ -1,14 +1,14 @@
 import Posts from "./posts.model.js";
 import Share from "./sharePost.model.js";
 import Comment from "./comment.model.js";
-import errorHandler from "../../shared/middlewares/errorHandler.js";
+import { catchAsync } from "../../shared/middlewares/errorHandler.js";
+import { AppError } from "../../shared/utils/appError.js";
 import cloudinary from "../../shared/utils/cloudinary.js";
-import appError from "../../shared/utils/appError.js";
 import { createNotification } from "../notifications/notification.controller.js";
 
 import * as factory from "../../shared/utils/handlerFactory.js";
 
-const addComment = errorHandler(async (req, res, next) => {
+const addComment = catchAsync(async (req, res, next) => {
 	const postId = req.params.id; //post id
 	const userId = req.user._id; // user id
 	let addComment;
@@ -56,7 +56,7 @@ const addComment = errorHandler(async (req, res, next) => {
 				addComment.postId = share.sharePost._id;
 			}
 		} else {
-			const error = appError.Error("post not found", "fail", 404);
+			const error = new AppError("post not found", "fail", 404);
 			return next(error);
 		}
 	}
@@ -81,7 +81,7 @@ const singleComment = factory.getOne(Comment, ["replies", "userId"]);
 const updateComment = factory.updateOneByOwner(Comment);
 const deleteComment = factory.deleteOneByOwner(Comment);
 
-const likeOnComm = errorHandler(async (req, res, next) => {
+const likeOnComm = catchAsync(async (req, res, next) => {
 	const _id = req.params.id; // comment id
 	const comment = await Comment.findById(_id);
 	const isLiked = comment.like.find(
@@ -116,7 +116,7 @@ const likeOnComm = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: like });
 });
 
-const disLikeComm = errorHandler(async (req, res, next) => {
+const disLikeComm = catchAsync(async (req, res, next) => {
 	const _id = req.params.id; // post id
 	const comment = await Comment.findById(_id);
 	const isDisLiked = comment.disLike.find(
@@ -153,7 +153,7 @@ const disLikeComm = errorHandler(async (req, res, next) => {
 	res.status(200).json({ status: "success", data: disLike });
 });
 
-const postComments = errorHandler(async (req, res, next) => {
+const postComments = catchAsync(async (req, res, next) => {
 	let postId = req.params.id;
 
 	// Check if it's a share without a note
