@@ -84,7 +84,10 @@ const deleteComment = factory.deleteOneByOwner(Comment);
 const likeOnComm = catchAsync(async (req, res, next) => {
 	const _id = req.params.id; // comment id
 	const comment = await Comment.findById(_id);
-	const isLiked = comment.like.find(
+	if (!comment) {
+		return next(new AppError("Comment not found", "fail", 404));
+	}
+	const isLiked = comment.like.some(
 		(el) => el.toString() === req.user._id.toString()
 	);
 	if (!isLiked) {
@@ -93,64 +96,93 @@ const likeOnComm = catchAsync(async (req, res, next) => {
 			{
 				$push: { like: req.user._id },
 				$pull: { disLike: req.user._id },
-				likeNum: comment.like.length + 1,
-				disLikeNum:
-					comment.disLike.length > 0
-						? comment.disLike.length - 1
-						: comment.disLike.length,
+				$inc: { likeNum: 1 },
+				$inc: {
+					disLikeNum: comment.disLike.some(
+						(id) => id.toString() === req.user._id.toString()
+					)
+						? -1
+						: 0,
+				},
 			},
-			{ new: true, runValidators: true }
+			{ new: true }
 		);
-		return res.status(200).json({ status: "success", data: like });
-	}
-	const like = await Comment.findByIdAndUpdate(
-		_id,
-		{
-			$pull: { like: req.user._id, disLike: req.user._id },
-			likeNum: comment.like.length - 1,
-			disLikeNum: comment.disLike.length,
-		},
-		{ new: true, runValidators: true }
-	);
 
-	res.status(200).json({ status: "success", data: like });
+		// Recalculate numbers to be sure
+		like.likeNum = like.like.length;
+		like.disLikeNum = like.disLike.length;
+		await like.save();
+
+		res.status(200).json({ status: "success", data: like });
+	} else {
+		const unLike = await Comment.findByIdAndUpdate(
+			_id,
+			{
+				$pull: { like: req.user._id },
+				$inc: { likeNum: -1 },
+			},
+			{ new: true }
+		);
+
+		// Recalculate numbers to be sure
+		unLike.likeNum = unLike.like.length;
+		unLike.disLikeNum = unLike.disLike.length;
+		await unLike.save();
+
+		res.status(200).json({ status: "success", data: unLike });
+	}
 });
 
 const disLikeComm = catchAsync(async (req, res, next) => {
-	const _id = req.params.id; // post id
+	const _id = req.params.id; // comment id
 	const comment = await Comment.findById(_id);
-	const isDisLiked = comment.disLike.find(
+	if (!comment) {
+		return next(new AppError("Comment not found", "fail", 404));
+	}
+	const isDisLiked = comment.disLike.some(
 		(el) => el.toString() === req.user._id.toString()
 	);
 	if (!isDisLiked) {
 		const disLike = await Comment.findByIdAndUpdate(
 			_id,
 			{
-				$pull: { like: req.user._id },
 				$push: { disLike: req.user._id },
-				disLikeNum: comment.disLike.length + 1,
-				likeNum:
-					comment.like.length > 0
-						? comment.like.length - 1
-						: comment.like.length,
+				$pull: { like: req.user._id },
+				$inc: { disLikeNum: 1 },
+				$inc: {
+					likeNum: comment.like.some(
+						(id) => id.toString() === req.user._id.toString()
+					)
+						? -1
+						: 0,
+				},
 			},
-			{ new: true, runValidators: true }
+			{ new: true }
 		);
 
-		return res.status(200).json({ status: "success", data: disLike });
+		// Recalculate numbers to be sure
+		disLike.likeNum = disLike.like.length;
+		disLike.disLikeNum = disLike.disLike.length;
+		await disLike.save();
+
+		res.status(200).json({ status: "success", data: disLike });
+	} else {
+		const unDisLike = await Comment.findByIdAndUpdate(
+			_id,
+			{
+				$pull: { disLike: req.user._id },
+				$inc: { disLikeNum: -1 },
+			},
+			{ new: true }
+		);
+
+		// Recalculate numbers to be sure
+		unDisLike.likeNum = unDisLike.like.length;
+		unDisLike.disLikeNum = unDisLike.disLike.length;
+		await unDisLike.save();
+
+		res.status(200).json({ status: "success", data: unDisLike });
 	}
-
-	const disLike = await Comment.findByIdAndUpdate(
-		_id,
-		{
-			$pull: { like: req.user._id, disLike: req.user._id },
-			likeNum: comment.like.length,
-			disLikeNum: comment.disLike.length - 1,
-		},
-		{ new: true, runValidators: true }
-	);
-
-	res.status(200).json({ status: "success", data: disLike });
 });
 
 const postComments = catchAsync(async (req, res, next) => {
@@ -181,5 +213,5 @@ export {
 	deleteComment,
 	likeOnComm,
 	disLikeComm,
-	postComments,
+	postComments
 };

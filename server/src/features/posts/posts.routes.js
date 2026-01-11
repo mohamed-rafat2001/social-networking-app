@@ -32,8 +32,8 @@ router
 	.patch(postValidator, handelValidation(), postsController.updatePost)
 	.delete(postsController.deletePost);
 
-router.post("/:id/like", postsController.likeOnPost);
-router.post("/:id/unlike", postsController.unLikeOnPost);
+router.post("/:id/like", protect, postsController.likeOnPost);
+router.post("/:id/unlike", protect, postsController.unLikeOnPost);
 router.patch("/:id/increment-view", postsController.incrementView);
 
 export { router as postsRouter };

@@ -238,80 +238,40 @@ const allPosts = catchAsync(async (req, res, next) => {
 	let queryFilter = {};
 	const feed = req.query.feed || "for-you";
 
-	console.log("Feed type requested:", feed);
-	console.log("User in req:", req.user ? req.user._id : "No user");
-
 	// "Following" feed: only posts and shares from followed users
 	if (feed === "following" && req.user) {
-		console.log(
-			"Searching for following records with follower ID:",
-			req.user._id
-		);
 		// Use mongoose.model to avoid any import issues
 		const FollowModel = mongoose.model("Follow");
 		const following = await FollowModel.find({
 			follower: req.user._id,
 		});
-		console.log(
-			`Found ${following.length} following records for user ${req.user._id}`
-		);
 
 		const followingIds = following
 			.map((f) => f.following)
-			.filter((id) => id != null);
+			.filter((id) => id != null)
+			.map((id) => new mongoose.Types.ObjectId(id.toString()));
 
 		// Include user's own posts in their following feed
-		followingIds.push(req.user._id);
+		followingIds.push(new mongoose.Types.ObjectId(req.user._id.toString()));
 
-		console.log("Following IDs (including self):", followingIds);
-
-		// Use a more explicit query filter
 		queryFilter = { userId: { $in: followingIds } };
-	} else if (feed === "following" && !req.user) {
-		console.log(
-			"Following feed requested but no user in req (unauthenticated)"
-		);
-		// If following feed requested but not logged in, return empty or redirect
-		return res.status(200).json({
-			status: "success",
-			results: 0,
-			data: [],
-		});
 	}
-	// "For You" feed: show all posts (default behavior, queryFilter remains {})
 
-	console.log("Final queryFilter for features:", JSON.stringify(queryFilter));
+	const postsQuery = Posts.find(queryFilter);
+	const sharesQuery = Share.find(queryFilter);
 
-	// DEBUG: Check total posts in DB
-	const totalPostsCount = await Posts.countDocuments();
-	const totalSharesCount = await Share.countDocuments();
-	console.log(
-		`Debug DB Stats - Total Posts: ${totalPostsCount}, Total Shares: ${totalSharesCount}`
-	);
-
-	const PostsModel = mongoose.model("Posts");
-	const ShareModel = mongoose.model("Share");
-
-	const postsQuery = PostsModel.find(queryFilter);
-	const sharesQuery = ShareModel.find(queryFilter);
-
-	// Create features for posts
 	const postsFeatures = new ApiFeatures(postsQuery, req.query)
 		.filter()
 		.sort()
 		.limitFields()
 		.paginate();
 
-	// Create features for shares
 	const sharesFeatures = new ApiFeatures(sharesQuery, req.query)
 		.filter()
 		.sort()
 		.limitFields()
 		.paginate();
 
-	console.log("Executing queries for posts and shares...");
-	console.log("Posts query filter:", postsFeatures.query._conditions);
-	console.log("Shares query filter:", sharesFeatures.query._conditions);
 	const [posts, sharedPosts] = await Promise.all([
 		postsFeatures.query.populate("userId"),
 		sharesFeatures.query
@@ -322,50 +282,62 @@ const allPosts = catchAsync(async (req, res, next) => {
 			.populate("userId"),
 	]);
 
-	console.log(
-		`Found ${posts.length} posts and ${sharedPosts.length} shared posts`
-	);
-
 	// Combine and interleave posts and shared posts
 	const combinedPosts = [
 		...posts.map((p) => {
-			const obj = p.toObject();
-			return { ...obj, type: "post" };
+			try {
+				const obj = p.toObject ? p.toObject() : p;
+				return { ...obj, type: "post" };
+			} catch (err) {
+				return { ...p, type: "post" };
+			}
 		}),
 		...sharedPosts
-			.filter((s) => s.sharePost)
+			.filter((s) => s && s.sharePost)
 			.map((s) => {
-				const hasNote = !!s.note;
-				const sharePostObj = s.sharePost.toObject
-					? s.sharePost.toObject()
-					: s.sharePost;
-				return {
-					...sharePostObj,
-					_id: s._id,
-					originalPostId: s.sharePost._id || s.sharePost,
-					shareNote: s.note,
-					shareDate: s.createdAt,
-					type: "share",
-					sharedBy: s.userId,
-					// If has note, use share's own stats, otherwise use original post's stats
-					views: hasNote ? s.views : s.sharePost.views || 0,
-					likes: hasNote ? s.likes : s.sharePost.likes || [],
-					likesNumber: hasNote ? s.likesNumber : s.sharePost.likesNumber || 0,
-					comments: hasNote ? s.comments : s.sharePost.comments || [],
-					shares: hasNote ? [] : s.sharePost.shares || [],
-					unLikes: hasNote ? s.unLikes : s.sharePost.unLikes || [],
-					unLikesNumber: hasNote
-						? s.unLikesNumber
-						: s.sharePost.unLikesNumber || 0,
-				};
-			}),
-	].sort((a, b) => {
+				try {
+					const hasNote = !!s.note;
+					const sharePostObj =
+						s.sharePost && s.sharePost.toObject
+							? s.sharePost.toObject()
+							: s.sharePost;
+
+					if (!sharePostObj) return null;
+
+					return {
+						...sharePostObj,
+						_id: s._id,
+						originalPostId: s.sharePost._id || s.sharePost,
+						shareNote: s.note,
+						shareDate: s.createdAt,
+						type: "share",
+						sharedBy: s.userId,
+						views: hasNote ? s.views : s.sharePost.views || 0,
+						likes: hasNote ? s.likes : s.sharePost.likes || [],
+						likesNumber: hasNote ? s.likesNumber : s.sharePost.likesNumber || 0,
+						comments: hasNote ? s.comments : s.sharePost.comments || [],
+						shares: hasNote ? [] : s.sharePost.shares || [],
+						unLikes: hasNote ? s.unLikes : s.sharePost.unLikes || [],
+						unLikesNumber: hasNote
+							? s.unLikesNumber
+							: s.sharePost.unLikesNumber || 0,
+					};
+				} catch (err) {
+					return null;
+				}
+			})
+			.filter(Boolean),
+	];
+
+	combinedPosts.sort((a, b) => {
 		const dateA = a.type === "share" ? a.shareDate : a.createdAt;
 		const dateB = b.type === "share" ? b.shareDate : b.createdAt;
-		return new Date(dateB) - new Date(dateA);
-	});
 
-	console.log(`Returning ${combinedPosts.length} combined posts`);
+		const timeA = dateA ? new Date(dateA).getTime() : 0;
+		const timeB = dateB ? new Date(dateB).getTime() : 0;
+
+		return timeB - timeA;
+	});
 
 	res.status(200).json({
 		status: "success",
@@ -401,19 +373,26 @@ const likeOnPost = catchAsync(async (req, res, next) => {
 	const len = numLike.length;
 	const numUnLike = doc.unLikes;
 	const lenUnLike = numUnLike.length;
-	const liked = numLike.includes(req.user._id.toString());
+	const liked = numLike.some((id) => id.toString() === req.user._id.toString());
 
 	if (liked === false) {
 		const updatedDoc = await Model.findByIdAndUpdate(
 			_id,
 			{
 				$push: { likes: req.user._id },
-				likesNumber: len + 1,
+				$inc: { likesNumber: 1 },
 				$pull: { unLikes: req.user._id },
-				unLikesNumber: lenUnLike > 0 ? lenUnLike - 1 : lenUnLike,
+				// We don't decrement unLikesNumber here because it's calculated from unLikes array in many places,
+				// but let's be consistent with how likesNumber is handled if that's the pattern.
+				// However, using $inc is much safer.
 			},
 			{ new: true }
 		).populate("userId");
+
+		// Recalculate numbers to be sure
+		updatedDoc.likesNumber = updatedDoc.likes.length;
+		updatedDoc.unLikesNumber = updatedDoc.unLikes.length;
+		await updatedDoc.save();
 
 		// Create notification
 		if (
@@ -434,10 +413,16 @@ const likeOnPost = catchAsync(async (req, res, next) => {
 			_id,
 			{
 				$pull: { likes: req.user._id },
-				likesNumber: len - 1,
+				$inc: { likesNumber: -1 },
 			},
 			{ new: true }
-		);
+		).populate("userId");
+
+		// Recalculate numbers to be sure
+		updatedDoc.likesNumber = updatedDoc.likes.length;
+		updatedDoc.unLikesNumber = updatedDoc.unLikes.length;
+		await updatedDoc.save();
+
 		return res.status(200).json({ status: "success", data: updatedDoc });
 	}
 });
@@ -463,34 +448,44 @@ const unLikeOnPost = catchAsync(async (req, res, next) => {
 		return next(error);
 	}
 
-	const numLike = doc.likes;
-	const len = numLike.length;
 	const numUnLike = doc.unLikes;
-	const lenUnLike = numUnLike.length;
-	const unLiked = numUnLike.includes(req.user._id.toString());
-	const liked = numLike.includes(req.user._id.toString());
+	const isUnLiked = numUnLike.some(
+		(id) => id.toString() === req.user._id.toString()
+	);
 
-	if (unLiked === false) {
+	if (!isUnLiked) {
 		const updatedDoc = await Model.findByIdAndUpdate(
 			_id,
 			{
 				$push: { unLikes: req.user._id },
-				unLikesNumber: lenUnLike + 1,
+				$inc: { unLikesNumber: 1 },
 				$pull: { likes: req.user._id },
-				likesNumber: liked ? len - 1 : len,
+				$inc: { likesNumber: doc.likes.includes(req.user._id) ? -1 : 0 },
 			},
 			{ new: true }
-		);
+		).populate("userId");
+
+		// Recalculate numbers to be sure
+		updatedDoc.likesNumber = updatedDoc.likes.length;
+		updatedDoc.unLikesNumber = updatedDoc.unLikes.length;
+		await updatedDoc.save();
+
 		return res.status(200).json({ status: "success", data: updatedDoc });
 	} else {
 		const updatedDoc = await Model.findByIdAndUpdate(
 			_id,
 			{
 				$pull: { unLikes: req.user._id },
-				unLikesNumber: lenUnLike - 1,
+				$inc: { unLikesNumber: -1 },
 			},
 			{ new: true }
-		);
+		).populate("userId");
+
+		// Recalculate numbers to be sure
+		updatedDoc.likesNumber = updatedDoc.likes.length;
+		updatedDoc.unLikesNumber = updatedDoc.unLikes.length;
+		await updatedDoc.save();
+
 		return res.status(200).json({ status: "success", data: updatedDoc });
 	}
 });
