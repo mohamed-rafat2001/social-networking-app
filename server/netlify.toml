@@ -1,10 +1,10 @@
 [build]
   command = "npm install"
   functions = "functions"
-  publish = "public" # Create an empty public folder if needed or use a dummy
+  publish = "public"
 
 [build.environment]
-  SECRETS_SCAN_OMIT_KEYS = "VITE_API_URL,VITE_SOCKET_URL"
+  SECRETS_SCAN_OMIT_KEYS = "VITE_API_URL,VITE_SOCKET_URL,PORT,NODE_ENV,MODE"
 
 [[redirects]]
   from = "/*"
