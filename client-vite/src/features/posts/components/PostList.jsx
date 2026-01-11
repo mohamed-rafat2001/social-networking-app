@@ -48,13 +48,14 @@ function PostList() {
 	const [isUploading, setIsUploading] = useState(false);
 	const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 	const [selectedPreviewIndex, setSelectedPreviewIndex] = useState(0);
+	const [feedType, setFeedType] = useState("for-you");
 	const fileInputRef = useRef(null);
 
 	const { user } = useUser();
 	const { darkMode } = useTheme();
 	const { onlineUsers } = useSocket();
 
-	const { data: postsData, isLoading: isPostsLoading } = usePosts();
+	const { data: postsData, isLoading: isPostsLoading } = usePosts(feedType);
 	const { mutate: addPostMutation } = useAddPost();
 	const { mutate: likePostMutation } = useLikePost();
 	const { mutate: sharePostMutation } = useSharePost();
@@ -161,17 +162,39 @@ function PostList() {
 				<div className="flex">
 					<button
 						type="button"
-						className="flex-1 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-all border-b-4 border-primary"
+						onClick={() => setFeedType("for-you")}
+						className={cn(
+							"flex-1 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-all border-b-4",
+							feedType === "for-you" ? "border-primary" : "border-transparent"
+						)}
 					>
-						<span className="font-bold text-gray-900 dark:text-white">
+						<span
+							className={cn(
+								"font-bold",
+								feedType === "for-you"
+									? "text-gray-900 dark:text-white"
+									: "text-gray-500 dark:text-gray-400"
+							)}
+						>
 							For you
 						</span>
 					</button>
 					<button
 						type="button"
-						className="flex-1 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-all border-b-4 border-transparent"
+						onClick={() => setFeedType("following")}
+						className={cn(
+							"flex-1 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-all border-b-4",
+							feedType === "following" ? "border-primary" : "border-transparent"
+						)}
 					>
-						<span className="font-bold text-gray-500 dark:text-gray-400">
+						<span
+							className={cn(
+								"font-bold",
+								feedType === "following"
+									? "text-gray-900 dark:text-white"
+									: "text-gray-500 dark:text-gray-400"
+							)}
+						>
 							Following
 						</span>
 					</button>

@@ -4,11 +4,11 @@ import { useSocket } from "../../../shared/hooks/useSocket";
 import { useUser } from "../../../shared/hooks/useUser";
 import { getToken } from "../../../shared/utils/helpers";
 
-export const usePosts = () => {
+export const usePosts = (feedType = "for-you") => {
 	const token = getToken();
 	return useQuery({
-		queryKey: ["posts"],
-		queryFn: postService.getPosts,
+		queryKey: ["posts", feedType],
+		queryFn: () => postService.getPosts(feedType),
 		refetchInterval: 10000,
 		enabled: !!token,
 	});

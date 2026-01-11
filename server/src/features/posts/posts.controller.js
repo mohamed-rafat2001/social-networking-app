@@ -237,14 +237,15 @@ const deletePost = catchAsync(async (req, res, next) => {
 const allPosts = catchAsync(async (req, res, next) => {
 	let queryFilter = {};
 
-	// If following feed is requested, filter by followed users
+	// "Following" feed: only posts and shares from followed users
 	if (req.query.feed === "following" && req.user) {
 		const following = await Follow.find({ follower: req.user._id });
 		const followingIds = following.map((f) => f.following);
-		// Include user's own posts in the following feed
+		// Include user's own posts in their following feed
 		followingIds.push(req.user._id);
 		queryFilter = { userId: { $in: followingIds } };
 	}
+	// "For You" feed: show all posts (default behavior, queryFilter remains {})
 
 	const postsFeatures = new ApiFeatures(Posts.find(queryFilter), req.query)
 		.filter()

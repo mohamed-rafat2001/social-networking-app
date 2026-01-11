@@ -95,12 +95,22 @@ const profileImg = catchAsync(async (req, res, next) => {
 
 	// Create a post for the profile update if an image was uploaded
 	if (newImageData) {
-		await Posts.create({
+		const profilePost = await Posts.create({
 			userId: req.user._id,
 			text: req.body.bio || "Updated profile picture",
 			fileUp: [newImageData],
 			isProfileUpdate: true,
 		});
+
+		// Emit socket event for the profile update post
+		const io = req.app.get("io");
+		if (io) {
+			io.emit("newPost", {
+				type: "post",
+				postId: profilePost._id,
+				userId: req.user._id,
+			});
+		}
 	}
 
 	res.status(200).json({ status: "success", data: req.user });
