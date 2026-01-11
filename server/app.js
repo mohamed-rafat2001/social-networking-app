@@ -92,6 +92,9 @@ app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/notifications", notificationRouter);
 
 app.all("*", (req, res, next) => {
+	if (req.originalUrl.startsWith("/socket.io")) {
+		return next();
+	}
 	res.status(404).json({
 		status: "fail",
 		message: `Can't find ${req.originalUrl} on this server!`,
