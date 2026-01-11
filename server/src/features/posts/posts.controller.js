@@ -236,9 +236,10 @@ const deletePost = catchAsync(async (req, res, next) => {
 
 const allPosts = catchAsync(async (req, res, next) => {
 	let queryFilter = {};
+	const feed = req.query.feed || "for-you";
 
 	// "Following" feed: only posts and shares from followed users
-	if (req.query.feed === "following" && req.user) {
+	if (feed === "following" && req.user) {
 		const following = await Follow.find({ follower: req.user._id });
 		const followingIds = following.map((f) => f.following);
 		// Include user's own posts in their following feed

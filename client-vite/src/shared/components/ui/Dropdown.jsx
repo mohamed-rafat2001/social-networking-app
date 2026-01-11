@@ -114,7 +114,7 @@ export const Dropdown = ({
 								>
 									{children}
 								</motion.div>
-							</div>
+							</motion.div>
 						</DropdownPortal>
 					)}
 				</AnimatePresence>
