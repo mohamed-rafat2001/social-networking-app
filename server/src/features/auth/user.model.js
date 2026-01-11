@@ -176,17 +176,19 @@ userSchema.pre("save", async function (next) {
 
 		let uniqueUsername = baseUsername;
 		let isUnique = false;
+		let attempts = 0;
 
-		while (!isUnique) {
-			const existingUser = await mongoose.models.User.findOne({
+		while (!isUnique && attempts < 10) {
+			const existingUser = await mongoose.model("User").findOne({
 				username: uniqueUsername,
 			});
 			if (!existingUser) {
 				isUnique = true;
 			} else {
-				// Append 3-4 random digits if collision occurs
+				// Append random digits if collision occurs
 				const randomSuffix = Math.floor(1000 + Math.random() * 9000);
 				uniqueUsername = `${baseUsername}${randomSuffix}`;
+				attempts++;
 			}
 		}
 		this.username = uniqueUsername;

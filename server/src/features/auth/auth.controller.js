@@ -10,6 +10,13 @@ import { cloudinary } from "../../shared/utils/cloudinary.js";
 import { ApiFeatures as apiFeatures } from "../../shared/utils/apiFeatures.js";
 
 const sendToken = (user, statusCode, res) => {
+	if (!process.env.USER_KEY_TOKEN) {
+		throw new AppError(
+			"JWT secret is not defined in environment variables",
+			500
+		);
+	}
+
 	const token = user.createToken();
 	const cookieOptions = {
 		expires: new Date(

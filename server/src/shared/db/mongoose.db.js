@@ -5,7 +5,11 @@ const connectDB = async () => {
 	const isDev = process.env.NODE_ENV === "development";
 
 	if (!dbUrl && !isDev) {
-		console.error("DB_URL is not defined in production environment!");
+		const errorMsg = "DB_URL is not defined in production environment!";
+		console.error(errorMsg);
+		// In production, we should probably throw to let the handler catch it
+		// but since this is called at top level, it might crash the process.
+		// However, in serverless, that's often what we want if we can't connect.
 		return;
 	}
 
@@ -16,7 +20,11 @@ const connectDB = async () => {
 			finalUrl = finalUrl.replace("<db_password>", process.env.DB_PASSWORD);
 		}
 
-		await mongoose.connect(finalUrl);
+		mongoose.set("strictQuery", false);
+		await mongoose.connect(finalUrl, {
+			useNewUrlParser: true,
+			useUnifiedTopology: true,
+		});
 		console.log("MongoDB Connected successfully");
 	} catch (error) {
 		console.error(`Error connecting to MongoDB: ${error.message}`);

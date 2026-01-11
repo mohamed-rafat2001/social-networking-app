@@ -24,6 +24,8 @@ import { notificationRouter } from "./src/features/notifications/notification.ro
 import { globalErrorHandler } from "./src/shared/middlewares/errorHandler.js";
 import "./src/shared/db/mongoose.db.js";
 
+import { AppError } from "./src/shared/utils/appError.js";
+
 export const app = express();
 
 // 1) SECURITY MIDDLEWARES
@@ -49,7 +51,7 @@ app.use(
 			if (!origin || allowedOrigins.indexOf(origin) !== -1) {
 				callback(null, true);
 			} else {
-				callback(new Error("Not allowed by CORS"));
+				callback(new AppError("Not allowed by CORS", 403));
 			}
 		},
 		credentials: true,
