@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Posts } from "./posts.model.js";
 import { Share } from "./sharePost.model.js";
 import { Follow } from "../follow/follow.model.js";
@@ -235,24 +236,19 @@ const deletePost = catchAsync(async (req, res, next) => {
 });
 
 const allPosts = catchAsync(async (req, res, next) => {
-	let queryFilter = {};
 	const feed = req.query.feed || "for-you";
+	let queryFilter = {};
 
 	// "Following" feed: only posts and shares from followed users
 	if (feed === "following" && req.user) {
-		// Use mongoose.model to avoid any import issues
-		const FollowModel = mongoose.model("Follow");
-		const following = await FollowModel.find({
+		const following = await Follow.find({
 			follower: req.user._id,
-		});
+		}).select("following");
 
-		const followingIds = following
-			.map((f) => f.following)
-			.filter((id) => id != null)
-			.map((id) => new mongoose.Types.ObjectId(id.toString()));
+		const followingIds = following.map((f) => f.following).filter(Boolean);
 
 		// Include user's own posts in their following feed
-		followingIds.push(new mongoose.Types.ObjectId(req.user._id.toString()));
+		followingIds.push(req.user._id);
 
 		queryFilter = { userId: { $in: followingIds } };
 	}
@@ -282,7 +278,7 @@ const allPosts = catchAsync(async (req, res, next) => {
 			.populate("userId"),
 	]);
 
-	// Combine and interleave posts and shared posts
+	// Combine posts and shared posts with defensive mapping
 	const combinedPosts = [
 		...posts.map((p) => {
 			try {
@@ -332,10 +328,8 @@ const allPosts = catchAsync(async (req, res, next) => {
 	combinedPosts.sort((a, b) => {
 		const dateA = a.type === "share" ? a.shareDate : a.createdAt;
 		const dateB = b.type === "share" ? b.shareDate : b.createdAt;
-
 		const timeA = dateA ? new Date(dateA).getTime() : 0;
 		const timeB = dateB ? new Date(dateB).getTime() : 0;
-
 		return timeB - timeA;
 	});
 

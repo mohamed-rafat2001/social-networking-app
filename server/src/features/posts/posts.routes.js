@@ -13,6 +13,12 @@ import { handelValidation } from "../../shared/middlewares/handelValidation.js";
 
 const router = express.Router();
 
+// Debug middleware for posts
+router.use((req, res, next) => {
+	console.log(`Posts Route: ${req.method} ${req.originalUrl}`);
+	next();
+});
+
 router
 	.route("/")
 	.get(optionalUser, postsController.allPosts)
