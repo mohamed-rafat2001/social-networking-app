@@ -36,9 +36,27 @@ const MainLayout = () => {
 							className="fixed inset-y-0 left-0 w-72 bg-white dark:bg-gray-900 z-[210] lg:hidden shadow-2xl p-4 flex flex-col"
 						>
 							<div className="flex items-center justify-between mb-6 px-2">
-								<span className="text-xl font-black tracking-tight text-gray-900 dark:text-white">
-									Engi<span className="text-primary">Connect</span>
-								</span>
+								<div className="flex items-center gap-2">
+									<div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-blue-100 dark:shadow-none">
+										<svg
+											className="w-5 h-5 text-white"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth="2.5"
+												d="M13 10V3L4 14h7v7l9-11h-7z"
+											></path>
+										</svg>
+									</div>
+									<span className="text-xl font-black tracking-tight text-gray-900 dark:text-white">
+										Engi<span className="text-primary">Connect</span>
+									</span>
+								</div>
 								<button
 									onClick={() => setIsMobileSidebarOpen(false)}
 									className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
