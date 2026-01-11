@@ -38,4 +38,41 @@ const allowTo = (...roles) => {
 	};
 };
 
-export { user, allowTo };
+const optionalUser = async (req, res, next) => {
+	let token;
+	console.log("optionalUser: Cookies received:", req.cookies);
+	if (req.cookies.token) {
+		token = req.cookies.token;
+	}
+
+	if (!token) {
+		console.log("optionalUser: No token found in cookies");
+		return next();
+	}
+
+	try {
+		const verifyToken = jwt.verify(token, process.env.USER_KEY_TOKEN);
+		console.log("optionalUser: Token verified, ID:", verifyToken.id);
+		const userData = await User.findById(verifyToken.id);
+		if (userData) {
+			console.log(
+				"optionalUser: User found and attached to req.user:",
+				userData._id,
+				userData.firstName,
+				userData.lastName
+			);
+			req.user = userData;
+		} else {
+			console.log(
+				"optionalUser: Token valid but user NOT found in DB for ID:",
+				verifyToken.id
+			);
+		}
+		next();
+	} catch (e) {
+		console.log("optionalUser: Invalid token error:", e.message);
+		next();
+	}
+};
+
+export { user, allowTo, optionalUser };

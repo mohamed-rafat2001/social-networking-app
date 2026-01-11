@@ -1,6 +1,9 @@
 import express from "express";
 import * as postsController from "./posts.controller.js";
-import { user as protect } from "../../shared/middlewares/auth.middleware.js";
+import {
+	user as protect,
+	optionalUser,
+} from "../../shared/middlewares/auth.middleware.js";
 import { fileUpload } from "../../shared/utils/multer.js";
 import {
 	fileValidation,
@@ -12,7 +15,7 @@ const router = express.Router();
 
 router
 	.route("/")
-	.get(postsController.allPosts)
+	.get(optionalUser, postsController.allPosts)
 	.post(
 		protect,
 		fileUpload(fileValidation.image).array("fileUp", 10),

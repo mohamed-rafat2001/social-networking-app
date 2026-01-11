@@ -34,7 +34,7 @@ const PostItemHeader = ({
 					{userToDisplay?.firstName} {userToDisplay?.lastName}
 				</Link>
 				<span className="text-gray-500 dark:text-gray-400 text-[14px]">
-					@{userToDisplay?.firstName?.toLowerCase()}
+					@{userToDisplay?.username || userToDisplay?.firstName?.toLowerCase()}
 				</span>
 				{isShare && (
 					<span className="text-primary font-medium text-[13px] ml-1 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full">

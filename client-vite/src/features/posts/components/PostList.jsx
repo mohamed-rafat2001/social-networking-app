@@ -55,7 +55,22 @@ function PostList() {
 	const { darkMode } = useTheme();
 	const { onlineUsers } = useSocket();
 
-	const { data: postsData, isLoading: isPostsLoading } = usePosts(feedType);
+	const {
+		data: postsData,
+		isLoading: isPostsLoading,
+		error: postsError,
+	} = usePosts(feedType);
+
+	if (postsError) {
+		console.error(`PostList [${feedType}] fetch error:`, postsError);
+	}
+
+	console.log(`PostList [${feedType}]:`, {
+		count: postsData?.results,
+		hasData: !!postsData?.data,
+		dataLength: postsData?.data?.length,
+		error: postsError?.message,
+	});
 	const { mutate: addPostMutation } = useAddPost();
 	const { mutate: likePostMutation } = useLikePost();
 	const { mutate: sharePostMutation } = useSharePost();
@@ -379,23 +394,47 @@ function PostList() {
 			</div>
 
 			{/* Posts List */}
-			<AnimatePresence initial={false}>
-				{isPostsLoading ? (
-					<div className="flex justify-center items-center p-12">
-						<Spinner size="lg" />
-					</div>
-				) : posts.length > 0 ? (
-					posts.map((post, index) => (
-						<PostItem key={post._id} post={post} index={index} />
-					))
-				) : (
-					<div className="flex flex-col items-center justify-center p-12 text-center">
-						<p className="text-gray-500 dark:text-gray-400 text-lg">
-							No posts yet. Be the first to share something!
-						</p>
-					</div>
-				)}
-			</AnimatePresence>
+			<div className="divide-y divide-gray-100 dark:divide-white/5">
+				<AnimatePresence initial={false}>
+					{isPostsLoading ? (
+						<div className="flex justify-center items-center p-12">
+							<Spinner size="lg" />
+						</div>
+					) : posts.length > 0 ? (
+						posts.map((post, index) => (
+							<PostItem key={post._id} post={post} index={index} />
+						))
+					) : (
+						<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+							<div className="w-16 h-16 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
+								<svg
+									className="w-8 h-8 text-gray-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+									/>
+								</svg>
+							</div>
+							<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+								{feedType === "following"
+									? "No posts from people you follow"
+									: "No posts yet"}
+							</h3>
+							<p className="text-gray-500 dark:text-gray-400 max-w-xs">
+								{feedType === "following"
+									? "When people you follow share posts, they'll show up here."
+									: "Be the first one to share something with the world!"}
+							</p>
+						</div>
+					)}
+				</AnimatePresence>
+			</div>
 		</div>
 	);
 }

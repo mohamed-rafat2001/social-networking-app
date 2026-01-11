@@ -239,16 +239,38 @@ const allPosts = catchAsync(async (req, res, next) => {
 	const feed = req.query.feed || "for-you";
 
 	console.log("Feed type requested:", feed);
-	console.log("Query parameters:", req.query);
+	console.log("User in req:", req.user ? req.user._id : "No user");
 
 	// "Following" feed: only posts and shares from followed users
 	if (feed === "following" && req.user) {
-		const following = await Follow.find({ follower: req.user._id });
-		const followingIds = following.map((f) => f.following);
+		console.log(
+			"Searching for following records with follower ID:",
+			req.user._id
+		);
+		// Use mongoose.model to avoid any import issues
+		const FollowModel = mongoose.model("Follow");
+		const following = await FollowModel.find({
+			follower: req.user._id,
+		});
+		console.log(
+			`Found ${following.length} following records for user ${req.user._id}`
+		);
+
+		const followingIds = following
+			.map((f) => f.following)
+			.filter((id) => id != null);
+
 		// Include user's own posts in their following feed
 		followingIds.push(req.user._id);
+
+		console.log("Following IDs (including self):", followingIds);
+
+		// Use a more explicit query filter
 		queryFilter = { userId: { $in: followingIds } };
 	} else if (feed === "following" && !req.user) {
+		console.log(
+			"Following feed requested but no user in req (unauthenticated)"
+		);
 		// If following feed requested but not logged in, return empty or redirect
 		return res.status(200).json({
 			status: "success",
@@ -258,20 +280,38 @@ const allPosts = catchAsync(async (req, res, next) => {
 	}
 	// "For You" feed: show all posts (default behavior, queryFilter remains {})
 
-	console.log("Final queryFilter:", JSON.stringify(queryFilter));
+	console.log("Final queryFilter for features:", JSON.stringify(queryFilter));
 
-	const postsFeatures = new ApiFeatures(Posts.find(queryFilter), req.query)
+	// DEBUG: Check total posts in DB
+	const totalPostsCount = await Posts.countDocuments();
+	const totalSharesCount = await Share.countDocuments();
+	console.log(
+		`Debug DB Stats - Total Posts: ${totalPostsCount}, Total Shares: ${totalSharesCount}`
+	);
+
+	const PostsModel = mongoose.model("Posts");
+	const ShareModel = mongoose.model("Share");
+
+	const postsQuery = PostsModel.find(queryFilter);
+	const sharesQuery = ShareModel.find(queryFilter);
+
+	// Create features for posts
+	const postsFeatures = new ApiFeatures(postsQuery, req.query)
 		.filter()
 		.sort()
 		.limitFields()
 		.paginate();
 
-	const sharesFeatures = new ApiFeatures(Share.find(queryFilter), req.query)
+	// Create features for shares
+	const sharesFeatures = new ApiFeatures(sharesQuery, req.query)
 		.filter()
 		.sort()
 		.limitFields()
 		.paginate();
 
+	console.log("Executing queries for posts and shares...");
+	console.log("Posts query filter:", postsFeatures.query._conditions);
+	console.log("Shares query filter:", sharesFeatures.query._conditions);
 	const [posts, sharedPosts] = await Promise.all([
 		postsFeatures.query.populate("userId"),
 		sharesFeatures.query
@@ -282,9 +322,16 @@ const allPosts = catchAsync(async (req, res, next) => {
 			.populate("userId"),
 	]);
 
+	console.log(
+		`Found ${posts.length} posts and ${sharedPosts.length} shared posts`
+	);
+
 	// Combine and interleave posts and shared posts
 	const combinedPosts = [
-		...posts.map((p) => ({ ...p.toObject(), type: "post" })),
+		...posts.map((p) => {
+			const obj = p.toObject();
+			return { ...obj, type: "post" };
+		}),
 		...sharedPosts
 			.filter((s) => s.sharePost)
 			.map((s) => {
@@ -317,6 +364,8 @@ const allPosts = catchAsync(async (req, res, next) => {
 		const dateB = b.type === "share" ? b.shareDate : b.createdAt;
 		return new Date(dateB) - new Date(dateA);
 	});
+
+	console.log(`Returning ${combinedPosts.length} combined posts`);
 
 	res.status(200).json({
 		status: "success",

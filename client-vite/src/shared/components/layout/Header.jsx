@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
 	HiSearch,
@@ -28,7 +28,6 @@ const Header = ({ onMenuClick }) => {
 	const { user } = useUser();
 	const { onlineUsers } = useSocket();
 	const { notifications } = useNotifications();
-	const { data: chats } = useChats();
 	const navigate = useNavigate();
 
 	const unreadNotificationsCount =
