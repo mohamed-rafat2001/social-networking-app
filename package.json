@@ -6,8 +6,8 @@
 		"node": ">=18.0.0"
 	},
 	"scripts": {
-		"postinstall": "cd server && npm install",
-		"start": "cd server && node server.js",
-		"build": "echo 'No build step required for server'"
+		"install-deps": "cd server && npm install",
+		"build": "npm run install-deps",
+		"start": "cd server && node server.js"
 	}
 }
