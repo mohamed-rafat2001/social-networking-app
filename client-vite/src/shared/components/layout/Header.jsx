@@ -17,6 +17,9 @@ import { useNotifications } from "../../../features/notifications/hooks/useNotif
 import NotificationList from "../../../features/notifications/components/NotificationList";
 import { useChats } from "../../../features/chat/hooks/useChatQueries";
 import { Avatar, Button, cn } from "../ui";
+import { useQueryClient } from "@tanstack/react-query";
+import * as userService from "../../../features/profile/services/userService";
+import { removeToken } from "../../utils/helpers";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../../../providers/ThemeProvider";
 import { useClickOutside } from "../../hooks/useClickOutside";
@@ -49,9 +52,19 @@ const Header = ({ onMenuClick }) => {
 
 	const isLandingPage = location.pathname === "/";
 
-	const handleLogout = () => {
-		localStorage.removeItem("token");
-		window.location.href = "/welcome";
+	const queryClient = useQueryClient();
+
+	const handleLogout = async () => {
+		try {
+			await userService.logout();
+			queryClient.clear();
+			removeToken();
+			window.location.href = "/welcome";
+		} catch (error) {
+			console.error("Logout failed:", error);
+			// Fallback redirect
+			window.location.href = "/welcome";
+		}
 	};
 
 	const navLinks = [

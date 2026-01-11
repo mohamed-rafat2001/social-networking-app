@@ -13,10 +13,8 @@ apiApp.interceptors.request.use((req) => {
 apiApp.interceptors.response.use(
 	(response) => response,
 	(error) => {
-		if (error.response?.status === 401) {
-			removeToken();
-			// Optional: window.location.href = '/welcome';
-		}
+		// Global error level for errors other than 401
+		// (401 is handled specifically in getCurrentUser to prevent query loops)
 		return Promise.reject(error);
 	}
 );

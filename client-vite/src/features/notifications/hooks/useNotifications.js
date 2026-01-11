@@ -4,17 +4,17 @@ import {
 	markAsRead,
 	markAllAsRead,
 } from "../services/notificationService";
-import { getToken } from "../../../shared/utils/helpers";
+import { useUser } from "../../../shared/hooks/useUser";
 import { toast } from "react-hot-toast";
 
 export const useNotifications = () => {
 	const queryClient = useQueryClient();
-	const token = getToken();
+	const { user } = useUser();
 
 	const { data: notifications, isLoading } = useQuery({
 		queryKey: ["notifications"],
 		queryFn: getNotifications,
-		enabled: !!token,
+		enabled: !!user,
 	});
 
 	const markAsReadMutation = useMutation({

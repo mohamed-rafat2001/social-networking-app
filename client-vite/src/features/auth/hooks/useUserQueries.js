@@ -4,11 +4,12 @@ export const useCurrentUser = () => {
 	return useQuery({
 		queryKey: ["currentUser"],
 		queryFn: userService.getCurrentUser,
-		retry: false,
-		staleTime: 1000 * 60 * 5, // 5 minutes
-		gcTime: 1000 * 60 * 10, // 10 minutes
+		retry: 0,
+		staleTime: 1000 * 60 * 30, // 30 minutes
+		gcTime: 1000 * 60 * 60, // 1 hour
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
+		refetchOnMount: false,
 	});
 };
 

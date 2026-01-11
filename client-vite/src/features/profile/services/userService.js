@@ -1,8 +1,18 @@
 import apiApp from "../../../shared/api/apiApp";
 
 export const getCurrentUser = async () => {
-	const response = await apiApp.get("/user/user");
-	return response.data;
+	try {
+		const response = await apiApp.get("/user/user");
+		return response.data;
+	} catch (error) {
+		// If 401, it means the user is simply not logged in.
+		// We return a structure that indicates "no user" rather than throwing,
+		// which allows React Query to cache this "not logged in" state as a success.
+		if (error.response?.status === 401) {
+			return { data: null };
+		}
+		throw error;
+	}
 };
 
 export const login = async (credentials) => {
@@ -12,6 +22,11 @@ export const login = async (credentials) => {
 
 export const signup = async (userData) => {
 	const response = await apiApp.post("/user/signup", userData);
+	return response.data;
+};
+
+export const logout = async () => {
+	const response = await apiApp.get("/user/logout");
 	return response.data;
 };
 
