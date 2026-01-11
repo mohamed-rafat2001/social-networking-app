@@ -77,6 +77,14 @@ app.use(hpp());
 // Health check for Netlify to see if the function is alive
 app.get("/ping", (req, res) => res.send("pong"));
 
+// Root route for deployment health checks
+app.get("/", (req, res) => {
+	res.status(200).json({
+		status: "success",
+		message: "EngiConnect API is running",
+	});
+});
+
 // Routes
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/follows", followRouter);

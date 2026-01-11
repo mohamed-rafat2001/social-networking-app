@@ -21,9 +21,10 @@ const startServer = async () => {
 		// Initialize Socket.io
 		initSocket(httpServer);
 
-		const server = httpServer.listen(port, () =>
-			console.log(`server running on port ${port}`)
-		);
+		const server = httpServer.listen(port, () => {
+			console.log(`Server is running on port ${port}`);
+			console.log(`Health check available at http://localhost:${port}/`);
+		});
 
 		process.on("unhandledRejection", (err) => {
 			console.log("UNHANDLED REJECTION! 💥 Shutting down...");
