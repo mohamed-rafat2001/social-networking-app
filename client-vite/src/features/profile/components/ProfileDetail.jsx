@@ -2,13 +2,16 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
 	useUserProfile,
+	useDeleteProfileImage,
+	useUpdateProfile,
+} from "../../auth/hooks/useUserQueries";
+import {
 	useFollowUser,
 	useUnfollowUser,
 	useBlockUser,
 	useUnblockUser,
 	useBlockedUsers,
-	useDeleteProfileImage,
-} from "../../auth/hooks/useUserQueries";
+} from "../../auth/hooks/useSocialQueries";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useUser } from "../../../shared/hooks/useUser";
 import { usePosts } from "../../posts/hooks/usePostQueries";

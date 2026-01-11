@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import {
 	useFollowUser,
 	useUnfollowUser,
-} from "../../auth/hooks/useUserQueries";
+} from "../../auth/hooks/useSocialQueries";
 
 const FollowsModal = ({ isOpen, onClose, title, users = [], currentUser }) => {
 	const [searchTerm, setSearchTerm] = useState("");
