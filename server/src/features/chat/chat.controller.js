@@ -1,6 +1,6 @@
-import Chat from "./chat.model.js";
-import Message from "./message.model.js";
-import User from "../auth/user.model.js";
+import { Chat } from "./chat.model.js";
+import { Message } from "./message.model.js";
+import { User } from "../auth/user.model.js";
 import { cloudinary } from "../../shared/utils/cloudinary.js";
 import { AppError } from "../../shared/utils/appError.js";
 import { catchAsync } from "../../shared/middlewares/errorHandler.js";
@@ -94,7 +94,7 @@ const findUserChats = catchAsync(async (req, res, next) => {
 
 			chatObj.unreadCount = unreadCount;
 
-			if (chatObj.latestMessage) {
+			if (chatObj.latestMessage && typeof chatObj.latestMessage === "object") {
 				chatObj.latestMessage.sender = chatObj.latestMessage.senderId;
 			}
 			return chatObj;

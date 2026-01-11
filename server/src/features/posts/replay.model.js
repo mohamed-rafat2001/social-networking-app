@@ -43,4 +43,5 @@ const replaySchema = new mongoose.Schema(
 );
 
 const Replay = mongoose.model("Replay", replaySchema);
+export { Replay };
 export default Replay;

@@ -1,5 +1,5 @@
-import Replay from "./replay.model.js";
-import Comment from "./comment.model.js";
+import { Replay } from "./replay.model.js";
+import { Comment } from "./comment.model.js";
 import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 import { AppError } from "../../shared/utils/appError.js";
 import * as factory from "../../shared/utils/handlerFactory.js";

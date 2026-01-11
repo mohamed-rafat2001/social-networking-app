@@ -1,6 +1,6 @@
-import Posts from "./posts.model.js";
-import Share from "./sharePost.model.js";
-import Follow from "../follow/follow.model.js";
+import { Posts } from "./posts.model.js";
+import { Share } from "./sharePost.model.js";
+import { Follow } from "../follow/follow.model.js";
 import { ApiFeatures } from "../../shared/utils/apiFeatures.js";
 import { cloudinary } from "../../shared/utils/cloudinary.js";
 import { catchAsync } from "../../shared/middlewares/errorHandler.js";

@@ -1,11 +1,11 @@
-import Notification from "./notification.model.js";
+import { Notification } from "./notification.model.js";
 import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 import * as factory from "../../shared/utils/handlerFactory.js";
 
 const getNotifications = catchAsync(async (req, res, next) => {
 	const notifications = await Notification.find({ recipient: req.user._id })
 		.populate("sender", "firstName lastName image")
-		.populate("post", "content")
+		.populate("post", "text")
 		.sort({ createdAt: -1 });
 
 	res.status(200).json({

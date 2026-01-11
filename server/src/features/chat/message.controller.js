@@ -1,5 +1,5 @@
-import Message from "./message.model.js";
-import Chat from "./chat.model.js";
+import { Message } from "./message.model.js";
+import { Chat } from "./chat.model.js";
 import { cloudinary } from "../../shared/utils/cloudinary.js";
 import { AppError } from "../../shared/utils/appError.js";
 import { catchAsync } from "../../shared/middlewares/errorHandler.js";

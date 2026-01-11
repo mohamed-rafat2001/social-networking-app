@@ -1,6 +1,6 @@
-import Posts from "./posts.model.js";
-import Share from "./sharePost.model.js";
-import Comment from "./comment.model.js";
+import { Posts } from "./posts.model.js";
+import { Share } from "./sharePost.model.js";
+import { Comment } from "./comment.model.js";
 import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 import { AppError } from "../../shared/utils/appError.js";
 import { cloudinary } from "../../shared/utils/cloudinary.js";

@@ -1,5 +1,5 @@
-import Share from "./sharePost.model.js";
-import Post from "./posts.model.js";
+import { Share } from "./sharePost.model.js";
+import { Posts } from "./posts.model.js";
 import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 import { AppError } from "../../shared/utils/appError.js";
 import { cloudinary } from "../../shared/utils/cloudinary.js";
@@ -25,7 +25,7 @@ const sharePost = catchAsync(async (req, res, next) => {
 	}
 
 	// 2. Check if the original post exists
-	const originalPost = await Post.findById(postId);
+	const originalPost = await Posts.findById(postId);
 	if (!originalPost) {
 		return next(new AppError("Original post not found", "fail", 404));
 	}
@@ -72,7 +72,7 @@ const sharePost = catchAsync(async (req, res, next) => {
 	// 5. Save share and update original post
 	await sharePO.save();
 
-	await Post.findByIdAndUpdate(
+	await Posts.findByIdAndUpdate(
 		postId,
 		{
 			$push: { shares: { shareId: sharePO._id, userId } },
@@ -81,7 +81,7 @@ const sharePost = catchAsync(async (req, res, next) => {
 	);
 
 	// 6. Notification logic
-	const postWithAuthor = await Post.findById(postId).populate("userId");
+	const postWithAuthor = await Posts.findById(postId).populate("userId");
 	if (
 		postWithAuthor &&
 		postWithAuthor.userId?._id.toString() !== userId.toString()
