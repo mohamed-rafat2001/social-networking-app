@@ -324,9 +324,9 @@ const Header = ({ onMenuClick }) => {
 											{user?.firstName}
 										</p>
 										<div className="flex items-center gap-1">
+											<span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
 											<span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-												{user?.userType?.charAt(0).toUpperCase() +
-													user?.userType?.slice(1)}
+												Online
 											</span>
 										</div>
 									</div>

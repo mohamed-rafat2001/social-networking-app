@@ -10,7 +10,7 @@ const ProfileTabs = ({
 	handleFollowsClick,
 }) => {
 	return (
-		<div className="flex items-center gap-2 p-1 bg-slate-100/50 dark:bg-slate-800/50 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 w-fit mx-auto md:mx-0">
+		<div className="flex items-center gap-2 p-1 bg-slate-100/50 dark:bg-slate-800/50 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 w-fit mx-auto">
 			<button
 				onClick={() => setActiveTab("posts")}
 				className={cn(

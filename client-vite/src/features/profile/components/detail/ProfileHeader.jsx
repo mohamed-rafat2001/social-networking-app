@@ -90,7 +90,7 @@ const ProfileHeader = ({
 							<div className="flex items-center gap-3">
 								<Button
 									variant="secondary"
-									className="rounded-full flex items-center gap-2 px-6 h-11 font-black shadow-lg shadow-slate-200/50 dark:shadow-none hover:shadow-xl transition-all border-none bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white"
+									className="rounded-full flex items-center gap-2 px-6 h-10 font-bold shadow-sm shadow-slate-200/50 dark:shadow-none hover:shadow-md transition-all border-none bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700"
 									onClick={handleMessage}
 									disabled={isCreatingChat}
 								>
@@ -98,28 +98,28 @@ const ProfileHeader = ({
 										<Spinner size="sm" />
 									) : (
 										<>
-											<HiOutlineChatAlt2 size={22} />
+											<HiOutlineChatAlt2 size={20} />
 											<span className="hidden sm:inline">Message</span>
 										</>
 									)}
 								</Button>
 								<Button
 									className={cn(
-										"rounded-full flex items-center gap-2 px-8 h-11 font-black shadow-lg transition-all",
+										"rounded-full flex items-center gap-2 px-8 h-10 font-bold shadow-sm transition-all",
 										isFollowing
-											? "bg-slate-100 text-slate-900 hover:bg-slate-200 border-none dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700 shadow-slate-200/50 dark:shadow-none"
+											? "bg-red-100 text-red-600 hover:bg-red-200 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 dark:border-red-800 shadow-red-200/50 dark:shadow-none"
 											: "bg-primary text-white hover:bg-primary/90 shadow-primary/25"
 									)}
 									onClick={handleFollowToggle}
 								>
 									{isFollowing ? (
 										<>
-											<HiUserRemove size={22} />
+											<HiUserRemove size={20} />
 											<span>Unfollow</span>
 										</>
 									) : (
 										<>
-											<HiUserAdd size={22} />
+											<HiUserAdd size={20} />
 											<span>Follow</span>
 										</>
 									)}
@@ -128,8 +128,8 @@ const ProfileHeader = ({
 								<Dropdown
 									align="right"
 									trigger={
-										<button className="p-2.5 rounded-full border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400 shadow-sm">
-											<HiDotsHorizontal size={22} />
+										<button className="p-2 rounded-full border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400 shadow-sm hover:shadow-md">
+											<HiDotsHorizontal size={20} />
 										</button>
 									}
 								>
