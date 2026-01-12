@@ -5,7 +5,12 @@ import { HiOutlineBell } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import NotificationItem from "./detail/NotificationItem";
 
-const NotificationList = ({ filterType, onClose, hideHeader = false }) => {
+const NotificationList = ({
+	filterType,
+	onClose,
+	hideHeader = false,
+	isDropdown = true,
+}) => {
 	const { notifications, isLoading, markAsRead, markAllAsRead } =
 		useNotifications();
 	const { onlineUsers } = useSocket();
@@ -17,9 +22,11 @@ const NotificationList = ({ filterType, onClose, hideHeader = false }) => {
 		return true;
 	});
 
-	// Limit notifications to 5 items in dropdown
-	const limitedNotifications = filteredNotifications?.slice(0, 5);
-	const hasMore = filteredNotifications?.length > 5;
+	// Limit notifications to 5 items only in dropdown context
+	const displayNotifications = isDropdown
+		? filteredNotifications?.slice(0, 5)
+		: filteredNotifications;
+	const hasMore = isDropdown && filteredNotifications?.length > 5;
 
 	if (isLoading) {
 		return (
@@ -75,7 +82,7 @@ const NotificationList = ({ filterType, onClose, hideHeader = false }) => {
 				</div>
 			)}
 			<div className="flex-1 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-800">
-				{limitedNotifications.map((notification) => (
+				{displayNotifications.map((notification) => (
 					<NotificationItem
 						key={notification._id}
 						notification={notification}

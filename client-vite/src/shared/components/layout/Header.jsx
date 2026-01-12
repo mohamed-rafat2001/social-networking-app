@@ -265,6 +265,7 @@ const Header = ({ onMenuClick }) => {
 													(n) => n.type !== "message"
 												)}
 												onClose={() => setShowNotifications(false)}
+												isDropdown={true}
 											/>
 										</motion.div>
 									)}
@@ -299,9 +300,10 @@ const Header = ({ onMenuClick }) => {
 										>
 											<NotificationList
 												notifications={notifications.filter(
-													(n) => n.type === "message"
+													(n) => n.type === "message" && !n.read
 												)}
 												onClose={() => setShowMessages(false)}
+												isDropdown={true}
 											/>
 										</motion.div>
 									)}
@@ -348,8 +350,17 @@ const Header = ({ onMenuClick }) => {
 												onClick={() => setShowUserMenu(false)}
 											>
 												<HiUserCircle size={20} />
-												Profile
+												<span className="flex-1">Profile</span>
 											</Link>
+											<div className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400">
+												{user?.userType?.charAt(0).toUpperCase() +
+													user?.userType?.slice(1)}
+												{user?.major &&
+													` • ${
+														user.major.charAt(0).toUpperCase() +
+														user.major.slice(1)
+													}`}
+											</div>
 											<button
 												onClick={handleLogout}
 												className="w-full flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors border-t border-slate-50 dark:border-gray-800"
