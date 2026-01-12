@@ -261,9 +261,7 @@ const Header = ({ onMenuClick }) => {
 											className="absolute top-full right-0 mt-2 w-[320px] sm:w-[400px] bg-white dark:bg-gray-900 border border-slate-100 dark:border-gray-800 rounded-2xl shadow-2xl overflow-hidden z-[110]"
 										>
 											<NotificationList
-												notifications={notifications.filter(
-													(n) => n.type !== "message"
-												)}
+												filterType="general"
 												onClose={() => setShowNotifications(false)}
 												isDropdown={true}
 											/>
@@ -299,9 +297,7 @@ const Header = ({ onMenuClick }) => {
 											className="absolute top-full right-0 mt-2 w-[320px] sm:w-[400px] bg-white dark:bg-gray-900 border border-slate-100 dark:border-gray-800 rounded-2xl shadow-2xl overflow-hidden z-[110]"
 										>
 											<NotificationList
-												notifications={notifications.filter(
-													(n) => n.type === "message" && !n.read
-												)}
+												filterType="messages"
 												onClose={() => setShowMessages(false)}
 												isDropdown={true}
 											/>
@@ -328,9 +324,9 @@ const Header = ({ onMenuClick }) => {
 											{user?.firstName}
 										</p>
 										<div className="flex items-center gap-1">
-											<span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
 											<span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-												Online
+												{user?.userType?.charAt(0).toUpperCase() +
+													user?.userType?.slice(1)}
 											</span>
 										</div>
 									</div>
@@ -416,7 +412,7 @@ const Header = ({ onMenuClick }) => {
 									type="text"
 									autoFocus
 									className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-gray-800 border-none rounded-xl text-[15px] focus:ring-2 focus:ring-primary/20 dark:text-white"
-									placeholder="Search..."
+									placeholder="Search about users groups..."
 									value={searchTerm}
 									onChange={(e) => setSearchTerm(e.target.value)}
 								/>

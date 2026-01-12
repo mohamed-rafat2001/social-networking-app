@@ -80,13 +80,11 @@ const MainLayout = () => {
 						<Sidebar onMobileItemClick={null} />
 					</div>
 				</aside>
-				<main
-					className="flex-1 bg-white dark:bg-gray-900 sm:rounded-2xl shadow-sm border-x sm:border border-slate-200 dark:border-gray-800 overflow-hidden xl:max-w-none"
-				>
+				<main className="flex-1 bg-white dark:bg-gray-900 sm:rounded-2xl shadow-sm border-x sm:border border-slate-200 dark:border-gray-800 overflow-hidden xl:max-w-none">
 					<Outlet />
 				</main>
 				{!isMessagesPage && (
-					<aside className="hidden xl:block w-80 shrink-0">
+					<aside className="hidden xl:block w-72 shrink-0">
 						<div className="sticky top-24 space-y-6">
 							{/* Right Sidebar - Trending or Suggestions */}
 							<div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">

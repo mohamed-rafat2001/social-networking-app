@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { useNotifications } from "../hooks/useNotifications";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { HiOutlineBell } from "react-icons/hi";
@@ -11,9 +11,37 @@ const NotificationList = ({
 	hideHeader = false,
 	isDropdown = true,
 }) => {
-	const { notifications, isLoading, markAsRead, markAllAsRead } =
-		useNotifications();
+	const {
+		notifications,
+		isLoading,
+		markAsRead,
+		markAllAsRead,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useNotifications();
 	const { onlineUsers } = useSocket();
+	const lastNotificationRef = useRef(null);
+
+	// Set up infinite scrolling for non-dropdown view
+	useEffect(() => {
+		if (isDropdown) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+					fetchNextPage();
+				}
+			},
+			{ threshold: 0.1 }
+		);
+
+		if (lastNotificationRef.current) {
+			observer.observe(lastNotificationRef.current);
+		}
+
+		return () => observer.disconnect();
+	}, [isDropdown, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 	// Filter notifications based on type if filterType is provided
 	const filteredNotifications = notifications?.filter((n) => {
@@ -82,15 +110,38 @@ const NotificationList = ({
 				</div>
 			)}
 			<div className="flex-1 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-800">
-				{displayNotifications.map((notification) => (
-					<NotificationItem
-						key={notification._id}
-						notification={notification}
-						markAsRead={markAsRead}
-						onlineUsers={onlineUsers}
-						onClose={onClose}
-					/>
-				))}
+				{displayNotifications.map((notification, index) => {
+					if (index === displayNotifications.length - 1 && !isDropdown) {
+						return (
+							<div key={notification._id} ref={lastNotificationRef}>
+								<NotificationItem
+									notification={notification}
+									markAsRead={markAsRead}
+									onlineUsers={onlineUsers}
+									onClose={onClose}
+								/>
+							</div>
+						);
+					}
+					return (
+						<NotificationItem
+							key={notification._id}
+							notification={notification}
+							markAsRead={markAsRead}
+							onlineUsers={onlineUsers}
+							onClose={onClose}
+						/>
+					);
+				})}
+				{/* Loading indicator for infinite scroll */}
+				{!isDropdown && isFetchingNextPage && (
+					<div className="flex justify-center items-center py-4">
+						<div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+							<div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+							<span>Loading more notifications...</span>
+						</div>
+					</div>
+				)}
 			</div>
 			{hasMore && (
 				<Link

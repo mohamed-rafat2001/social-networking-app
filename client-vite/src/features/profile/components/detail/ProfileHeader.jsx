@@ -32,7 +32,7 @@ const ProfileHeader = ({
 }) => {
 	return (
 		<>
-			<div className="h-48 bg-gradient-to-br from-primary/20 via-primary/5 to-purple-200 dark:from-primary/30 dark:via-slate-800 dark:to-purple-900/40 relative">
+			<div className="h-48 bg-gray-100 dark:bg-gray-800 relative">
 				<div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_left] dark:bg-grid-slate-100/[0.02]"></div>
 			</div>
 			<div className="px-6 md:px-8 pb-8">
@@ -151,11 +151,11 @@ const ProfileHeader = ({
 						<h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
 							{user.firstName} {user.lastName}
 						</h1>
-						<span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-black bg-primary/10 text-primary uppercase tracking-widest w-fit">
+						<span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-black bg-blue-100 text-blue-600 uppercase tracking-widest w-fit">
 							{user.userType}
 						</span>
 					</div>
-					<p className="text-xl text-primary font-black tracking-tight">
+					<p className="text-xl text-blue-600 font-black tracking-tight">
 						@{user.username}
 					</p>
 				</div>

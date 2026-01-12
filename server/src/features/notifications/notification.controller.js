@@ -1,15 +1,26 @@
 import { Notification } from "./notification.model.js";
 import { catchAsync } from "../../shared/middlewares/errorHandler.js";
 import * as factory from "../../shared/utils/handlerFactory.js";
+import { ApiFeatures } from "../../shared/utils/apiFeatures.js";
 
 const getNotifications = catchAsync(async (req, res, next) => {
-	const notifications = await Notification.find({ recipient: req.user._id })
-		.populate("sender", "firstName lastName image")
-		.populate("post", "text")
-		.sort({ createdAt: -1 });
+	// Apply pagination with APIFeatures
+	const features = new ApiFeatures(
+		Notification.find({ recipient: req.user._id })
+			.populate("sender", "firstName lastName image")
+			.populate("post", "text"),
+		req.query
+	)
+		.filter()
+		.sort()
+		.limitFields()
+		.paginate();
+
+	const notifications = await features.query;
 
 	res.status(200).json({
 		status: "success",
+		results: notifications.length,
 		data: notifications,
 	});
 });

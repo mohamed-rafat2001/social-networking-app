@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
 	getNotifications,
 	markAsRead,
@@ -11,21 +11,43 @@ export const useNotifications = () => {
 	const queryClient = useQueryClient();
 	const { user } = useUser();
 
-	const { data: notifications, isLoading } = useQuery({
+	const { 
+		data, 
+		isLoading, 
+		fetchNextPage, 
+		hasNextPage, 
+		isFetchingNextPage 
+	} = useInfiniteQuery({
 		queryKey: ["notifications"],
-		queryFn: getNotifications,
+		queryFn: ({ pageParam = 1 }) => getNotifications(pageParam),
+		getNextPageParam: (lastPage, allPages) => {
+			if (lastPage.data.length < lastPage.results) {
+				return allPages.length + 1;
+			}
+			return undefined;
+		},
 		enabled: !!user,
 	});
+
+	// Flatten all notifications from all pages
+	const notifications = data?.pages.flatMap(page => page.data) || [];
+	const totalResults = data?.pages[0]?.results || 0;
 
 	const markAsReadMutation = useMutation({
 		mutationFn: markAsRead,
 		onSuccess: (updatedNotification) => {
 			queryClient.setQueryData(["notifications"], (old) => {
-				return old.map((n) =>
-					n._id === updatedNotification._id ? { ...n, read: true } : n
-				);
+				if (!old) return old;
+				return {
+					...old,
+					pages: old.pages.map(page => ({
+						...page,
+						data: page.data.map((n) =>
+							n._id === updatedNotification._id ? { ...n, read: true } : n
+						)
+					}))
+				};
 			});
-			queryClient.invalidateQueries(["notifications"]);
 		},
 		onError: (error) => {
 			toast.error("Failed to mark notification as read");
@@ -36,16 +58,26 @@ export const useNotifications = () => {
 		mutationFn: markAllAsRead,
 		onSuccess: () => {
 			queryClient.setQueryData(["notifications"], (old) => {
-				return old.map((n) => ({ ...n, read: true }));
+				if (!old) return old;
+				return {
+					...old,
+					pages: old.pages.map(page => ({
+						...page,
+						data: page.data.map((n) => ({ ...n, read: true }))
+					}))
+				};
 			});
-			queryClient.invalidateQueries(["notifications"]);
 		},
 	});
 
 	return {
 		notifications,
 		isLoading,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
 		markAsRead: markAsReadMutation.mutate,
 		markAllAsRead: markAllAsReadMutation.mutate,
+		totalResults
 	};
 };

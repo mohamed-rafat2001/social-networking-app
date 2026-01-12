@@ -1,8 +1,8 @@
 import apiApp from "../../../shared/api/apiApp";
 
-export const getNotifications = async () => {
-	const response = await apiApp.get("/notifications");
-	return response.data.data;
+export const getNotifications = async (page = 1, limit = 10) => {
+	const response = await apiApp.get("/notifications", { params: { page, limit } });
+	return response.data;
 };
 
 export const markAsRead = async (id) => {
