@@ -16,7 +16,7 @@ const PostItemActions = ({
 	);
 
 	return (
-		<div className="flex items-center justify-between text-slate-500 dark:text-gray-400 mt-3 max-w-md -ml-2">
+		<div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mt-3 max-w-md -ml-2">
 			<motion.button
 				className="flex items-center gap-1 hover:text-primary group transition-all duration-200"
 				whileHover={{ scale: 1.02 }}
@@ -76,7 +76,7 @@ const PostItemActions = ({
 				<span className="text-[13px] font-medium">{post.likesNumber || 0}</span>
 			</motion.button>
 
-			<div className="flex items-center gap-1 text-slate-400 dark:text-gray-500">
+			<div className="flex items-center gap-1 text-slate-400 dark:text-slate-500">
 				<div className="p-2">
 					<HiChartBar size={18} />
 				</div>

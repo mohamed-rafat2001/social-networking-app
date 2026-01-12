@@ -325,7 +325,7 @@ function PostList() {
 			</div>
 
 			{/* Posts List */}
-			<div className="divide-y divide-gray-100 dark:divide-white/5">
+			<div className="divide-y divide-slate-100 dark:divide-slate-800/50">
 				<AnimatePresence initial={false}>
 					{isPostsLoading ? (
 						<div className="flex justify-center items-center p-12">
@@ -335,9 +335,9 @@ function PostList() {
 						posts.map((post) => <PostItem key={post._id} post={post} />)
 					) : (
 						<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-							<div className="w-16 h-16 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
+							<div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
 								<svg
-									className="w-8 h-8 text-gray-400"
+									className="w-8 h-8 text-slate-400"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -350,12 +350,12 @@ function PostList() {
 									/>
 								</svg>
 							</div>
-							<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+							<h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
 								{feedType === "following"
 									? "No posts from people you follow"
 									: "No posts yet"}
 							</h3>
-							<p className="text-gray-500 dark:text-gray-400 max-w-xs">
+							<p className="text-slate-500 dark:text-slate-400 max-w-xs">
 								{feedType === "following"
 									? "When people you follow share posts, they'll show up here."
 									: "Be the first one to share something with the world!"}

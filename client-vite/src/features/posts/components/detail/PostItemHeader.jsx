@@ -53,7 +53,7 @@ const PostItemHeader = ({
 			{isOwner && (
 				<Dropdown
 					trigger={
-						<button className="text-slate-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-full transition-colors">
+						<button className="text-slate-500 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2 rounded-full transition-colors">
 							<HiDotsHorizontal size={18} />
 						</button>
 					}

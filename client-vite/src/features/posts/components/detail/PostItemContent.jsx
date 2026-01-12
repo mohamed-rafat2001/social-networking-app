@@ -20,7 +20,7 @@ const PostItemContent = ({ post, isShare }) => {
 			{/* Original Post Content */}
 			{isShare ? (
 				<div
-					className="mt-2 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all cursor-pointer"
+					className="mt-2 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-all cursor-pointer"
 					onClick={(e) => {
 						e.stopPropagation();
 						navigate(`/posts/${post.originalPostId}`);

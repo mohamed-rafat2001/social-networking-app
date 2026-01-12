@@ -13,7 +13,7 @@ const ProfileContent = ({ activeTab, userPosts, isCurrentUser }) => {
 						initial={{ opacity: 0, y: 10 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -10 }}
-						className="divide-y divide-slate-50 dark:divide-slate-800/50"
+						className="divide-y divide-slate-100 dark:divide-slate-800/50"
 					>
 						{userPosts.length > 0 ? (
 							userPosts.map((post) => <PostItem key={post._id} post={post} />)
