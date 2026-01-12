@@ -11,7 +11,6 @@ import {
 	useDeletePost,
 	useUpdatePost,
 } from "../hooks/usePostQueries";
-import { HiRefresh } from "react-icons/hi";
 import { toast } from "react-hot-toast";
 import PostItemHeader from "./detail/PostItemHeader";
 import PostItemContent from "./detail/PostItemContent";
@@ -119,11 +118,6 @@ function PostItem({ post, index }) {
 		likePost(post._id);
 	};
 
-	const handleShare = (e) => {
-		e.stopPropagation();
-		sharePost(post._id);
-	};
-
 	const goToDetail = () => {
 		navigate(`/posts/${post._id}`);
 	};
@@ -165,23 +159,11 @@ function PostItem({ post, index }) {
 								setIsDeleteModalOpen={setIsDeleteModalOpen}
 							/>
 
-							<PostItemContent
-								post={post}
-								isShare={isShare}
-								onLike={(e) => {
-									e.stopPropagation();
-									likePost(post._id);
-								}}
-								onRepost={handleRepost}
-								onRepostWithNote={() => setIsRepostModalOpen(true)}
-								onComment={() => navigate(`/posts/${post._id}`)}
-								user={user}
-							/>
+							<PostItemContent post={post} isShare={isShare} />
 
 							<PostItemActions
 								post={post}
 								user={user}
-								isShare={isShare}
 								handleLike={handleLike}
 								handleRepost={handleRepost}
 								setIsRepostModalOpen={setIsRepostModalOpen}

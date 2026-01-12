@@ -147,22 +147,14 @@ function PostDetailPage() {
 			<PostDetailContent
 				post={post}
 				isOwner={isOwner}
-				isShare={isShare}
 				setIsEditModalOpen={setIsEditModalOpen}
 				setIsDeleteModalOpen={setIsDeleteModalOpen}
-				onLike={(e) => {
-					e?.stopPropagation();
-					likePost(post.originalPostId || post._id);
-				}}
-				onRepost={handleShare}
-				onComment={() => navigate(`/posts/${post.originalPostId || post._id}`)}
 				user={user}
 			/>
 
 			<PostDetailActions
 				post={post}
 				user={user}
-				isShare={isShare}
 				handleLike={handleLike}
 				handleShare={handleShare}
 				setIsRepostModalOpen={setIsRepostModalOpen}

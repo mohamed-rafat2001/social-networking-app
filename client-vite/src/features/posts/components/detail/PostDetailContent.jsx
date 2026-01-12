@@ -6,16 +6,11 @@ import {
 	Dropdown,
 	DropdownItem,
 	ImageGallery,
-	cn,
 } from "../../../../shared/components/ui";
 import {
 	HiDotsHorizontal,
 	HiOutlinePencil,
 	HiOutlineTrash,
-	HiChatAlt2,
-	HiRefresh,
-	HiHeart,
-	HiChartBar,
 } from "react-icons/hi";
 
 const PostDetailContent = ({
@@ -23,23 +18,12 @@ const PostDetailContent = ({
 	isOwner,
 	setIsEditModalOpen,
 	setIsDeleteModalOpen,
-	onLike,
-	onRepost,
-	onComment,
 	user,
 }) => {
 	const navigate = useNavigate();
 	const isShare = post.type === "share";
 	const originalAuthor = post.originalPost?.userId || post.userId;
 	const originalDate = post.originalPost?.createdAt || post.createdAt;
-	const originalPost = post.originalPost || post;
-
-	const isLiked = originalPost.likes?.some(
-		(like) => (like._id || like) === user?._id
-	);
-	const isShared = originalPost.shares?.some(
-		(share) => (share.userId?._id || share.userId) === user?._id
-	);
 
 	return (
 		<div className="p-4">

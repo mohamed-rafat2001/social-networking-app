@@ -31,7 +31,7 @@ const ProfileHeader = ({
 	setIsDeleteModalOpen,
 }) => {
 	return (
-		<div className="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm mb-6 transition-colors duration-300">
+		<>
 			<div className="h-48 bg-gradient-to-br from-primary/20 via-primary/5 to-purple-200 dark:from-primary/30 dark:via-gray-800 dark:to-purple-900/40 relative">
 				<div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_left] dark:bg-grid-slate-100/[0.02]"></div>
 			</div>
@@ -159,7 +159,7 @@ const ProfileHeader = ({
 					<p className="text-lg text-primary font-bold">@{user.username}</p>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 

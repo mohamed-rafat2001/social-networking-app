@@ -15,7 +15,6 @@ import { useUser } from "../../hooks/useUser";
 import { useSocket } from "../../hooks/useSocket";
 import { useNotifications } from "../../../features/notifications/hooks/useNotifications";
 import NotificationList from "../../../features/notifications/components/NotificationList";
-import { useChats } from "../../../features/chat/hooks/useChatQueries";
 import { Avatar, Button, cn } from "../ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as userService from "../../../features/profile/services/userService";

@@ -12,7 +12,6 @@ import { cn, Dropdown, DropdownItem } from "../../../../shared/components/ui";
 const PostDetailActions = ({
 	post,
 	user,
-	isShare,
 	handleLike,
 	handleShare,
 	setIsRepostModalOpen,
@@ -23,7 +22,6 @@ const PostDetailActions = ({
 	const isShared = post.shares?.some(
 		(share) => (share.userId?._id || share.userId) === user?._id
 	);
-	const hasNote = !!post.shareNote;
 
 	return (
 		<div className="px-4 py-1 border-b border-t dark:border-gray-800 flex items-center justify-center gap-6 md:gap-10 text-gray-500 dark:text-gray-400">

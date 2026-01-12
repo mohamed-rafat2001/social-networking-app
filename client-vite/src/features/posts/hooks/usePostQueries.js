@@ -2,7 +2,6 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import * as postService from "../services/postService";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useUser } from "../../../shared/hooks/useUser";
-import { getToken } from "../../../shared/utils/helpers";
 
 export const usePosts = (feedType = "for-you") => {
 	const { user } = useUser();

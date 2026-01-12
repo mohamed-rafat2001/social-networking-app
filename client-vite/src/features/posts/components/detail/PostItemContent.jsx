@@ -1,18 +1,12 @@
 import React from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import { ImageGallery, Avatar, cn } from "../../../../shared/components/ui";
+import { ImageGallery, Avatar } from "../../../../shared/components/ui";
 
-const PostItemContent = ({
-	post,
-	isShare,
-
-	user,
-}) => {
+const PostItemContent = ({ post, isShare }) => {
 	const navigate = useNavigate();
 	const originalAuthor = post.userId;
 	const originalDate = post.createdAt;
-	const originalPost = post.originalPost || post;
 
 	return (
 		<>

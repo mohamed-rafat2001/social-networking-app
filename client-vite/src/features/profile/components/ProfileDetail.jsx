@@ -1,9 +1,8 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
 	useUserProfile,
 	useDeleteProfileImage,
-	useUpdateProfile,
 } from "../../auth/hooks/useUserQueries";
 import {
 	useFollowUser,
@@ -14,7 +13,6 @@ import {
 } from "../../auth/hooks/useSocialQueries";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useUser } from "../../../shared/hooks/useUser";
-import { usePosts } from "../../posts/hooks/usePostQueries";
 import { useCreateChat } from "../../chat/hooks/useChatQueries";
 import { Spinner, ConfirmModal } from "../../../shared/components/ui";
 import FollowsModal from "./FollowsModal";
@@ -30,7 +28,6 @@ const ProfileDetail = () => {
 	const { user: currentUser } = useUser();
 	const { onlineUsers } = useSocket();
 	const { data: profile, isLoading: profileLoading } = useUserProfile(userId);
-	const { data: postsResponse, isLoading: postsLoading } = usePosts();
 	const { mutate: followUser } = useFollowUser();
 	const { mutate: unfollowUser } = useUnfollowUser();
 	const { mutate: blockUser } = useBlockUser();
@@ -52,7 +49,7 @@ const ProfileDetail = () => {
 	const isCurrentUser =
 		currentUser?._id === userId || !userId || userId === "user";
 
-	if (profileLoading || postsLoading) {
+	if (profileLoading) {
 		return (
 			<div className="flex items-center justify-center h-[calc(100vh-100px)]">
 				<Spinner size="lg" />
