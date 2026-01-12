@@ -100,10 +100,10 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 				<div className="flex items-center gap-3 px-1">
 					<Avatar src={user?.image?.secure_url} size="md" />
 					<div>
-						<h3 className="font-bold text-gray-900 dark:text-white leading-tight">
+						<h3 className="font-bold text-slate-900 dark:text-white leading-tight">
 							{user?.firstName} {user?.lastName}
 						</h3>
-						<p className="text-xs text-gray-500 dark:text-gray-400">
+						<p className="text-xs text-slate-500 dark:text-slate-400">
 							Updating profile...
 						</p>
 					</div>
@@ -126,7 +126,7 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 							.profile-emoji-input .react-input-emoji--input {
 								background: transparent !important;
 								padding: 8px 0 !important;
-								color: ${darkMode ? "white" : "#1f2937"} !important;
+								color: ${darkMode ? "white" : "#334155"} !important;
 								min-height: 40px !important;
 								max-height: 120px !important;
 								overflow-y: auto !important;
@@ -153,8 +153,8 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 						fontFamily="inherit"
 						borderColor="transparent"
 						background="transparent"
-						placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
-						color={darkMode ? "#ffffff" : "#1f2937"}
+						placeholderColor={darkMode ? "#94a3b8" : "#64748b"}
+						color={darkMode ? "#ffffff" : "#334155"}
 					/>
 				</div>
 
@@ -167,10 +167,10 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 							onDragLeave={onDragLeave}
 							onDrop={onDrop}
 							className={cn(
-								"border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all group bg-gray-50/50 dark:bg-gray-800/30",
+								"border-2 border-dashed rounded-[2rem] p-8 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all group bg-slate-50/50 dark:bg-slate-800/30",
 								isDragging
 									? "border-primary bg-primary/10 scale-[1.01]"
-									: "border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:bg-primary/5"
+									: "border-slate-200 dark:border-slate-700 hover:border-primary/50 hover:bg-primary/5"
 							)}
 						>
 							<div
@@ -178,23 +178,23 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 									"w-12 h-12 rounded-full flex items-center justify-center transition-colors",
 									isDragging
 										? "bg-primary text-white"
-										: "bg-gray-100 dark:bg-gray-800 text-gray-400 group-hover:text-primary"
+										: "bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:text-primary"
 								)}
 							>
 								<HiOutlinePhotograph size={24} />
 							</div>
 							<div className="text-center">
-								<p className="text-sm font-bold text-gray-900 dark:text-white">
+								<p className="text-sm font-bold text-slate-900 dark:text-white">
 									{isDragging ? "Drop photo here" : "Add Profile Photo"}
 								</p>
-								<p className="text-xs text-gray-500 dark:text-gray-400">
+								<p className="text-xs text-slate-500 dark:text-slate-400">
 									or drag and drop
 								</p>
 							</div>
 						</div>
 					) : (
-						<div className="relative rounded-2xl overflow-hidden group border border-gray-100 dark:border-gray-800 shadow-sm bg-gray-50 dark:bg-gray-950">
-							<div className="flex items-center justify-center bg-gray-100 dark:bg-gray-800 max-h-[400px]">
+						<div className="relative rounded-[2rem] overflow-hidden group border border-slate-100 dark:border-slate-800 shadow-sm bg-slate-50 dark:bg-slate-950">
+							<div className="flex items-center justify-center bg-slate-100 dark:bg-slate-800 max-h-[400px]">
 								<img
 									src={previewUrl}
 									alt="Preview"
@@ -241,7 +241,7 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 				</div>
 
 				{/* Bottom Bar / Actions */}
-				<div className="flex items-center justify-end pt-2 border-t border-gray-100 dark:border-gray-800">
+				<div className="flex items-center justify-end pt-2 border-t border-slate-100 dark:border-slate-800">
 					<div className="flex gap-2">
 						<Button
 							variant="secondary"

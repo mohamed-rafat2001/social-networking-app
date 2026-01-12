@@ -44,7 +44,7 @@ const PostItemModals = ({
 			>
 				<div className="space-y-4">
 					<textarea
-						className="w-full min-h-[150px] p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
+						className="w-full min-h-[150px] p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
 						placeholder="What's on your mind?"
 						value={editContent}
 						onChange={(e) => setEditContent(e.target.value)}
@@ -87,7 +87,7 @@ const PostItemModals = ({
 										.repost-emoji-input .react-input-emoji--input {
 											background: transparent !important;
 											padding: 8px 0 !important;
-											color: ${darkMode ? "white" : "#1f2937"} !important;
+											color: ${darkMode ? "white" : "#0f172a"} !important;
 											min-height: 40px !important;
 											max-height: 120px !important;
 											overflow-y: auto !important;
@@ -113,47 +113,47 @@ const PostItemModals = ({
 									fontFamily="inherit"
 									borderColor="transparent"
 									background="transparent"
-									color={darkMode ? "#ffffff" : "#1f2937"}
-									placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
+									color={darkMode ? "#ffffff" : "#0f172a"}
+									placeholderColor={darkMode ? "#94a3b8" : "#64748b"}
 								/>
 							</div>
 						</div>
 					</div>
 
 					{/* Original Post Preview */}
-					<div className="border dark:border-gray-700 rounded-2xl p-4 ml-12 bg-gray-50/30 dark:bg-gray-800/20">
+					<div className="border dark:border-slate-700 rounded-2xl p-4 ml-12 bg-slate-50/30 dark:bg-slate-800/20">
 						<div className="flex gap-2 items-center mb-2">
 							<Avatar src={post.userId?.image?.secure_url} size="sm" />
-							<span className="font-bold text-sm text-gray-900 dark:text-white">
+							<span className="font-bold text-sm text-slate-900 dark:text-white">
 								{post.userId?.firstName} {post.userId?.lastName}
 							</span>
-							<span className="text-gray-500 text-xs">
+							<span className="text-slate-500 text-xs">
 								·{" "}
 								{post.createdAt && !isNaN(new Date(post.createdAt).getTime())
 									? formatDistanceToNow(new Date(post.createdAt))
 									: "just now"}
 							</span>
 						</div>
-						<p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-3">
+						<p className="text-sm text-slate-700 dark:text-slate-300 line-clamp-3">
 							{post.text}
 						</p>
 					</div>
 
 					<div className="flex justify-end gap-3 pt-2">
-							<Button
-								variant="secondary"
-								onClick={closeRepostModal}
-								className="rounded-full px-5"
-							>
-								Cancel
-							</Button>
-							<Button
-								onClick={handleRepostWithNote}
-								className="rounded-full px-6"
-							>
-								Repost
-							</Button>
-						</div>
+						<Button
+							variant="secondary"
+							onClick={closeRepostModal}
+							className="rounded-full px-5"
+						>
+							Cancel
+						</Button>
+						<Button
+							onClick={handleRepostWithNote}
+							className="rounded-full px-6"
+						>
+							Repost
+						</Button>
+					</div>
 				</div>
 			</Modal>
 		</>

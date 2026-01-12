@@ -61,7 +61,7 @@ const NotificationItem = ({
 	return (
 		<div
 			onClick={handleClick}
-			className={`flex gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer ${
+			className={`flex gap-4 p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer ${
 				!notification.read ? "bg-blue-50/50 dark:bg-blue-900/10" : ""
 			}`}
 		>
@@ -73,17 +73,17 @@ const NotificationItem = ({
 						(u) => String(u.userId) === String(notification.sender._id)
 					)}
 				/>
-				<div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center shadow-sm border border-gray-100 dark:border-gray-800">
+				<div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white dark:bg-slate-950 rounded-full flex items-center justify-center shadow-sm border border-slate-100 dark:border-slate-800">
 					{getIcon(notification.type)}
 				</div>
 			</div>
 
 			<div className="flex-1 min-w-0">
-				<p className="text-sm text-gray-900 dark:text-white leading-snug">
+				<p className="text-sm text-slate-900 dark:text-white leading-snug">
 					<span className="font-bold">
 						{notification.sender.firstName} {notification.sender.lastName}
 					</span>{" "}
-					<span className="text-gray-600 dark:text-gray-400">
+					<span className="text-slate-600 dark:text-slate-400">
 						{notification.type === "like" && "liked your post"}
 						{notification.type === "comment" && "commented on your post"}
 						{notification.type === "follow" && "started following you"}
@@ -94,12 +94,12 @@ const NotificationItem = ({
 				</p>
 
 				{notification.content && (
-					<p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-1 italic">
+					<p className="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-1 italic">
 						"{notification.content}"
 					</p>
 				)}
 
-				<p className="text-xs text-gray-400 dark:text-gray-500 mt-1 font-medium">
+				<p className="text-xs text-slate-400 dark:text-slate-500 mt-1 font-medium">
 					{notification.createdAt &&
 					!isNaN(new Date(notification.createdAt).getTime())
 						? formatDistanceToNow(new Date(notification.createdAt), {

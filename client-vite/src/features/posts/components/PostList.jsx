@@ -146,246 +146,182 @@ function PostList() {
 	};
 
 	return (
-		<div className="w-full">
-			{/* Sticky Header */}
-			<div className="sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b dark:border-gray-800 z-10">
+		<div className="flex flex-col min-h-screen bg-white dark:bg-slate-950">
+			{/* Feed Tabs */}
+			<div className="sticky top-0 z-30 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
 				<div className="flex">
-					<button
-						type="button"
-						onClick={() => setFeedType("for-you")}
-						className={cn(
-							"flex-1 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-all border-b-4",
-							feedType === "for-you" ? "border-primary" : "border-transparent"
-						)}
-					>
-						<span
-							className={cn(
-								"font-bold",
-								feedType === "for-you"
-									? "text-gray-900 dark:text-white"
-									: "text-gray-500 dark:text-gray-400"
-							)}
+					{["for-you", "following"].map((type) => (
+						<button
+							key={type}
+							onClick={() => setFeedType(type)}
+							className="flex-1 py-4 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative group"
 						>
-							For you
-						</span>
-					</button>
-					<button
-						type="button"
-						onClick={() => setFeedType("following")}
-						className={cn(
-							"flex-1 py-4 hover:bg-black/5 dark:hover:bg-white/5 transition-all border-b-4",
-							feedType === "following" ? "border-primary" : "border-transparent"
-						)}
-					>
-						<span
-							className={cn(
-								"font-bold",
-								feedType === "following"
-									? "text-gray-900 dark:text-white"
-									: "text-gray-500 dark:text-gray-400"
+							<span
+								className={cn(
+									"text-[15px] font-bold transition-colors",
+									feedType === type
+										? "text-slate-900 dark:text-white"
+										: "text-slate-500 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-400"
+								)}
+							>
+								{type === "for-you" ? "For You" : "Following"}
+							</span>
+							{feedType === type && (
+								<motion.div
+									layoutId="activeTab"
+									className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-1 bg-primary rounded-full"
+								/>
 							)}
-						>
-							Following
-						</span>
-					</button>
+						</button>
+					))}
 				</div>
 			</div>
 
-			{/* Create Post Area */}
-			<div className="p-4 border-b dark:border-gray-800">
-				<div className="flex gap-4">
-					<Avatar src={user?.image?.secure_url} />
-					<form className="flex-1" onSubmit={handleFormSubmit(onSubmit)}>
-						<div className="mb-2 emoji-input-container relative z-[60]">
-							<style>
-								{`
-									.emoji-input-container .react-input-emoji--container {
-										background: transparent !important;
-										border: none !important;
-										margin-bottom: 0 !important;
-									}
-									.emoji-input-container .react-input-emoji--wrapper {
-										background: transparent !important;
-										border: none !important;
-										padding: 0 !important;
-									}
-									.emoji-input-container .react-input-emoji--input {
-										background: transparent !important;
-										padding: 8px 0 !important;
-										color: ${darkMode ? "white" : "#1f2937"} !important;
-										min-height: 40px !important;
-										max-height: 120px !important;
-										overflow-y: auto !important;
-										font-size: 20px !important;
-									}
-									.emoji-input-container .react-input-emoji--button {
-										padding: 8px !important;
-										z-index: 100 !important;
-									}
-									.emoji-input-container .react-input-emoji--picker-wrapper {
-										z-index: 1000 !important;
-										position: absolute !important;
-										bottom: 100% !important;
-										right: 0 !important;
-									}
-								`}
-							</style>
-							<Controller
-								name="text"
-								control={control}
-								render={({ field }) => (
-									<InputEmoji
-										value={field.value}
-										onChange={field.onChange}
-										cleanOnEnter
-										onEnter={() => handleFormSubmit(onSubmit)()}
-										placeholder="What's on your mind?"
-										fontSize={20}
-										fontFamily="inherit"
-										borderColor="transparent"
-										theme={darkMode ? "dark" : "light"}
-										background="transparent"
-										color={darkMode ? "#ffffff" : "#1f2937"}
-										placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
-									/>
-								)}
-							/>
-							{errors.text && (
-								<p className="text-xs text-red-500 mt-1 px-2">
-									{errors.text.message}
-								</p>
-							)}
-						</div>
-
-						{/* Image Previews */}
-						{previewUrls.length > 0 && (
-							<div
-								className={cn(
-									"grid gap-2 mb-4",
-									previewUrls.length === 1 ? "grid-cols-1" : "grid-cols-2"
-								)}
-							>
-								{previewUrls.slice(0, 4).map((url, index) => (
-									<div
-										key={url}
-										className={cn(
-											"relative group rounded-2xl overflow-hidden border dark:border-gray-800 bg-gray-100 dark:bg-gray-800 cursor-pointer",
-											previewUrls.length === 1 ? "" : "aspect-square"
-										)}
-										onClick={() => {
-											setSelectedPreviewIndex(index);
-											setIsPreviewModalOpen(true);
-										}}
-									>
-										<img
-											src={url}
-											alt=""
-											className={cn(
-												"w-full h-full",
-												previewUrls.length === 1
-													? "object-contain max-h-[512px]"
-													: "object-cover"
-											)}
-										/>
-										<button
-											type="button"
-											onClick={(e) => {
-												e.stopPropagation();
-												removeFile(index);
-											}}
-											className="absolute top-2 right-2 p-1.5 bg-gray-900/60 hover:bg-gray-900/80 text-white rounded-full backdrop-blur-sm transition-all z-10"
-										>
-											<HiX className="text-sm" />
-										</button>
-										{previewUrls.length > 4 && index === 3 && (
-											<div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center backdrop-blur-[2px] group-hover:bg-black/40 transition-colors">
-												<span className="text-white text-2xl font-bold">
-													+{previewUrls.length - 4}
-												</span>
-												<span className="text-white/80 text-xs font-medium uppercase tracking-wider">
-													more images
-												</span>
-											</div>
-										)}
-									</div>
-								))}
-							</div>
-						)}
-
-						<ImageModal
-							isOpen={isPreviewModalOpen}
-							onClose={() => setIsPreviewModalOpen(false)}
-							images={previewUrls}
-							initialIndex={selectedPreviewIndex}
+			<div className="p-4 border-b border-slate-200 dark:border-slate-800">
+				<form onSubmit={handleFormSubmit(onSubmit)}>
+					<div className="flex gap-4">
+						<Avatar
+							src={user?.image?.secure_url}
+							size="md"
+							className="shrink-0"
 						/>
-
-						<div className="flex justify-between items-center mt-2 pt-2 border-t dark:border-gray-800">
-							<div className="flex gap-1">
-								<label
-									htmlFor="image-upload"
-									className="cursor-pointer hover:bg-primary/10 p-2 rounded-full transition-colors text-primary"
-									title="Add images"
-								>
-									<HiPhotograph className="text-xl" />
-								</label>
-								<input
-									ref={fileInputRef}
-									type="file"
-									id="image-upload"
-									className="hidden"
-									accept="image/*"
-									multiple
-									onChange={handleFileChange}
+						<div className="flex-1 min-w-0">
+							<div className="post-input-container emoji-input-container relative z-20">
+								<style>
+									{`
+										.post-input-container .react-input-emoji--container {
+											background: transparent !important;
+											border: none !important;
+											margin-bottom: 0 !important;
+										}
+										.post-input-container .react-input-emoji--wrapper {
+											background: transparent !important;
+											border: none !important;
+											padding: 0 !important;
+										}
+										.post-input-container .react-input-emoji--input {
+											background: transparent !important;
+											padding: 12px 0 !important;
+											color: ${darkMode ? "white" : "#0f172a"} !important;
+											font-size: 19px !important;
+											min-height: 50px !important;
+										}
+										.post-input-container .react-input-emoji--placeholder {
+											left: 0 !important;
+											font-size: 19px !important;
+											color: ${darkMode ? "#64748b" : "#94a3b8"} !important;
+										}
+										.post-input-container .react-input-emoji--button {
+											padding: 8px !important;
+										}
+									`}
+								</style>
+								<Controller
+									name="text"
+									control={control}
+									render={({ field }) => (
+										<InputEmoji
+											value={field.value}
+											onChange={field.onChange}
+											placeholder="What's happening in engineering?"
+											theme={darkMode ? "dark" : "light"}
+											fontSize={19}
+											fontFamily="inherit"
+											borderColor="transparent"
+											background="transparent"
+										/>
+									)}
 								/>
-								<button
-									type="button"
-									className="hover:bg-primary/10 p-2 rounded-full transition-colors text-primary"
-									title="Add video"
-								>
-									<HiFilm className="text-xl" />
-								</button>
-								<button
-									type="button"
-									className="hover:bg-primary/10 p-2 rounded-full transition-colors text-primary"
-									title="Add feeling"
-								>
-									<HiEmojiHappy className="text-xl" />
-								</button>
 							</div>
 
-							<div className="flex items-center gap-4">
-								{isUploading && (
-									<div className="flex items-center gap-2">
-										<div className="w-20 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-											<motion.div
-												className="h-full bg-primary"
-												initial={{ width: 0 }}
-												animate={{ width: `${uploadProgress}%` }}
-											/>
-										</div>
-										<span className="text-xs font-bold text-gray-500 dark:text-gray-400">
-											{uploadProgress}%
-										</span>
-									</div>
+							{/* Image Previews */}
+							<AnimatePresence>
+								{previewUrls.length > 0 && (
+									<motion.div
+										initial={{ opacity: 0, scale: 0.95 }}
+										animate={{ opacity: 1, scale: 1 }}
+										exit={{ opacity: 0, scale: 0.95 }}
+										className={cn(
+											"grid gap-2 mt-4 rounded-2xl overflow-hidden",
+											previewUrls.length === 1 ? "grid-cols-1" : "grid-cols-2"
+										)}
+									>
+										{previewUrls.map((url, index) => (
+											<div key={url} className="relative group aspect-video">
+												<img
+													src={url}
+													alt=""
+													className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
+													onClick={() => {
+														setSelectedPreviewIndex(index);
+														setIsPreviewModalOpen(true);
+													}}
+												/>
+												<button
+													type="button"
+													onClick={() => removeFile(index)}
+													className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-sm transition-colors"
+												>
+													<HiX size={18} />
+												</button>
+											</div>
+										))}
+									</motion.div>
 								)}
-								<Button
-									type="submit"
-									className="px-6 py-1.5 rounded-full font-bold relative overflow-hidden"
-									disabled={(!text.trim() && files.length === 0) || isUploading}
-								>
-									<span className={isUploading ? "opacity-0" : "opacity-100"}>
-										Post
-									</span>
-									{isUploading && (
-										<div className="absolute inset-0 flex items-center justify-center">
-											<Spinner size="sm" variant="white" />
-										</div>
+							</AnimatePresence>
+
+							<div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 dark:border-gray-800/50">
+								<div className="flex items-center">
+									<button
+										type="button"
+										onClick={() => fileInputRef.current?.click()}
+										className="p-2.5 text-primary hover:bg-primary/10 rounded-full transition-all active:scale-95"
+										title="Add Media"
+									>
+										<HiPhotograph size={22} />
+									</button>
+									<button
+										type="button"
+										className="p-2.5 text-primary hover:bg-primary/10 rounded-full transition-all active:scale-95"
+										title="Add Emoji"
+									>
+										<HiEmojiHappy size={22} />
+									</button>
+								</div>
+
+								<div className="flex items-center gap-4">
+									{text.length > 0 && (
+										<span
+											className={cn(
+												"text-[13px] font-medium",
+												text.length > 1800 ? "text-red-500" : "text-slate-400"
+											)}
+										>
+											{text.length}/2000
+										</span>
 									)}
-								</Button>
+									<Button
+										type="submit"
+										disabled={
+											(!text.trim() && files.length === 0) || isUploading
+										}
+										className="rounded-full px-6 py-2 shadow-lg shadow-primary/20"
+									>
+										{isUploading ? <Spinner size="sm" /> : "Post"}
+									</Button>
+								</div>
 							</div>
 						</div>
-					</form>
-				</div>
+					</div>
+					<input
+						type="file"
+						ref={fileInputRef}
+						onChange={handleFileChange}
+						multiple
+						accept="image/*"
+						className="hidden"
+					/>
+				</form>
 			</div>
 
 			{/* Posts List */}

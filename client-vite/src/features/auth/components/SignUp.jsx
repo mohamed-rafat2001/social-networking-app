@@ -124,7 +124,7 @@ const SignUp = () => {
 					)}
 				</AnimatePresence>
 
-				<p className="text-xs text-center text-gray-500 dark:text-gray-400 px-4 mt-6">
+				<p className="text-xs text-center text-slate-500 dark:text-slate-400 px-4 mt-6">
 					By signing up, you agree to our{" "}
 					<a href="#" className="text-primary hover:underline">
 						Terms of Service

@@ -13,7 +13,7 @@ const MainLayout = () => {
 	const isMessagesPage = location.pathname.startsWith("/messages");
 
 	return (
-		<div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col transition-colors duration-300">
+		<div className="min-h-screen bg-slate-50 dark:bg-gray-950 flex flex-col transition-colors duration-300">
 			<NotificationManager />
 			<Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
 
@@ -53,7 +53,7 @@ const MainLayout = () => {
 											></path>
 										</svg>
 									</div>
-									<span className="text-xl font-black tracking-tight text-gray-900 dark:text-white">
+									<span className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
 										Engi<span className="text-primary">Connect</span>
 									</span>
 								</div>
@@ -74,14 +74,14 @@ const MainLayout = () => {
 				)}
 			</AnimatePresence>
 
-			<div className="flex-1 container mx-auto px-4 py-6 flex gap-6">
-				<aside className="hidden lg:block w-64 shrink-0">
+			<div className="flex-1 container mx-auto px-0 sm:px-4 lg:px-6 py-0 sm:py-6 flex gap-0 sm:gap-6">
+				<aside className="hidden lg:block w-64 xl:w-72 shrink-0">
 					<div className="sticky top-24">
 						<Sidebar onMobileItemClick={null} />
 					</div>
 				</aside>
 				<main
-					className={`flex-1 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden ${
+					className={`flex-1 bg-white dark:bg-gray-900 sm:rounded-2xl shadow-sm border-x sm:border border-slate-200 dark:border-gray-800 overflow-hidden ${
 						isMessagesPage ? "xl:max-w-none" : ""
 					}`}
 				>
@@ -91,41 +91,41 @@ const MainLayout = () => {
 					<aside className="hidden xl:block w-80 shrink-0">
 						<div className="sticky top-24 space-y-6">
 							{/* Right Sidebar - Trending or Suggestions */}
-							<div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
-								<h3 className="font-bold text-lg mb-4 text-gray-900 dark:text-white">
+							<div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
+								<h3 className="font-bold text-lg mb-4 text-slate-900 dark:text-white">
 									Trending for Engineers
 								</h3>
 								<div className="space-y-4">
 									<div className="group cursor-pointer">
-										<p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
+										<p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
 											Computer Science · Trending
 										</p>
-										<p className="font-bold text-gray-900 dark:text-white group-hover:underline">
+										<p className="font-bold text-slate-900 dark:text-white group-hover:underline">
 											#React19_Released
 										</p>
-										<p className="text-xs text-gray-500 dark:text-gray-400">
+										<p className="text-xs text-slate-500 dark:text-slate-400">
 											1,234 Posts
 										</p>
 									</div>
 									<div className="group cursor-pointer">
-										<p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
+										<p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
 											Civil Engineering · Trending
 										</p>
-										<p className="font-bold text-gray-900 dark:text-white group-hover:underline">
+										<p className="font-bold text-slate-900 dark:text-white group-hover:underline">
 											#SmartBridges
 										</p>
-										<p className="text-xs text-gray-500 dark:text-gray-400">
+										<p className="text-xs text-slate-500 dark:text-slate-400">
 											856 Posts
 										</p>
 									</div>
 									<div className="group cursor-pointer">
-										<p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
+										<p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
 											Mechanical · Trending
 										</p>
-										<p className="font-bold text-gray-900 dark:text-white group-hover:underline">
+										<p className="font-bold text-slate-900 dark:text-white group-hover:underline">
 											#EV_Future
 										</p>
-										<p className="text-xs text-gray-500 dark:text-gray-400">
+										<p className="text-xs text-slate-500 dark:text-slate-400">
 											2,431 Posts
 										</p>
 									</div>
@@ -133,8 +133,8 @@ const MainLayout = () => {
 							</div>
 
 							{/* Suggestions */}
-							<div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
-								<h3 className="font-bold text-lg mb-4 text-gray-900 dark:text-white">
+							<div className="bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
+								<h3 className="font-bold text-lg mb-4 text-slate-900 dark:text-white">
 									Who to follow
 								</h3>
 								<div className="space-y-4">
@@ -143,10 +143,10 @@ const MainLayout = () => {
 										<div className="flex items-center gap-2">
 											<div className="w-10 h-10 rounded-full bg-primary/10" />
 											<div>
-												<p className="text-sm font-bold text-gray-900 dark:text-white">
+												<p className="text-sm font-bold text-slate-900 dark:text-white">
 													Dr. Sarah Chen
 												</p>
-												<p className="text-xs text-gray-500">@sarah_ai</p>
+												<p className="text-xs text-slate-500">@sarah_ai</p>
 											</div>
 										</div>
 										<button className="text-xs font-bold text-primary hover:underline">

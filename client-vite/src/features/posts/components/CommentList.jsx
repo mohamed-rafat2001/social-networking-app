@@ -65,7 +65,7 @@ function CommentList({ comments, postId, recipientId }) {
 	return (
 		<div className="w-full">
 			{/* Add Comment Form */}
-			<div className="p-4 border-b dark:border-gray-800">
+			<div className="p-4 border-b dark:border-slate-800">
 				<div className="flex gap-4">
 					<Avatar src={user?.image?.secure_url} size="md" />
 					<div className="flex-1 min-w-0">
@@ -157,7 +157,7 @@ function CommentList({ comments, postId, recipientId }) {
 						))
 					) : (
 						<div className="p-8 text-center">
-							<p className="text-gray-500 dark:text-gray-400">
+							<p className="text-slate-500 dark:text-slate-400">
 								No replies yet.
 							</p>
 						</div>

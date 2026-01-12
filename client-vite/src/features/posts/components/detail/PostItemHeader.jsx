@@ -6,10 +6,7 @@ import {
 	HiOutlinePencil,
 	HiOutlineTrash,
 } from "react-icons/hi";
-import {
-	Dropdown,
-	DropdownItem,
-} from "../../../../shared/components/ui";
+import { Dropdown, DropdownItem } from "../../../../shared/components/ui";
 
 const PostItemHeader = ({
 	post,
@@ -23,37 +20,40 @@ const PostItemHeader = ({
 	const dateToDisplay = isShare ? post.shareDate : post.createdAt;
 
 	return (
-		<div className="flex justify-between items-center">
-			<div className="flex items-center gap-1 flex-wrap">
+		<div className="flex justify-between items-start gap-2">
+			<div className="flex items-center gap-1 min-w-0 flex-wrap sm:flex-nowrap">
 				<Link
 					to={`/profile/${userToDisplay?._id}`}
-					className="font-bold text-[15px] text-gray-900 dark:text-white hover:underline flex items-center gap-2 leading-tight"
+					className="font-bold text-[15px] text-slate-900 dark:text-white hover:underline flex items-center gap-1 leading-tight truncate shrink-0"
 					onClick={(e) => e.stopPropagation()}
 				>
 					{userToDisplay?.firstName} {userToDisplay?.lastName}
 				</Link>
-				<span className="text-gray-500 dark:text-gray-400 text-[14px]">
+				<span className="text-slate-500 dark:text-slate-400 text-[14px] truncate shrink min-w-[50px]">
 					@{userToDisplay?.username || userToDisplay?.firstName?.toLowerCase()}
 				</span>
-				{isShare && (
-					<span className="text-primary font-medium text-[13px] ml-1 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full">
-						reposted
+
+				<div className="flex items-center gap-1 shrink-0">
+					{isShare && (
+						<span className="text-primary font-bold text-[11px] uppercase tracking-wider bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-100 dark:border-blue-800/50">
+							reposted
+						</span>
+					)}
+					<span className="text-slate-400 dark:text-slate-600">·</span>
+					<span className="text-slate-500 dark:text-slate-400 text-[14px] whitespace-nowrap">
+						{dateToDisplay && !isNaN(new Date(dateToDisplay).getTime())
+							? formatDistanceToNow(new Date(dateToDisplay), {
+									addSuffix: true,
+							  })
+							: "just now"}
 					</span>
-				)}
-				<span className="text-gray-500 dark:text-gray-400">·</span>
-				<span className="text-gray-500 dark:text-gray-400 text-[14px]">
-					{dateToDisplay && !isNaN(new Date(dateToDisplay).getTime())
-						? formatDistanceToNow(new Date(dateToDisplay), {
-								addSuffix: true,
-						  })
-						: "just now"}
-				</span>
+				</div>
 			</div>
 
 			{isOwner && (
 				<Dropdown
 					trigger={
-						<button className="text-gray-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-full transition-colors">
+						<button className="text-slate-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-full transition-colors">
 							<HiDotsHorizontal size={18} />
 						</button>
 					}

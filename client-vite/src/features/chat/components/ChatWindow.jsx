@@ -223,7 +223,7 @@ const ChatWindow = () => {
 	}
 
 	return (
-		<div className="flex flex-col h-full bg-white dark:bg-gray-900">
+		<div className="flex flex-col h-full bg-white dark:bg-slate-950">
 			<ChatHeader
 				otherUser={otherUser}
 				isOnline={isOnline}

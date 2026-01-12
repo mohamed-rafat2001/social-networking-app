@@ -16,7 +16,7 @@ const EditMessageModal = ({
 		>
 			<div className="space-y-4">
 				<textarea
-					className="w-full min-h-[100px] p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
+					className="w-full min-h-[100px] p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
 					placeholder="Edit your message..."
 					value={editContent}
 					onChange={(e) => setEditContent(e.target.value)}

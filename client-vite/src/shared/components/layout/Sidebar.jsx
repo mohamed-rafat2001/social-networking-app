@@ -51,16 +51,16 @@ const Sidebar = ({ onMobileItemClick }) => {
 					to={item.path}
 					onClick={() => onMobileItemClick && onMobileItemClick()}
 					className={({ isActive }) =>
-						`flex items-center gap-4 px-4 py-3 text-lg font-semibold rounded-2xl transition-all duration-200 group ${
+						`flex items-center gap-4 px-4 py-3.5 text-[17px] font-bold rounded-2xl transition-all duration-200 group ${
 							isActive
-								? "bg-primary/10 text-primary dark:bg-primary/20"
-								: "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+								? "bg-primary text-white shadow-lg shadow-primary/25"
+								: "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
 						}`
 					}
 				>
 					<div className="relative">
 						<item.icon
-							size={26}
+							size={24}
 							className="group-hover:scale-110 transition-transform duration-200 shrink-0"
 						/>
 						{item.badge > 0 && (
@@ -73,33 +73,33 @@ const Sidebar = ({ onMobileItemClick }) => {
 				</NavLink>
 			))}
 
-			<div className="pt-6 mt-6 border-t border-gray-100 dark:border-gray-800 px-4">
-				<h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">
-					prefered groups
+			<div className="pt-6 mt-6 border-t border-slate-200 dark:border-slate-800 px-4">
+				<h4 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-4">
+					preferred groups
 				</h4>
-				<div className="space-y-3">
+				<div className="space-y-4">
 					<button className="flex items-center gap-3 w-full text-left group">
-						<div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs group-hover:bg-blue-600 group-hover:text-white transition-colors">
+						<div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs group-hover:bg-blue-600 group-hover:text-white transition-all duration-200 shadow-sm">
 							CS
 						</div>
-						<span className="text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+						<span className="text-[14px] font-bold text-slate-600 dark:text-gray-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
 							Computer Science 2024
 						</span>
 					</button>
 					<button className="flex items-center gap-3 w-full text-left group">
-						<div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-xs group-hover:bg-purple-600 group-hover:text-white transition-colors">
+						<div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-xs group-hover:bg-purple-600 group-hover:text-white transition-all duration-200 shadow-sm">
 							ME
 						</div>
-						<span className="text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+						<span className="text-[14px] font-bold text-slate-600 dark:text-gray-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
 							Mechanical Design
 						</span>
 					</button>
 					<button className="flex items-center gap-3 w-full text-left group">
-						<div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center font-bold text-xs group-hover:bg-green-600 group-hover:text-white transition-colors">
+						<div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xs group-hover:bg-emerald-600 group-hover:text-white transition-all duration-200 shadow-sm">
 							AI
 						</div>
-						<span className="text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-							AI & Robotics Club
+						<span className="text-[14px] font-bold text-slate-600 dark:text-gray-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+							Artificial Intelligence
 						</span>
 					</button>
 				</div>

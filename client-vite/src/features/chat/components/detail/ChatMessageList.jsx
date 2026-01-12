@@ -84,7 +84,7 @@ const ChatMessageList = ({
 													"p-3 rounded-2xl text-sm",
 													isMe
 														? "bg-primary text-white rounded-tr-none shadow-sm shadow-blue-100 dark:shadow-none"
-														: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-none"
+														: "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none"
 												)}
 											>
 												{msg.content}
@@ -97,7 +97,7 @@ const ChatMessageList = ({
 											<Dropdown
 												position="top"
 												trigger={
-													<button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-400 transition-colors">
+													<button className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 transition-colors">
 														<HiOutlineDotsVertical size={16} />
 													</button>
 												}

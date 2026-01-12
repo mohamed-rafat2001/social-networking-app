@@ -60,7 +60,7 @@ const ProfileDetail = () => {
 	if (!profile) {
 		return (
 			<div className="text-center py-20">
-				<h3 className="text-xl font-bold text-gray-900 dark:text-white">
+				<h3 className="text-xl font-bold text-slate-900 dark:text-white">
 					User not found
 				</h3>
 			</div>
@@ -106,7 +106,7 @@ const ProfileDetail = () => {
 	};
 
 	return (
-		<div className="max-w-4xl mx-auto p-4 md:p-8">
+		<div className="max-w-4xl mx-auto p-4 md:p-6 lg:p-8">
 			<FollowsModal
 				isOpen={isFollowsModalOpen}
 				onClose={() => setIsFollowsModalOpen(false)}
@@ -133,7 +133,7 @@ const ProfileDetail = () => {
 				variant="danger"
 			/>
 
-			<div className="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm mb-6 transition-colors duration-300">
+			<div className="bg-white dark:bg-slate-950 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm mb-6 transition-colors duration-300">
 				<ProfileHeader
 					user={user}
 					isCurrentUser={isCurrentUser}

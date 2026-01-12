@@ -5,7 +5,7 @@ import { HiOutlineArrowLeft, HiOutlineSearch } from "react-icons/hi";
 
 export const NotFound = () => {
 	return (
-		<div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+		<div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
 			<div className="max-w-md w-full text-center space-y-8">
 				{/* 404 Number Animation */}
 				<motion.div
@@ -27,7 +27,7 @@ export const NotFound = () => {
 								damping: 20,
 								delay: 0.2,
 							}}
-							className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700"
+							className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700"
 						>
 							<HiOutlineSearch className="w-16 h-16 text-primary" />
 						</motion.div>
@@ -41,10 +41,10 @@ export const NotFound = () => {
 					transition={{ delay: 0.4, duration: 0.5 }}
 					className="space-y-4"
 				>
-					<h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+					<h2 className="text-3xl font-bold text-slate-900 dark:text-white sm:text-4xl">
 						Page not found
 					</h2>
-					<p className="text-lg text-gray-600 dark:text-gray-400">
+					<p className="text-lg text-slate-600 dark:text-slate-400">
 						Sorry, we couldn't find the page you're looking for. It might have
 						been moved or deleted.
 					</p>
@@ -65,7 +65,7 @@ export const NotFound = () => {
 					</Link>
 					<Link
 						to="/"
-						className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-xl text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all"
+						className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-slate-300 dark:border-slate-600 text-base font-medium rounded-xl text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all"
 					>
 						<HiOutlineArrowLeft className="mr-2 -ml-1 w-5 h-5" />
 						Landing Page

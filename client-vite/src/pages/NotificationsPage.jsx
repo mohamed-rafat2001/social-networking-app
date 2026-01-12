@@ -23,10 +23,10 @@ const NotificationsPage = () => {
 						<HiOutlineBell size={28} />
 					</div>
 					<div>
-						<h1 className="text-2xl font-black text-gray-900 dark:text-white">
+						<h1 className="text-2xl font-black text-slate-900 dark:text-white">
 							Notifications
 						</h1>
-						<p className="text-sm text-gray-500 dark:text-gray-400">
+						<p className="text-sm text-slate-500 dark:text-slate-400">
 							{unreadCount > 0
 								? `You have ${unreadCount} unread notifications`
 								: "You're all caught up!"}
@@ -45,7 +45,7 @@ const NotificationsPage = () => {
 				)}
 			</div>
 
-			<div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+			<div className="bg-white dark:bg-slate-950 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
 				<NotificationList filterType="general" />
 			</div>
 		</div>

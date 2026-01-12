@@ -35,13 +35,13 @@ const Hero = () => {
 							>
 								Engineering Student Network
 							</motion.span>
-							<h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 dark:text-white leading-[1.1] mb-6">
+							<h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 dark:text-white leading-[1.1] mb-6">
 								Connecting the Future of{" "}
 								<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-500 to-indigo-600 dark:from-primary dark:via-blue-400 dark:to-indigo-400">
 									Engineering
 								</span>
 							</h1>
-							<p className="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-lg mx-auto md:mx-0 leading-relaxed">
+							<p className="text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-lg mx-auto md:mx-0 leading-relaxed">
 								The exclusive social platform for engineering students to
 								collaborate, share resources, and build a professional network
 								within the college community.
@@ -69,7 +69,7 @@ const Hero = () => {
 									<a href="#about">
 										<Button
 											variant="secondary"
-											className="px-10 py-4 text-lg w-full sm:w-auto rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-primary/20 bg-white dark:bg-gray-800 dark:text-white transition-all duration-300"
+											className="px-10 py-4 text-lg w-full sm:w-auto rounded-2xl border-2 border-slate-100 dark:border-slate-800 hover:border-primary/20 bg-white dark:bg-slate-800 dark:text-white transition-all duration-300"
 										>
 											Learn More
 										</Button>
@@ -88,7 +88,7 @@ const Hero = () => {
 										<motion.div
 											key={i}
 											whileHover={{ zIndex: 10, scale: 1.1 }}
-											className="w-10 h-10 rounded-full border-4 border-white dark:border-gray-900 bg-gray-200 dark:bg-gray-700 overflow-hidden cursor-pointer transition-transform"
+											className="w-10 h-10 rounded-full border-4 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-700 overflow-hidden cursor-pointer transition-transform"
 										>
 											<img
 												src={`https://i.pravatar.cc/100?img=${i + 10}`}
@@ -97,8 +97,8 @@ const Hero = () => {
 										</motion.div>
 									))}
 								</div>
-								<p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-									<span className="text-gray-900 dark:text-white font-bold">
+								<p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+									<span className="text-slate-900 dark:text-white font-bold">
 										5,000+
 									</span>{" "}
 									students already joined
@@ -131,7 +131,7 @@ const Hero = () => {
 									repeat: Infinity,
 									ease: "easeInOut",
 								}}
-								className="absolute top-10 -left-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-50 dark:border-gray-700 flex items-center gap-3"
+								className="absolute top-10 -left-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-slate-50 dark:border-slate-700 flex items-center gap-3"
 							>
 								<div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-xl flex items-center justify-center">
 									<svg
@@ -149,10 +149,10 @@ const Hero = () => {
 									</svg>
 								</div>
 								<div>
-									<p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">
+									<p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
 										Verified
 									</p>
-									<p className="text-sm font-black text-gray-900 dark:text-white">
+									<p className="text-sm font-black text-slate-900 dark:text-white">
 										Student ID
 									</p>
 								</div>
@@ -166,7 +166,7 @@ const Hero = () => {
 									ease: "easeInOut",
 									delay: 0.5,
 								}}
-								className="absolute bottom-10 -right-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-gray-50 dark:border-gray-700 flex items-center gap-3"
+								className="absolute bottom-10 -right-4 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-slate-50 dark:border-slate-700 flex items-center gap-3"
 							>
 								<div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 text-primary dark:text-primary rounded-xl flex items-center justify-center">
 									<svg
@@ -184,10 +184,10 @@ const Hero = () => {
 									</svg>
 								</div>
 								<div>
-									<p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">
+									<p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">
 										Community
 									</p>
-									<p className="text-sm font-black text-gray-900 dark:text-white">
+									<p className="text-sm font-black text-slate-900 dark:text-white">
 										10+ Majors
 									</p>
 								</div>

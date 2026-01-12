@@ -1,104 +1,86 @@
 import React from "react";
 import { motion } from "framer-motion";
-import {
-	HiChatAlt2,
-	HiRefresh,
-	HiHeart,
-	HiOutlineChatAlt,
-} from "react-icons/hi";
-import { cn, Dropdown, DropdownItem } from "../../../../shared/components/ui";
+import { HiChatAlt2, HiRefresh, HiHeart, HiChartBar } from "react-icons/hi";
+import { cn } from "../../../../shared/components/ui";
 
 const PostItemActions = ({
 	post,
 	user,
 	handleLike,
-	handleRepost,
 	setIsRepostModalOpen,
 	goToDetail,
 }) => {
-	// showStats is true for everything now because the backend handles which stats to send
-	const showStats = true;
 	const isLiked = post.likes?.some((like) => (like._id || like) === user?._id);
 	const isShared = post.shares?.some(
 		(share) => (share.userId?._id || share.userId) === user?._id
 	);
 
 	return (
-		<div className="flex items-center justify-between text-gray-500 dark:text-gray-400 mt-3 max-w-md">
+		<div className="flex items-center justify-between text-slate-500 dark:text-gray-400 mt-3 max-w-md -ml-2">
 			<motion.button
-				className="flex items-center gap-1.5 hover:text-primary group transition-all duration-200"
-				whileHover={{ scale: 1.05 }}
+				className="flex items-center gap-1 hover:text-primary group transition-all duration-200"
+				whileHover={{ scale: 1.02 }}
 				onClick={(e) => {
 					e.stopPropagation();
 					goToDetail();
 				}}
 			>
-				<div className="p-2 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
-					<HiChatAlt2 size={19} />
+				<div className="p-2 rounded-full group-hover:bg-primary/10 transition-colors">
+					<HiChatAlt2 size={18} />
 				</div>
-				{showStats && (
-					<span className="text-[13px] font-medium opacity-80 group-hover:opacity-100">
-						{post.comments?.length || 0}
-					</span>
-				)}
+				<span className="text-[13px] font-medium group-hover:opacity-100">
+					{post.comments?.length || 0}
+				</span>
 			</motion.button>
-
-			{/* Share button */}
-			<div className="flex items-center">
-				<motion.button
-					className={cn(
-						"flex items-center gap-1.5 transition-all duration-200 hover:text-green-500 group",
-						isShared && "text-green-500"
-					)}
-					whileHover={{ scale: 1.05 }}
-					onClick={(e) => {
-						e.stopPropagation();
-						setIsRepostModalOpen(true);
-					}}
-				>
-					<div className="p-2 rounded-full group-hover:bg-green-50 dark:group-hover:bg-green-900/20 transition-colors">
-						<HiRefresh size={19} />
-					</div>
-					{showStats && (
-						<span className="text-[13px] font-medium opacity-80 group-hover:opacity-100">
-							{post.shares?.length || 0}
-						</span>
-					)}
-				</motion.button>
-			</div>
 
 			<motion.button
 				className={cn(
-					"flex items-center gap-1.5 hover:text-pink-500 group transition-all duration-200",
-					isLiked && "text-pink-500"
+					"flex items-center gap-1 transition-all duration-200 hover:text-emerald-500 group",
+					isShared && "text-emerald-500"
 				)}
-				onClick={handleLike}
-				whileHover={{ scale: 1.05 }}
+				whileHover={{ scale: 1.02 }}
+				onClick={(e) => {
+					e.stopPropagation();
+					setIsRepostModalOpen(true);
+				}}
 			>
-				<div className="p-2 rounded-full group-hover:bg-pink-50 dark:group-hover:bg-pink-900/20 transition-colors">
-					<HiHeart
-						size={19}
+				<div className="p-2 rounded-full group-hover:bg-emerald-500/10 transition-colors">
+					<HiRefresh
+						size={18}
 						className={cn(
-							isLiked
-								? "text-pink-500 fill-current"
-								: "text-gray-500 dark:text-gray-400"
+							isShared && "rotate-180 transition-transform duration-500"
 						)}
 					/>
 				</div>
-				{showStats && (
-					<span className="text-[13px] font-medium opacity-80 group-hover:opacity-100">
-						{post.likesNumber || 0}
-					</span>
-				)}
+				<span className="text-[13px] font-medium">
+					{post.shares?.length || 0}
+				</span>
 			</motion.button>
 
-			<div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 opacity-60">
+			<motion.button
+				className={cn(
+					"flex items-center gap-1 hover:text-rose-500 group transition-all duration-200",
+					isLiked && "text-rose-500"
+				)}
+				onClick={handleLike}
+				whileHover={{ scale: 1.02 }}
+			>
+				<div className="p-2 rounded-full group-hover:bg-rose-500/10 transition-colors">
+					<HiHeart
+						size={18}
+						className={cn(
+							isLiked && "fill-current scale-110 transition-transform"
+						)}
+					/>
+				</div>
+				<span className="text-[13px] font-medium">{post.likesNumber || 0}</span>
+			</motion.button>
+
+			<div className="flex items-center gap-1 text-slate-400 dark:text-gray-500">
 				<div className="p-2">
 					<HiChartBar size={18} />
 				</div>
-				{showStats && (
-					<span className="text-[13px] font-medium">{post.views || 0}</span>
-				)}
+				<span className="text-[13px] font-medium">{post.views || 0}</span>
 			</div>
 		</div>
 	);

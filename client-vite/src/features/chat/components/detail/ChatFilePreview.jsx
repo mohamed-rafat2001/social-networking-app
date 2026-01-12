@@ -17,9 +17,9 @@ const ChatFilePreview = ({
 	if (previewUrls.length === 0) return null;
 
 	return (
-		<div className="px-4 py-3 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800">
+		<div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
 			<div className="flex items-center justify-between mb-2">
-				<span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+				<span className="text-xs font-medium text-slate-500 dark:text-slate-400">
 					{previewUrls.length} image{previewUrls.length > 1 ? "s" : ""} selected
 				</span>
 				<button

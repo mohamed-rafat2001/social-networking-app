@@ -9,9 +9,9 @@ export const Button = React.forwardRef(
 		const variants = {
 			primary: "bg-primary text-white hover:bg-primary/90 shadow-sm",
 			secondary:
-				"bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700",
+				"bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700",
 			ghost:
-				"hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300",
+				"hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300",
 			danger: "bg-red-500 text-white hover:bg-red-600",
 		};
 

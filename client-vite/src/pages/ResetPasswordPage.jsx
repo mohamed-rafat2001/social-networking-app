@@ -6,7 +6,7 @@ import Footer from "../shared/components/layout/Footer";
 
 const ResetPasswordPage = () => {
 	return (
-		<div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors duration-300">
+		<div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col transition-colors duration-300">
 			<Header />
 			<main className="flex-grow flex flex-col justify-center py-20 sm:px-6 lg:px-8">
 				<div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -31,7 +31,7 @@ const ResetPasswordPage = () => {
 				</div>
 
 				<div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-					<div className="bg-white dark:bg-gray-800 py-8 px-4 shadow-xl shadow-gray-200/50 dark:shadow-none sm:rounded-3xl sm:px-10 border border-gray-100 dark:border-gray-700 relative overflow-hidden">
+					<div className="bg-white dark:bg-slate-900 py-8 px-4 shadow-xl shadow-slate-200/50 dark:shadow-none sm:rounded-3xl sm:px-10 border border-slate-100 dark:border-slate-800 relative overflow-hidden">
 						<motion.div
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}

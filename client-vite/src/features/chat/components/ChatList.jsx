@@ -72,13 +72,13 @@ const ChatList = () => {
 			<div className="flex-1 overflow-y-auto">
 				{!chats?.length ? (
 					<div className="flex flex-col items-center justify-center py-20 text-center px-4">
-						<div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6 text-gray-400 dark:text-gray-500">
+						<div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6 text-slate-400 dark:text-slate-500">
 							<HiOutlineChatAlt2 size={40} />
 						</div>
-						<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+						<h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
 							No conversations yet
 						</h3>
-						<p className="text-gray-500 dark:text-gray-400 max-w-xs mb-6">
+						<p className="text-slate-500 dark:text-slate-400 max-w-xs mb-6">
 							Start a conversation with other students to collaborate in
 							groups or study together.
 						</p>

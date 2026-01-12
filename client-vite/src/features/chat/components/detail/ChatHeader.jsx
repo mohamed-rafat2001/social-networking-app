@@ -15,10 +15,10 @@ const ChatHeader = ({ otherUser, isOnline, setIsDeleteChatModalOpen }) => {
 	const navigate = useNavigate();
 
 	return (
-		<div className="flex items-center gap-4 p-4 border-b border-gray-100 dark:border-gray-800 sticky top-0 bg-white dark:bg-gray-900 z-10">
+		<div className="flex items-center gap-4 p-4 border-b border-slate-100 dark:border-slate-800 sticky top-0 bg-white dark:bg-slate-950 z-10">
 			<button
 				onClick={() => navigate("/messages")}
-				className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-900 dark:text-white lg:hidden"
+				className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-900 dark:text-white lg:hidden"
 			>
 				<HiOutlineArrowLeft size={20} />
 			</button>
@@ -32,10 +32,10 @@ const ChatHeader = ({ otherUser, isOnline, setIsDeleteChatModalOpen }) => {
 					isActive={isOnline}
 				/>
 				<div>
-					<h3 className="font-bold text-gray-900 dark:text-white leading-tight">
+					<h3 className="font-bold text-slate-900 dark:text-white leading-tight">
 						{otherUser?.firstName} {otherUser?.lastName}
 					</h3>
-					<p className="text-xs text-gray-500 dark:text-gray-400">
+					<p className="text-xs text-slate-500 dark:text-slate-400">
 						{isOnline ? "Online" : "Offline"}
 					</p>
 				</div>
@@ -44,7 +44,7 @@ const ChatHeader = ({ otherUser, isOnline, setIsDeleteChatModalOpen }) => {
 			<div className="ml-auto">
 				<Dropdown
 					trigger={
-						<button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-500">
+						<button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-500">
 							<HiOutlineDotsVertical size={20} />
 						</button>
 					}

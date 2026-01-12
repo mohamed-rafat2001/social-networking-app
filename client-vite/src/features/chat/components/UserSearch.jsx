@@ -41,12 +41,12 @@ const UserSearch = ({ onClose }) => {
 
 			<div className="max-h-96 overflow-y-auto p-2">
 				{isLoading ? (
-					<div className="text-center py-4 text-gray-500">Searching...</div>
+					<div className="text-center py-4 text-slate-500">Searching...</div>
 				) : searchResults?.data?.length > 0 ? (
 					searchResults.data.map((user) => (
 						<div
 							key={user._id}
-							className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors cursor-pointer group"
+							className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer group"
 							onClick={() => handleUserClick(user._id)}
 						>
 							<Link
@@ -60,26 +60,26 @@ const UserSearch = ({ onClose }) => {
 								<Link
 									to={`/profile/${user._id}`}
 									onClick={(e) => e.stopPropagation()}
-									className="font-bold text-gray-900 dark:text-white hover:text-primary transition-colors block truncate"
+									className="font-bold text-slate-900 dark:text-white hover:text-primary transition-colors block truncate"
 								>
 									{user.firstName} {user.lastName}
 								</Link>
-								<p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+								<p className="text-xs text-slate-500 dark:text-slate-400 truncate">
 									@{user.username}
 								</p>
 							</div>
 							<HiChatAlt
-								className="text-gray-300 dark:text-gray-600 group-hover:text-primary transition-colors"
+								className="text-slate-300 dark:text-slate-600 group-hover:text-primary transition-colors"
 								size={20}
 							/>
 						</div>
 					))
 				) : searchTerm.length > 2 ? (
-					<div className="text-center py-8 text-gray-500 dark:text-gray-400">
+					<div className="text-center py-8 text-slate-500 dark:text-slate-400">
 						No users found
 					</div>
 				) : (
-					<div className="text-center py-12 text-gray-400 dark:text-gray-500">
+					<div className="text-center py-12 text-slate-400 dark:text-slate-500">
 						<HiChatAlt size={48} className="mx-auto mb-2 opacity-20" />
 						<p>Type a name to search</p>
 					</div>

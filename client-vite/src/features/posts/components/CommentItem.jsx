@@ -149,7 +149,7 @@ function CommentItem({ comment, postId }) {
 
 	return (
 		<motion.div
-			className="p-4 border-b dark:border-gray-800 hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-all"
+			className="p-4 border-b dark:border-slate-800 hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-all"
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 		>
@@ -162,17 +162,17 @@ function CommentItem({ comment, postId }) {
 						<div className="flex items-center gap-1 flex-wrap">
 							<Link
 								to={`/profile/${comment.userId?._id}`}
-								className="font-bold text-[15px] text-gray-900 dark:text-white hover:underline cursor-pointer leading-tight"
+								className="font-bold text-[15px] text-slate-900 dark:text-white hover:underline cursor-pointer leading-tight"
 							>
 								{comment.userId?.firstName} {comment.userId?.lastName}
 							</Link>
-							<span className="text-gray-500 dark:text-gray-400 text-[14px]">
+							<span className="text-slate-500 dark:text-slate-400 text-[14px]">
 								@{comment.userId?.firstName?.toLowerCase()}
 							</span>
-							<span className="text-gray-500 dark:text-gray-400 text-[14px]">
+							<span className="text-slate-500 dark:text-slate-400 text-[14px]">
 								·
 							</span>
-							<span className="text-gray-500 dark:text-gray-400 text-[14px]">
+							<span className="text-slate-500 dark:text-slate-400 text-[14px]">
 								{comment.createdAt &&
 								!isNaN(new Date(comment.createdAt).getTime())
 									? formatDistanceToNow(new Date(comment.createdAt), {
@@ -186,7 +186,7 @@ function CommentItem({ comment, postId }) {
 							<div className="ml-auto">
 								<Dropdown
 									trigger={
-										<button className="text-gray-500 hover:text-primary p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+										<button className="text-slate-500 hover:text-primary p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
 											<HiDotsHorizontal size={18} />
 										</button>
 									}
@@ -212,7 +212,7 @@ function CommentItem({ comment, postId }) {
 						)}
 					</div>
 
-					<p className="text-[15px] text-gray-900 dark:text-gray-200 leading-normal break-words mb-3 whitespace-pre-wrap">
+					<p className="text-[15px] text-slate-900 dark:text-slate-200 leading-normal break-words mb-3 whitespace-pre-wrap">
 						{comment.commentBody}
 					</p>
 
@@ -237,7 +237,7 @@ function CommentItem({ comment, postId }) {
 									className={cn(
 										comment.like?.includes(user?._id)
 											? "text-pink-500"
-											: "text-gray-500 dark:text-gray-400"
+											: "text-slate-500 dark:text-slate-400"
 									)}
 								/>
 							</div>
@@ -248,7 +248,7 @@ function CommentItem({ comment, postId }) {
 
 						<button
 							onClick={() => setShowReplyInput(!showReplyInput)}
-							className="flex items-center gap-1.5 hover:text-primary group transition-colors text-gray-500 dark:text-gray-400"
+							className="flex items-center gap-1.5 hover:text-primary group transition-colors text-slate-500 dark:text-slate-400"
 						>
 							<div className="p-2 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 transition-colors">
 								<HiChatAlt2 size={18} />
@@ -261,7 +261,7 @@ function CommentItem({ comment, postId }) {
 
 					{/* Replies List */}
 					{comment.replies?.length > 0 && (
-						<div className="mt-4 space-y-4 ml-1 pl-4 border-l dark:border-gray-800">
+						<div className="mt-4 space-y-4 ml-1 pl-4 border-l dark:border-slate-800">
 							{comment.replies.map((reply) => (
 								<div key={reply._id} className="flex gap-3">
 									<Link
@@ -275,11 +275,11 @@ function CommentItem({ comment, postId }) {
 											<div className="flex items-center gap-1">
 												<Link
 													to={`/profile/${reply.userId?._id}`}
-													className="font-bold text-[13px] text-gray-900 dark:text-white hover:underline leading-tight"
+													className="font-bold text-[13px] text-slate-900 dark:text-white hover:underline leading-tight"
 												>
 													{reply.userId?.firstName} {reply.userId?.lastName}
 												</Link>
-												<span className="text-gray-500 dark:text-gray-400 text-[12px]">
+												<span className="text-slate-500 dark:text-slate-400 text-[12px]">
 													·{" "}
 													{reply.createdAt &&
 													!isNaN(new Date(reply.createdAt).getTime())
@@ -294,7 +294,7 @@ function CommentItem({ comment, postId }) {
 												<div className="ml-auto">
 													<Dropdown
 														trigger={
-															<button className="text-gray-500 hover:text-primary p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+															<button className="text-slate-500 hover:text-primary p-1 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
 																<HiDotsHorizontal size={14} />
 															</button>
 														}
@@ -319,7 +319,7 @@ function CommentItem({ comment, postId }) {
 												</div>
 											)}
 										</div>
-										<p className="text-[14px] text-gray-900 dark:text-gray-200 leading-normal break-words mb-2 whitespace-pre-wrap">
+										<p className="text-[14px] text-slate-900 dark:text-slate-200 leading-normal break-words mb-2 whitespace-pre-wrap">
 											{reply.replayBody}
 										</p>
 										<div className="flex gap-4 items-center">
@@ -342,7 +342,7 @@ function CommentItem({ comment, postId }) {
 														className={cn(
 															reply.like?.includes(user?._id)
 																? "text-pink-500"
-																: "text-gray-500 dark:text-gray-400"
+																: "text-slate-500 dark:text-slate-400"
 														)}
 													/>
 												</div>
@@ -385,7 +385,7 @@ function CommentItem({ comment, postId }) {
 								<div className="flex gap-2">
 									<Avatar src={user?.image?.secure_url} size="xs" />
 									<div className="flex-1 min-w-0">
-										<div className="emoji-input-container bg-gray-50 dark:bg-gray-800/50 rounded-xl px-1 relative z-[60]">
+										<div className="emoji-input-container bg-slate-50 dark:bg-slate-900/50 rounded-xl px-1 relative z-[60]">
 											<style>
 												{`
 													.emoji-input-container .react-input-emoji--picker-wrapper {
@@ -407,9 +407,9 @@ function CommentItem({ comment, postId }) {
 												placeholder="Post your reply"
 												fontSize={14}
 												theme={darkMode ? "dark" : "light"}
-												background={darkMode ? "#1f2937" : "#f9fafb"}
-												color={darkMode ? "#f3f4f6" : "#1f2937"}
-												placeholderColor={darkMode ? "#9ca3af" : "#6b7280"}
+												background={darkMode ? "#0f172a" : "#f8fafc"}
+												color={darkMode ? "#f1f5f9" : "#0f172a"}
+												placeholderColor={darkMode ? "#94a3b8" : "#64748b"}
 												borderRadius={12}
 												borderColor="transparent"
 											/>
@@ -448,7 +448,7 @@ function CommentItem({ comment, postId }) {
 			>
 				<div className="space-y-4">
 					<textarea
-						className="w-full min-h-[120px] p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
+						className="w-full min-h-[120px] p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
 						placeholder="Edit your comment..."
 						value={editContent}
 						onChange={(e) => setEditContent(e.target.value)}
@@ -470,7 +470,7 @@ function CommentItem({ comment, postId }) {
 			>
 				<div className="space-y-4">
 					<textarea
-						className="w-full min-h-[100px] p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
+						className="w-full min-h-[100px] p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none"
 						placeholder="Edit your reply..."
 						value={editReplyContent}
 						onChange={(e) => setEditReplyContent(e.target.value)}

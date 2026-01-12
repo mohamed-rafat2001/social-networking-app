@@ -55,8 +55,8 @@ const NotificationList = ({ filterType, onClose, hideHeader = false }) => {
 	return (
 		<div className="flex flex-col h-full">
 			{!hideHeader && (
-				<div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
-					<h2 className="text-lg font-bold text-gray-900 dark:text-white">
+				<div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
+					<h2 className="text-lg font-bold text-slate-900 dark:text-white">
 						{filterType === "messages" ? "Messages" : "Notifications"}
 					</h2>
 					{unreadCount > 0 && (

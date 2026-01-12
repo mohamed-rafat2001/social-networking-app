@@ -15,7 +15,7 @@ export const Spinner = ({ className, size = "md", variant = "primary" }) => {
 	const variants = {
 		primary: "border-primary/20 border-t-primary",
 		white: "border-white/20 border-t-white",
-		gray: "border-gray-200 dark:border-gray-700 border-t-gray-500",
+		gray: "border-slate-200 dark:border-slate-700 border-t-slate-500",
 	};
 
 	return (

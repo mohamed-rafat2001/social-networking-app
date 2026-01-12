@@ -4,11 +4,11 @@
 
 @layer base {
 	body {
-		@apply m-0 p-0 font-sans antialiased bg-white text-[#0f1419];
+		@apply m-0 p-0 font-sans antialiased bg-slate-50 text-slate-900 transition-colors duration-300;
 	}
 
 	* {
-		@apply box-border;
+		@apply box-border border-slate-200 dark:border-gray-800;
 	}
 
 	a {
@@ -41,7 +41,7 @@
 	}
 
 	.hover-bg-light {
-		@apply hover:bg-black hover:bg-opacity-[0.03] transition-colors duration-200;
+		@apply hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200;
 	}
 
 	.profile-image {

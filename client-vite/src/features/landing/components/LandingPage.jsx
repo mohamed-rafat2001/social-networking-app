@@ -14,18 +14,12 @@ const LandingPage = () => {
 	const { user, isLoading } = useUser();
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		if (!isLoading && user) {
-			navigate("/feed", { replace: true });
-		}
-	}, [user, isLoading, navigate]);
-
 	if (isLoading) {
 		return <LandingLoading />;
 	}
 
 	return (
-		<div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+		<div className="min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
 			<Header />
 			<main>
 				<Hero />

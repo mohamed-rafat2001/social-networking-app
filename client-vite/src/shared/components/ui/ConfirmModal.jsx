@@ -20,7 +20,7 @@ export const ConfirmModal = ({
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} title={title}>
 			<div className="space-y-4">
-				<p className="text-gray-600 dark:text-gray-400">{message}</p>
+				<p className="text-slate-600 dark:text-slate-400">{message}</p>
 				<div className="flex justify-end gap-3 pt-2">
 					<Button variant="secondary" onClick={onClose} disabled={isLoading}>
 						{cancelText}

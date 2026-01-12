@@ -101,15 +101,15 @@ const ChatItem = ({
 						className={cn(
 							"text-sm truncate flex-1",
 							chat.unreadCount > 0
-								? "text-gray-900 dark:text-white font-semibold"
-								: "text-gray-500 dark:text-gray-400"
+								? "text-slate-900 dark:text-white font-semibold"
+								: "text-slate-500 dark:text-slate-400"
 						)}
 					>
 						{lastMessage ? (
 							<>
 								{String(lastMessage.sender || lastMessage.senderId) ===
 									String(currentUser?._id) && (
-									<span className="text-gray-400 dark:text-gray-500 font-normal">
+									<span className="text-slate-400 dark:text-slate-500 font-normal">
 										You:{" "}
 									</span>
 								)}

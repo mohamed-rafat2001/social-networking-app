@@ -81,11 +81,11 @@ const Login = () => {
 						id="remember-me"
 						name="remember-me"
 						type="checkbox"
-						className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+						className="h-4 w-4 text-primary focus:ring-primary border-slate-300 rounded"
 					/>
 					<label
 						htmlFor="remember-me"
-						className="ml-2 block text-sm text-gray-900 dark:text-gray-300"
+						className="ml-2 block text-sm text-slate-900 dark:text-slate-300"
 					>
 						Remember me
 					</label>

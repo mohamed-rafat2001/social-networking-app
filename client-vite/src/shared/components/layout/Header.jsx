@@ -85,51 +85,48 @@ const Header = ({ onMenuClick }) => {
 	];
 
 	return (
-		<header className="sticky top-0 z-[100] bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
-			<div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
+		<header className="sticky top-0 z-[100] bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+			<div className="container mx-auto px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
 				{/* Left Section: Mobile Menu & Logo */}
 				<div className="flex items-center gap-2 sm:gap-4 shrink-0">
-					{user && (
+					{(user || isLandingPage) && (
 						<button
-							onClick={onMenuClick}
-							className="lg:hidden p-2 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all active:scale-95"
+							onClick={() => {
+								if (isLandingPage) {
+									setShowMobileMenu(true);
+								} else if (onMenuClick) {
+									onMenuClick();
+								}
+							}}
+							className="lg:hidden p-2 text-slate-600 dark:text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all active:scale-95"
 							aria-label="Open Menu"
 						>
 							<HiMenu size={24} />
 						</button>
 					)}
-
-					<Link to={user ? "/feed" : "/"} className="flex items-center gap-2">
-						<div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-blue-100 dark:shadow-none">
-							<svg
-								className="w-6 h-6 text-white"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth="2.5"
-									d="M13 10V3L4 14h7v7l9-11h-7z"
-								></path>
-							</svg>
+					<Link
+						to={user ? "/feed" : "/welcome"}
+						className="flex items-center gap-2.5 group"
+					>
+						<div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/25 group-hover:scale-110 transition-transform duration-300">
+							<span className="text-white font-black text-xl italic tracking-tighter">
+								S
+							</span>
 						</div>
-						<span className="text-xl font-black tracking-tight text-gray-900 dark:text-white hidden md:block">
-							Engi<span className="text-primary">Connect</span>
+						<span className="hidden sm:block text-xl font-black tracking-tight text-slate-900 dark:text-white group-hover:text-primary transition-colors">
+							SOCIAL<span className="text-primary italic">APP</span>
 						</span>
 					</Link>
 				</div>
 
 				{/* Landing Page Navigation */}
-				{isLandingPage && !user && (
+				{isLandingPage && (
 					<nav className="hidden lg:flex items-center gap-8">
 						{navLinks.map((link) => (
 							<a
 								key={link.name}
 								href={link.href}
-								className="text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-primary transition-colors"
+								className="text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-primary transition-colors"
 							>
 								{link.name}
 							</a>
@@ -137,316 +134,207 @@ const Header = ({ onMenuClick }) => {
 					</nav>
 				)}
 
-				{/* Search Bar (Only for logged in users) */}
-				{user && (
-					<div
-						className="flex-1 max-w-md relative hidden md:block"
-						ref={searchRef}
-					>
-						<div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-							<HiSearch size={20} />
-						</div>
-						<input
-							type="text"
-							value={searchTerm}
-							onChange={(e) => {
-								setSearchTerm(e.target.value);
-								setShowSearchResults(true);
-							}}
-							onFocus={() => setShowSearchResults(true)}
-							placeholder="Search for people, groups, or topics..."
-							className="w-full bg-gray-100 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-700 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 rounded-2xl py-2.5 pl-10 pr-4 text-sm transition-all outline-none dark:text-white"
-						/>
+				{/* Middle Section: Search (Hidden on Mobile unless toggled) */}
+				{user && !isLandingPage && (
+					<div className="flex-1 max-w-xl hidden md:block" ref={searchRef}>
+						<div className="relative group">
+							<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+								<HiSearch
+									size={20}
+									className="text-slate-400 dark:text-gray-500 group-focus-within:text-primary transition-colors"
+								/>
+							</div>
+							<input
+								type="text"
+								className="block w-full pl-11 pr-4 py-2.5 bg-slate-100 dark:bg-gray-900/50 border-none rounded-2xl text-[15px] text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-gray-900 transition-all"
+								placeholder="Search engineering minds..."
+								value={searchTerm}
+								onChange={(e) => {
+									setSearchTerm(e.target.value);
+									setShowSearchResults(true);
+								}}
+								onFocus={() => setShowSearchResults(true)}
+							/>
 
-						{/* Search Results Dropdown */}
-						<AnimatePresence>
-							{showSearchResults && searchTerm.trim().length >= 2 && (
-								<motion.div
-									initial={{ opacity: 0, y: 10 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, y: 10 }}
-									className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-50"
-								>
-									<div className="max-h-[400px] overflow-y-auto p-2">
+							<AnimatePresence>
+								{showSearchResults && searchTerm.trim().length >= 2 && (
+									<motion.div
+										initial={{ opacity: 0, y: 10, scale: 0.95 }}
+										animate={{ opacity: 1, y: 0, scale: 1 }}
+										exit={{ opacity: 0, y: 10, scale: 0.95 }}
+										className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 border border-slate-100 dark:border-gray-800 rounded-2xl shadow-2xl overflow-hidden z-[110]"
+									>
 										{isSearching ? (
-											<div className="flex items-center justify-center py-8">
-												<div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-											</div>
-										) : searchResults?.data?.length > 0 ? (
-											<div className="space-y-1">
-												<p className="px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-													People
+											<div className="p-8 text-center">
+												<div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
+												<p className="mt-3 text-slate-500 dark:text-slate-400 font-medium">
+													Searching profiles...
 												</p>
-												{searchResults.data.map((user) => (
+											</div>
+										) : searchResults?.data?.users?.length > 0 ? (
+											<div className="py-2">
+												{searchResults.data.users.map((u) => (
 													<Link
-														key={user._id}
-														to={`/profile/${user._id}`}
+														key={u._id}
+														to={`/profile/${u._id}`}
+														className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-gray-800 transition-colors"
 														onClick={() => {
 															setShowSearchResults(false);
 															setSearchTerm("");
 														}}
-														className="flex items-center gap-3 p-2.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-xl transition-colors group"
 													>
-														<Avatar src={user.image?.secure_url} size="md" />
-														<div className="flex-1 min-w-0">
-															<p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors truncate">
-																{user.firstName} {user.lastName}
+														<Avatar src={u.image?.secure_url} size="md" />
+														<div className="min-w-0">
+															<p className="font-bold text-slate-900 dark:text-white truncate">
+																{u.firstName} {u.lastName}
 															</p>
-															<p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-																@{user.username}
+															<p className="text-sm text-slate-500 dark:text-gray-400 truncate">
+																@{u.username || u.firstName.toLowerCase()}
 															</p>
 														</div>
 													</Link>
 												))}
 											</div>
 										) : (
-											<div className="text-center py-8 text-gray-500 dark:text-gray-400">
-												<p className="text-sm">
-													No users found for "{searchTerm}"
+											<div className="p-8 text-center">
+												<div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
+													<HiSearch size={24} className="text-slate-400" />
+												</div>
+												<p className="text-slate-500 dark:text-slate-400 font-medium">
+													No engineers found matching "{searchTerm}"
 												</p>
 											</div>
 										)}
-									</div>
-								</motion.div>
-							)}
-						</AnimatePresence>
+									</motion.div>
+								)}
+							</AnimatePresence>
+						</div>
 					</div>
 				)}
 
-				{/* Navigation Actions */}
-				<div className="flex items-center gap-2 sm:gap-4">
-					{user && (
-						<button
-							onClick={() => setShowMobileSearch(true)}
-							className="md:hidden p-2 text-gray-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
-						>
-							<HiSearch size={24} />
-						</button>
-					)}
-
-					<button
-						onClick={toggleDarkMode}
-						className="p-2 text-gray-500 hover:text-primary hover:bg-blue-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
-						title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-					>
-						{darkMode ? <HiSun size={24} /> : <HiMoon size={24} />}
-					</button>
-
+				{/* Right Section: Actions & User */}
+				<div className="flex items-center gap-1 sm:gap-3 shrink-0">
 					{user ? (
 						<>
-							{/* Messages & Notifications */}
-							<div className="flex items-center gap-1 sm:gap-2">
-								<div className="relative" ref={messagesRef}>
-									<button
-										onClick={() => setShowMessages(!showMessages)}
-										className={cn(
-											"relative p-2.5 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all active:scale-95",
-											(showMessages ||
-												location.pathname.startsWith("/messages")) &&
-												"text-primary bg-primary/5"
-										)}
-									>
-										<HiChatAlt size={22} />
-										{unreadMessagesCount > 0 && (
-											<span className="absolute top-1.5 right-1.5 w-5 h-5 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900">
-												{unreadMessagesCount > 9 ? "9+" : unreadMessagesCount}
-											</span>
-										)}
-									</button>
+							<button
+								onClick={() => setShowMobileSearch(!showMobileSearch)}
+								className="md:hidden p-2.5 text-slate-600 dark:text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+							>
+								<HiSearch size={22} />
+							</button>
 
-									<AnimatePresence>
-										{showMessages && (
-											<>
-												{/* Backdrop for Messages */}
-												<motion.div
-													initial={{ opacity: 0 }}
-													animate={{ opacity: 1 }}
-													exit={{ opacity: 0 }}
-													className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[99999]"
-													onClick={() => setShowMessages(false)}
-												/>
-												<motion.div
-													initial={{ opacity: 0, y: 10, scale: 0.95 }}
-													animate={{ opacity: 1, y: 0, scale: 1 }}
-													exit={{ opacity: 0, y: 10, scale: 0.95 }}
-													className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 z-[100000] overflow-hidden"
-												>
-													<div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
-														<h3 className="font-bold text-gray-900 dark:text-white">
-															Messages
-														</h3>
-														<Link
-															to="/messages"
-															onClick={() => setShowMessages(false)}
-															className="text-xs font-bold text-primary hover:underline"
-														>
-															Open Chats
-														</Link>
-													</div>
-													<div className="max-h-[400px] overflow-y-auto">
-														<NotificationList
-															filterType="messages"
-															onClose={() => setShowMessages(false)}
-															hideHeader={true}
-														/>
-													</div>
-												</motion.div>
-											</>
-										)}
-									</AnimatePresence>
-								</div>
-
-								<div className="relative" ref={notificationsRef}>
-									<button
-										onClick={() => setShowNotifications(!showNotifications)}
-										className={cn(
-											"relative p-2.5 text-gray-600 dark:text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all active:scale-95",
-											showNotifications && "text-primary bg-primary/5"
-										)}
-									>
-										<HiBell size={22} />
-										{unreadNotificationsCount > 0 && (
-											<span className="absolute top-1.5 right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900">
-												{unreadNotificationsCount > 9
-													? "9+"
-													: unreadNotificationsCount}
-											</span>
-										)}
-									</button>
-
-									<AnimatePresence>
-										{showNotifications && (
-											<>
-												{/* Backdrop for Notifications */}
-												<motion.div
-													initial={{ opacity: 0 }}
-													animate={{ opacity: 1 }}
-													exit={{ opacity: 0 }}
-													className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[99999]"
-													onClick={() => setShowNotifications(false)}
-												/>
-												<motion.div
-													initial={{ opacity: 0, y: 10, scale: 0.95 }}
-													animate={{ opacity: 1, y: 0, scale: 1 }}
-													exit={{ opacity: 0, y: 10, scale: 0.95 }}
-													className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 z-[100000] overflow-hidden"
-												>
-													<div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
-														<h3 className="font-bold text-gray-900 dark:text-white">
-															Notifications
-														</h3>
-														<Link
-															to="/notifications"
-															onClick={() => setShowNotifications(false)}
-															className="text-xs font-bold text-primary hover:underline"
-														>
-															View All
-														</Link>
-													</div>
-													<div className="max-h-[400px] overflow-y-auto">
-														<NotificationList
-															filterType="general"
-															onClose={() => setShowNotifications(false)}
-															hideHeader={true}
-														/>
-													</div>
-												</motion.div>
-											</>
-										)}
-									</AnimatePresence>
-								</div>
+							<div className="relative" ref={notificationsRef}>
+								<button
+									onClick={() => {
+										setShowNotifications(!showNotifications);
+										setShowMessages(false);
+									}}
+									className={cn(
+										"p-2.5 text-slate-600 dark:text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all relative",
+										showNotifications && "text-primary bg-primary/5"
+									)}
+								>
+									<HiBell size={24} />
+									{unreadNotificationsCount > 0 && (
+										<span className="absolute top-2 right-2 w-5 h-5 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900">
+											{unreadNotificationsCount > 9
+												? "9+"
+												: unreadNotificationsCount}
+										</span>
+									)}
+								</button>
+								<AnimatePresence>
+									{showNotifications && (
+										<motion.div
+											initial={{ opacity: 0, y: 10, scale: 0.95 }}
+											animate={{ opacity: 1, y: 0, scale: 1 }}
+											exit={{ opacity: 0, y: 10, scale: 0.95 }}
+											className="absolute top-full right-0 mt-2 w-[320px] sm:w-[400px] bg-white dark:bg-gray-900 border border-slate-100 dark:border-gray-800 rounded-2xl shadow-2xl overflow-hidden z-[110]"
+										>
+											<NotificationList
+												notifications={notifications.filter(
+													(n) => n.type !== "message"
+												)}
+												onClose={() => setShowNotifications(false)}
+											/>
+										</motion.div>
+									)}
+								</AnimatePresence>
 							</div>
 
-							<div className="relative" ref={userMenuRef}>
+							<button
+								onClick={toggleDarkMode}
+								className="p-2.5 text-slate-600 dark:text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+							>
+								{darkMode ? <HiSun size={24} /> : <HiMoon size={24} />}
+							</button>
+
+							<div className="relative ml-2" ref={userMenuRef}>
 								<button
 									onClick={() => setShowUserMenu(!showUserMenu)}
-									className="flex items-center gap-2 p-1 pl-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-colors"
+									className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 bg-slate-100 dark:bg-gray-800 hover:bg-slate-200 dark:hover:bg-gray-700 rounded-2xl transition-all active:scale-95"
 								>
-									<div className="text-right hidden sm:block">
-										<p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">
-											{user.firstName}
+									<Avatar src={user?.image?.secure_url} size="sm" />
+									<div className="hidden lg:block text-left">
+										<p className="text-xs font-black text-slate-900 dark:text-white leading-none mb-0.5">
+											{user?.firstName}
 										</p>
-										<p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">
-											{user.userType}
-										</p>
+										<div className="flex items-center gap-1">
+											<span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+											<span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+												Online
+											</span>
+										</div>
 									</div>
-									<Avatar
-										src={user.image?.secure_url}
-										size="md"
-										isActive={onlineUsers.some((u) => u.userId === user._id)}
-										className="cursor-pointer"
-									/>
 								</button>
 
 								<AnimatePresence>
 									{showUserMenu && (
-										<>
-											{/* Backdrop for User Menu */}
-											<motion.div
-												initial={{ opacity: 0 }}
-												animate={{ opacity: 1 }}
-												exit={{ opacity: 0 }}
-												className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[99999]"
+										<motion.div
+											initial={{ opacity: 0, y: 10, scale: 0.95 }}
+											animate={{ opacity: 1, y: 0, scale: 1 }}
+											exit={{ opacity: 0, y: 10, scale: 0.95 }}
+											className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-gray-900 border border-slate-100 dark:border-gray-800 rounded-2xl shadow-2xl py-2 overflow-hidden z-[110]"
+										>
+											<Link
+												to={`/profile/${user?._id}`}
+												className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
 												onClick={() => setShowUserMenu(false)}
-											/>
-											<motion.div
-												initial={{ opacity: 0, y: 10, scale: 0.95 }}
-												animate={{ opacity: 1, y: 0, scale: 1 }}
-												exit={{ opacity: 0, y: 10, scale: 0.95 }}
-												className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-[100000]"
 											>
-												<Link
-													to={`/profile/${user._id}`}
-													onClick={() => setShowUserMenu(false)}
-													className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-												>
-													<HiUserCircle size={20} className="text-gray-400" />
-													<span className="font-medium">My Profile</span>
-												</Link>
-												<button
-													onClick={() => {
-														handleLogout();
-														setShowUserMenu(false);
-													}}
-													className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-												>
-													<HiLogout size={20} />
-													<span className="font-medium">Sign Out</span>
-												</button>
-											</motion.div>
-										</>
+												<HiUserCircle size={20} />
+												Profile
+											</Link>
+											<button
+												onClick={handleLogout}
+												className="w-full flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors border-t border-slate-50 dark:border-gray-800"
+											>
+												<HiLogout size={20} />
+												Sign Out
+											</button>
+										</motion.div>
 									)}
 								</AnimatePresence>
 							</div>
 						</>
 					) : (
-						<div className="flex items-center gap-3">
-							<Button
-								variant="ghost"
-								onClick={() =>
-									navigate("/welcome", { state: { mode: "login" } })
-								}
-								className="hidden sm:block font-bold dark:text-gray-300 dark:hover:text-white"
-							>
-								Log In
-							</Button>
-							<Button
-								onClick={() =>
-									navigate("/welcome", { state: { mode: "signup" } })
-								}
-								className="rounded-xl px-6"
-							>
-								Join Now
-							</Button>
-							{/* Mobile Menu Toggle */}
-							{isLandingPage && (
-								<button
-									onClick={() => setShowMobileMenu(!showMobileMenu)}
-									className="lg:hidden p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl"
+						<div className="flex items-center gap-2 sm:gap-4">
+							{!isLandingPage && (
+								<Button
+									variant="ghost"
+									size="sm"
+									onClick={() => navigate("/welcome")}
+									className="text-slate-600 dark:text-slate-400 font-bold"
 								>
-									{showMobileMenu ? <HiX size={24} /> : <HiMenu size={24} />}
-								</button>
+									Sign In
+								</Button>
 							)}
+							<Button
+								size="sm"
+								onClick={() => navigate("/welcome?tab=signup")}
+								className="rounded-full px-6 font-black tracking-tight shadow-lg shadow-primary/25"
+							>
+								GET STARTED
+							</Button>
 						</div>
 					)}
 				</div>
@@ -456,113 +344,113 @@ const Header = ({ onMenuClick }) => {
 			<AnimatePresence>
 				{showMobileSearch && (
 					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						className="fixed inset-0 z-[200] bg-white dark:bg-gray-900 md:hidden p-4"
+						initial={{ opacity: 0, y: -20 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -20 }}
+						className="absolute inset-x-0 top-0 h-16 bg-white dark:bg-slate-900 px-4 flex items-center gap-3 z-[120] border-b border-slate-200 dark:border-slate-800 md:hidden"
 					>
-						<div className="flex items-center gap-4 mb-4">
-							<button
-								onClick={() => setShowMobileSearch(false)}
-								className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
-							>
-								<HiX size={24} />
-							</button>
-							<div className="flex-1 relative">
-								<div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-									<HiSearch size={20} />
-								</div>
-								<input
-									type="text"
-									autoFocus
-									value={searchTerm}
-									onChange={(e) => setSearchTerm(e.target.value)}
-									placeholder="Search for people..."
-									className="w-full bg-gray-100 dark:bg-gray-800 border-transparent focus:bg-white dark:focus:bg-gray-700 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 rounded-2xl py-2.5 pl-10 pr-4 text-sm transition-all outline-none dark:text-white"
-								/>
-							</div>
+						<div className="flex-1 relative">
+							<HiSearch
+								className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+								size={20}
+							/>
+							<input
+								type="text"
+								autoFocus
+								className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-gray-800 border-none rounded-xl text-[15px] focus:ring-2 focus:ring-primary/20"
+								placeholder="Search..."
+								value={searchTerm}
+								onChange={(e) => setSearchTerm(e.target.value)}
+							/>
 						</div>
-
-						<div className="overflow-y-auto max-h-[calc(100vh-100px)]">
-							{searchTerm.trim().length >= 2 ? (
-								isSearching ? (
-									<div className="flex items-center justify-center py-8">
-										<div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-									</div>
-								) : searchResults?.data?.length > 0 ? (
-									<div className="space-y-1">
-										<p className="px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-											People
-										</p>
-										{searchResults.data.map((user) => (
-											<Link
-												key={user._id}
-												to={`/profile/${user._id}`}
-												onClick={() => {
-													setShowMobileSearch(false);
-													setSearchTerm("");
-												}}
-												className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-2xl transition-colors group"
-											>
-												<Avatar src={user.image?.secure_url} size="md" />
-												<div className="flex-1 min-w-0">
-													<p className="font-bold text-gray-900 dark:text-white truncate">
-														{user.firstName} {user.lastName}
-													</p>
-													<p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-														@{user.username}
-													</p>
-												</div>
-											</Link>
-										))}
-									</div>
-								) : (
-									<div className="text-center py-12 text-gray-500 dark:text-gray-400">
-										<HiSearch size={48} className="mx-auto mb-4 opacity-20" />
-										<p>No users found for "{searchTerm}"</p>
-									</div>
-								)
-							) : (
-								<div className="text-center py-12 text-gray-400 dark:text-gray-500">
-									<HiSearch size={48} className="mx-auto mb-4 opacity-20" />
-									<p>Type at least 2 characters to search</p>
-								</div>
-							)}
-						</div>
+						<button
+							onClick={() => {
+								setShowMobileSearch(false);
+								setSearchTerm("");
+							}}
+							className="p-2 text-slate-500 font-bold text-sm"
+						>
+							Cancel
+						</button>
 					</motion.div>
 				)}
 			</AnimatePresence>
 
 			{/* Mobile Menu */}
 			<AnimatePresence>
-				{isLandingPage && !user && showMobileMenu && (
+				{showMobileMenu && (
 					<motion.div
-						initial={{ height: 0, opacity: 0 }}
-						animate={{ height: "auto", opacity: 1 }}
-						exit={{ height: 0, opacity: 0 }}
-						className="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 overflow-hidden"
+						initial={{ opacity: 0, x: "100%" }}
+						animate={{ opacity: 1, x: 0 }}
+						exit={{ opacity: 0, x: "100%" }}
+						className="fixed inset-0 z-[200] bg-white dark:bg-slate-950 flex flex-col p-6 lg:hidden"
 					>
-						<div className="container mx-auto px-4 py-6 flex flex-col gap-4">
+						<div className="flex items-center justify-between mb-8">
+							<Link
+								to="/"
+								className="flex items-center gap-2"
+								onClick={() => setShowMobileMenu(false)}
+							>
+								<div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+									<span className="text-white font-bold text-xl">S</span>
+								</div>
+								<span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+									SocialApp
+								</span>
+							</Link>
+							<button
+								onClick={() => setShowMobileMenu(false)}
+								className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl"
+							>
+								<HiX size={24} />
+							</button>
+						</div>
+						<nav className="flex flex-col gap-4">
 							{navLinks.map((link) => (
 								<a
 									key={link.name}
 									href={link.href}
 									onClick={() => setShowMobileMenu(false)}
-									className="text-lg font-bold text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary py-2"
+									className="text-lg font-bold text-slate-600 dark:text-slate-400 hover:text-primary transition-colors py-2 border-b border-slate-100 dark:border-slate-800"
 								>
 									{link.name}
 								</a>
 							))}
-							<hr className="border-gray-100 dark:border-gray-800 my-2" />
-							<Button
-								onClick={() => {
-									setShowMobileMenu(false);
-									navigate("/welcome", { state: { mode: "signup" } });
-								}}
-								className="w-full rounded-xl py-4"
-							>
-								Get Started
-							</Button>
+						</nav>
+						<div className="mt-auto flex flex-col gap-3">
+							{user ? (
+								<Button
+									onClick={() => {
+										setShowMobileMenu(false);
+										navigate("/feed");
+									}}
+									className="w-full py-4 rounded-xl font-bold"
+								>
+									Go to Feed
+								</Button>
+							) : (
+								<>
+									<Button
+										variant="outline"
+										onClick={() => {
+											setShowMobileMenu(false);
+											navigate("/welcome", { state: { mode: "login" } });
+										}}
+										className="w-full py-4 rounded-xl font-bold"
+									>
+										Log In
+									</Button>
+									<Button
+										onClick={() => {
+											setShowMobileMenu(false);
+											navigate("/welcome", { state: { mode: "signup" } });
+										}}
+										className="w-full py-4 rounded-xl font-bold"
+									>
+										Join Now
+									</Button>
+								</>
+							)}
 						</div>
 					</motion.div>
 				)}

@@ -108,7 +108,7 @@ export const Dropdown = ({
 									}}
 									onClick={(e) => e.stopPropagation()}
 									className={cn(
-										"w-56 rounded-2xl bg-white dark:bg-gray-800 shadow-[0_10px_40px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-gray-100 dark:border-gray-700 overflow-hidden py-1.5",
+										"w-56 rounded-2xl bg-white dark:bg-slate-900 shadow-[0_10px_40px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-slate-100 dark:border-slate-800 overflow-hidden py-1.5",
 										className
 									)}
 								>
@@ -144,7 +144,7 @@ export const DropdownItem = ({
 	const { close } = useContext(DropdownContext);
 	const variants = {
 		default:
-			"text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-primary dark:hover:text-primary",
+			"text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-primary dark:hover:text-primary",
 		danger: "text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10",
 	};
 

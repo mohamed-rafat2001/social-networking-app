@@ -67,21 +67,21 @@ export const Modal = ({
 						animate="visible"
 						exit="exit"
 						className={cn(
-							"relative w-full rounded-[2rem] bg-white dark:bg-gray-900 shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col max-h-[90vh]",
+							"relative w-full rounded-[2rem] bg-white dark:bg-slate-950 shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]",
 							sizes[size],
 							className
 						)}
 					>
 						{/* Header */}
 						{(title || showCloseButton) && (
-							<div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
-								<h3 className="text-xl font-black text-gray-900 dark:text-white">
+							<div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
+								<h3 className="text-xl font-black text-slate-900 dark:text-white">
 									{title}
 								</h3>
 								{showCloseButton && (
 									<button
 										onClick={onClose}
-										className="p-2 rounded-full text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
+										className="p-2 rounded-full text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200"
 									>
 										<HiOutlineX size={22} />
 									</button>
