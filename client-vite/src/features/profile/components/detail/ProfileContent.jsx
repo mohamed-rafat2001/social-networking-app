@@ -15,8 +15,8 @@ const ProfileContent = ({ activeTab, userPosts, isCurrentUser }) => {
                         exit={{ opacity: 0, y: -10 }}
                     >
                         {userPosts.length > 0 ? (
-                            userPosts.map((post, index) => (
-                                <PostItem key={post._id} post={post} index={index} />
+                            userPosts.map((post) => (
+                                <PostItem key={post._id} post={post} />
                             ))
                         ) : (
                             <div className="py-24 text-center">

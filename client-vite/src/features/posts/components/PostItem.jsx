@@ -17,7 +17,7 @@ import PostItemContent from "./detail/PostItemContent";
 import PostItemActions from "./detail/PostItemActions";
 import PostItemModals from "./detail/PostItemModals";
 
-function PostItem({ post, index }) {
+function PostItem({ post }) {
 	const navigate = useNavigate();
 	const { user } = useUser();
 	const { darkMode } = useTheme();

@@ -4,7 +4,6 @@ import {
 	HiChatAlt2,
 	HiRefresh,
 	HiHeart,
-	HiChartBar,
 	HiOutlineChatAlt,
 } from "react-icons/hi";
 import { cn, Dropdown, DropdownItem } from "../../../../shared/components/ui";

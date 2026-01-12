@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
 	HiOutlineSearch,
 	HiOutlineX,
-	HiUserAdd,
-	HiUserRemove,
 } from "react-icons/hi";
 import { Avatar, Button, cn } from "../../../shared/components/ui";
 import { useNavigate } from "react-router-dom";

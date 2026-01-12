@@ -105,12 +105,3 @@ export const resetPassword = async (resetData) => {
 	const response = await apiApp.patch("/user/resetPassword", resetData);
 	return response.data;
 };
-
-export const updateProfileImageDirect = async (formData) => {
-	const response = await apiApp.post("/user/profileImg", formData, {
-		headers: {
-			"Content-Type": "multipart/form-data",
-		},
-	});
-	return response.data;
-};

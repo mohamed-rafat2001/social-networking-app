@@ -7,7 +7,6 @@ import {
 	HiOutlineTrash,
 } from "react-icons/hi";
 import {
-	Avatar,
 	Dropdown,
 	DropdownItem,
 } from "../../../../shared/components/ui";

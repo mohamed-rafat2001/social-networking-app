@@ -5,7 +5,7 @@ import * as z from "zod";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import InputEmoji from "react-input-emoji";
-import { Avatar, Button, Spinner, cn } from "../../../shared/components/ui";
+import { Avatar, Button, Spinner } from "../../../shared/components/ui";
 import { useUser } from "../../../shared/hooks/useUser";
 import { useTheme } from "../../../providers/ThemeProvider";
 import { useSocket } from "../../../shared/hooks/useSocket";
@@ -22,7 +22,7 @@ const commentSchema = z.object({
 function CommentList({ comments, postId, recipientId }) {
 	const { user } = useUser();
 	const { darkMode } = useTheme();
-	const { socket } = useSocket();
+	useSocket();
 	const { mutate: addComment, isLoading } = useAddComment();
 
 	const {

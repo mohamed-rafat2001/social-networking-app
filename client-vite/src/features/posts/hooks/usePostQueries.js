@@ -4,7 +4,6 @@ import { useSocket } from "../../../shared/hooks/useSocket";
 import { useUser } from "../../../shared/hooks/useUser";
 
 export const usePosts = (feedType = "for-you") => {
-	const { user } = useUser();
 	return useQuery({
 		queryKey: ["posts", feedType],
 		queryFn: () => postService.getPosts(feedType),

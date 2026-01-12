@@ -5,12 +5,7 @@ import * as z from "zod";
 import { toast } from "react-hot-toast";
 import { useUser } from "../../../shared/hooks/useUser.js";
 import { useTheme } from "../../../providers/ThemeProvider";
-import {
-	usePosts,
-	useAddPost,
-	useLikePost,
-	useSharePost,
-} from "../hooks/usePostQueries.js";
+import { usePosts, useAddPost } from "../hooks/usePostQueries.js";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import InputEmoji from "react-input-emoji";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,18 +17,7 @@ import {
 	ImageModal,
 } from "../../../shared/components/ui";
 
-import {
-	HiPhotograph,
-	HiFilm,
-	HiEmojiHappy,
-	HiDotsHorizontal,
-	HiChatAlt2,
-	HiRefresh,
-	HiHeart,
-	HiX,
-	HiChartBar,
-	HiUpload,
-} from "react-icons/hi";
+import { HiPhotograph, HiFilm, HiEmojiHappy, HiX } from "react-icons/hi";
 
 import PostItem from "./PostItem";
 
@@ -53,7 +37,7 @@ function PostList() {
 
 	const { user } = useUser();
 	const { darkMode } = useTheme();
-	const { onlineUsers } = useSocket();
+	useSocket();
 
 	const {
 		data: postsData,
@@ -72,8 +56,6 @@ function PostList() {
 		error: postsError?.message,
 	});
 	const { mutate: addPostMutation } = useAddPost();
-	const { mutate: likePostMutation } = useLikePost();
-	const { mutate: sharePostMutation } = useSharePost();
 
 	const {
 		control,
@@ -114,13 +96,6 @@ function PostList() {
 			URL.revokeObjectURL(prev[index]);
 			return prev.filter((_, i) => i !== index);
 		});
-	};
-
-	const likeOn = (id) => {
-		likePostMutation(id);
-	};
-	const addShare = (id) => {
-		sharePostMutation(id);
 	};
 
 	const onSubmit = (data) => {
@@ -421,9 +396,7 @@ function PostList() {
 							<Spinner size="lg" />
 						</div>
 					) : posts.length > 0 ? (
-						posts.map((post, index) => (
-							<PostItem key={post._id} post={post} index={index} />
-						))
+						posts.map((post) => <PostItem key={post._id} post={post} />)
 					) : (
 						<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
 							<div className="w-16 h-16 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">

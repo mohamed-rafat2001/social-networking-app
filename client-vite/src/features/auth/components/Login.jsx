@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { HiMail, HiLockClosed } from "react-icons/hi";
-import { Button, Input, Spinner } from "../../../shared/components/ui";
+import { Button, Input } from "../../../shared/components/ui";
 import { useLogin } from "../hooks/useUserQueries";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
