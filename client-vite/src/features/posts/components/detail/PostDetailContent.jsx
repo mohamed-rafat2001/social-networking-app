@@ -154,53 +154,6 @@ const PostDetailContent = ({
 							className="rounded-lg shadow-sm"
 						/>
 					)}
-
-					{/* Nested Original Post Actions */}
-					<div className="flex items-center justify-between text-gray-400 dark:text-gray-500 mt-4 px-1">
-						<button
-							className="flex items-center gap-1 hover:text-primary transition-colors group"
-							onClick={onComment}
-						>
-							<HiChatAlt2 size={16} />
-							<span className="text-[12px]">
-								{originalPost.comments?.length || 0}
-							</span>
-						</button>
-
-						<button
-							className={cn(
-								"flex items-center gap-1 hover:text-green-500 transition-colors group",
-								isShared && "text-green-500"
-							)}
-							onClick={(e) => {
-								e.stopPropagation();
-								onRepost();
-							}}
-						>
-							<HiRefresh size={16} />
-							<span className="text-[12px]">
-								{originalPost.shares?.length || 0}
-							</span>
-						</button>
-
-						<button
-							className={cn(
-								"flex items-center gap-1 hover:text-pink-500 transition-colors group",
-								isLiked && "text-pink-500"
-							)}
-							onClick={onLike}
-						>
-							<HiHeart size={16} />
-							<span className="text-[12px]">
-								{originalPost.likes?.length || 0}
-							</span>
-						</button>
-
-						<div className="flex items-center gap-1">
-							<HiChartBar size={16} />
-							<span className="text-[12px]">{originalPost.views || 0}</span>
-						</div>
-					</div>
 				</div>
 			) : (
 				<>

@@ -170,13 +170,11 @@ function PostItem({ post, index }) {
 								isShare={isShare}
 								onLike={(e) => {
 									e.stopPropagation();
-									likePost(post.originalPostId || post._id);
+									likePost(post._id);
 								}}
 								onRepost={handleRepost}
 								onRepostWithNote={() => setIsRepostModalOpen(true)}
-								onComment={() =>
-									navigate(`/posts/${post.originalPostId || post._id}`)
-								}
+								onComment={() => navigate(`/posts/${post._id}`)}
 								user={user}
 							/>
 
