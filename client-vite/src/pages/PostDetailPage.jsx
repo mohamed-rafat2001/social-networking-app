@@ -97,14 +97,16 @@ function PostDetailPage() {
 	};
 
 	const handleRepostWithNote = () => {
-		if (!repostNote.trim()) return;
+		const originalPostId = post.originalPostId || post._id;
 		sharePost(
-			{ postId: post.originalPostId || post._id, note: repostNote },
+			{ postId: originalPostId, note: repostNote },
 			{
 				onSuccess: () => {
 					setIsRepostModalOpen(false);
 					setRepostNote("");
-					toast.success("Reposted with note");
+					toast.success(
+						repostNote.trim() ? "Reposted with note" : "Reposted successfully"
+					);
 				},
 				onError: (error) => {
 					toast.error(error.response?.data?.message || "Failed to repost");
@@ -254,12 +256,7 @@ function PostDetailPage() {
 						<Button variant="secondary" onClick={closeRepostModal}>
 							Cancel
 						</Button>
-						<Button
-							onClick={handleRepostWithNote}
-							disabled={!repostNote.trim()}
-						>
-							Repost
-						</Button>
+						<Button onClick={handleRepostWithNote}>Repost</Button>
 					</div>
 				</div>
 			</Modal>

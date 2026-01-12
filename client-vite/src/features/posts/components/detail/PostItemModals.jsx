@@ -140,21 +140,20 @@ const PostItemModals = ({
 					</div>
 
 					<div className="flex justify-end gap-3 pt-2">
-						<Button
-							variant="secondary"
-							onClick={closeRepostModal}
-							className="rounded-full px-5"
-						>
-							Cancel
-						</Button>
-						<Button
-							onClick={handleRepostWithNote}
-							disabled={!repostNote.trim()}
-							className="rounded-full px-6"
-						>
-							Repost
-						</Button>
-					</div>
+							<Button
+								variant="secondary"
+								onClick={closeRepostModal}
+								className="rounded-full px-5"
+							>
+								Cancel
+							</Button>
+							<Button
+								onClick={handleRepostWithNote}
+								className="rounded-full px-6"
+							>
+								Repost
+							</Button>
+						</div>
 				</div>
 			</Modal>
 		</>

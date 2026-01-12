@@ -72,7 +72,6 @@ function PostItem({ post }) {
 	};
 
 	const handleRepostWithNote = () => {
-		if (!repostNote.trim()) return;
 		const originalPostId = post.originalPostId || post._id;
 		const recipientId = post.userId?._id || post.userId;
 		sharePost(
@@ -81,7 +80,9 @@ function PostItem({ post }) {
 				onSuccess: () => {
 					setIsRepostModalOpen(false);
 					setRepostNote("");
-					toast.success("Reposted with note");
+					toast.success(
+						repostNote.trim() ? "Reposted with note" : "Reposted successfully"
+					);
 				},
 				onError: (error) => {
 					toast.error(error.response?.data?.message || "Failed to repost");

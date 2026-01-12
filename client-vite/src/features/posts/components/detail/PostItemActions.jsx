@@ -45,46 +45,26 @@ const PostItemActions = ({
 
 			{/* Share button */}
 			<div className="flex items-center">
-				<Dropdown
-					align="left"
-					trigger={
-						<motion.button
-							className={cn(
-								"flex items-center gap-1.5 transition-all duration-200 hover:text-green-500 group",
-								isShared && "text-green-500"
-							)}
-							whileHover={{ scale: 1.05 }}
-						>
-							<div className="p-2 rounded-full group-hover:bg-green-50 dark:group-hover:bg-green-900/20 transition-colors">
-								<HiRefresh size={19} />
-							</div>
-							{showStats && (
-								<span className="text-[13px] font-medium opacity-80 group-hover:opacity-100">
-									{post.shares?.length || 0}
-								</span>
-							)}
-						</motion.button>
-					}
+				<motion.button
+					className={cn(
+						"flex items-center gap-1.5 transition-all duration-200 hover:text-green-500 group",
+						isShared && "text-green-500"
+					)}
+					whileHover={{ scale: 1.05 }}
+					onClick={(e) => {
+						e.stopPropagation();
+						setIsRepostModalOpen(true);
+					}}
 				>
-					<DropdownItem
-						icon={HiRefresh}
-						onClick={(e) => {
-							e.stopPropagation();
-							handleRepost();
-						}}
-					>
-						Repost
-					</DropdownItem>
-					<DropdownItem
-						icon={HiOutlineChatAlt}
-						onClick={(e) => {
-							e.stopPropagation();
-							setIsRepostModalOpen(true);
-						}}
-					>
-						Repost with note
-					</DropdownItem>
-				</Dropdown>
+					<div className="p-2 rounded-full group-hover:bg-green-50 dark:group-hover:bg-green-900/20 transition-colors">
+						<HiRefresh size={19} />
+					</div>
+					{showStats && (
+						<span className="text-[13px] font-medium opacity-80 group-hover:opacity-100">
+							{post.shares?.length || 0}
+						</span>
+					)}
+				</motion.button>
 			</div>
 
 			<motion.button
