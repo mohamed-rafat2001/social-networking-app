@@ -156,7 +156,7 @@ const Header = ({ onMenuClick }) => {
 							<input
 								type="text"
 								className="block w-full pl-11 pr-4 py-2.5 bg-slate-100 dark:bg-gray-900/50 border-none rounded-2xl text-[15px] text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary/20 focus:bg-white dark:focus:bg-gray-900 transition-all"
-								placeholder="Search engineering minds..."
+								placeholder="Search about users groups..."
 								value={searchTerm}
 								onChange={(e) => {
 									setSearchTerm(e.target.value);
