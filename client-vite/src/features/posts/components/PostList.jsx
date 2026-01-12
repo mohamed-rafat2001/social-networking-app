@@ -154,7 +154,7 @@ function PostList() {
 						<button
 							key={type}
 							onClick={() => setFeedType(type)}
-							className="flex-1 py-4 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative group"
+							className="flex-1 py-4 px-6 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative group"
 						>
 							<span
 								className={cn(
@@ -169,7 +169,7 @@ function PostList() {
 							{feedType === type && (
 								<motion.div
 									layoutId="activeTab"
-									className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-1 bg-primary rounded-full"
+									className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
 								/>
 							)}
 						</button>

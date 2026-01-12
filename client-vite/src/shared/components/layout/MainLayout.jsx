@@ -81,9 +81,7 @@ const MainLayout = () => {
 					</div>
 				</aside>
 				<main
-					className={`flex-1 bg-white dark:bg-gray-900 sm:rounded-2xl shadow-sm border-x sm:border border-slate-200 dark:border-gray-800 overflow-hidden ${
-						isMessagesPage ? "xl:max-w-none" : ""
-					}`}
+					className="flex-1 bg-white dark:bg-gray-900 sm:rounded-2xl shadow-sm border-x sm:border border-slate-200 dark:border-gray-800 overflow-hidden xl:max-w-none"
 				>
 					<Outlet />
 				</main>

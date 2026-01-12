@@ -2,6 +2,7 @@ import React from "react";
 import { useNotifications } from "../hooks/useNotifications";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { HiOutlineBell } from "react-icons/hi";
+import { Link } from "react-router-dom";
 import NotificationItem from "./detail/NotificationItem";
 
 const NotificationList = ({ filterType, onClose, hideHeader = false }) => {
@@ -15,6 +16,10 @@ const NotificationList = ({ filterType, onClose, hideHeader = false }) => {
 		if (filterType === "general") return n.type !== "message";
 		return true;
 	});
+
+	// Limit notifications to 5 items in dropdown
+	const limitedNotifications = filteredNotifications?.slice(0, 5);
+	const hasMore = filteredNotifications?.length > 5;
 
 	if (isLoading) {
 		return (
@@ -70,7 +75,7 @@ const NotificationList = ({ filterType, onClose, hideHeader = false }) => {
 				</div>
 			)}
 			<div className="flex-1 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-800">
-				{filteredNotifications.map((notification) => (
+				{limitedNotifications.map((notification) => (
 					<NotificationItem
 						key={notification._id}
 						notification={notification}
@@ -80,6 +85,15 @@ const NotificationList = ({ filterType, onClose, hideHeader = false }) => {
 					/>
 				))}
 			</div>
+			{hasMore && (
+				<Link
+					to={filterType === "messages" ? "/messages" : "/notifications"}
+					onClick={onClose}
+					className="block w-full p-4 text-center text-primary font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-t border-gray-100 dark:border-gray-800"
+				>
+					Show All {filterType === "messages" ? "Messages" : "Notifications"}
+				</Link>
+			)}
 		</div>
 	);
 };

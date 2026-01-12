@@ -46,7 +46,7 @@ const NotificationsPage = () => {
 			</div>
 
 			<div className="bg-white dark:bg-slate-950 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
-				<NotificationList filterType="general" />
+				<NotificationList filterType="general" hideHeader={true} />
 			</div>
 		</div>
 	);
