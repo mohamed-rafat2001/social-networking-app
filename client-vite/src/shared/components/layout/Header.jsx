@@ -326,7 +326,7 @@ const Header = ({ onMenuClick }) => {
 										<div className="flex items-center gap-1">
 											<span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
 											<span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-												Online
+												{user?.userType || "User"}
 											</span>
 										</div>
 									</div>
@@ -349,10 +349,8 @@ const Header = ({ onMenuClick }) => {
 												<span className="flex-1">Profile</span>
 											</Link>
 											<div className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400">
-												{user?.userType?.charAt(0).toUpperCase() +
-													user?.userType?.slice(1)}
 												{user?.major &&
-													` • ${
+													`${
 														user.major.charAt(0).toUpperCase() +
 														user.major.slice(1)
 													}`}

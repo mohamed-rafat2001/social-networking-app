@@ -90,7 +90,7 @@ const NotificationList = ({
 		);
 	}
 
-	const unreadCount = filteredNotifications.filter((n) => !n.read).length;
+	const unreadCount = filteredNotifications?.filter((n) => !n.read).length || 0;
 
 	return (
 		<div className="flex flex-col h-full">

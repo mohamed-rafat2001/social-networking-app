@@ -154,7 +154,7 @@ const ProfileDetail = () => {
 				<ProfileTabs
 					activeTab={activeTab}
 					setActiveTab={setActiveTab}
-					userPostsCount={userPosts.length}
+					userPostsCount={userPosts?.length || 0}
 					followersCount={user.followers?.length || 0}
 					followingCount={user.following?.length || 0}
 					handleFollowsClick={handleFollowsClick}
