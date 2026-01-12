@@ -270,7 +270,7 @@ function PostList() {
 								)}
 							</AnimatePresence>
 
-							<div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 dark:border-gray-800/50">
+							<div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/50">
 								<div className="flex items-center">
 									<button
 										type="button"
