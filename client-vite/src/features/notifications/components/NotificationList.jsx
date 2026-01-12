@@ -44,17 +44,18 @@ const NotificationList = ({
 	}, [isDropdown, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 	// Filter notifications based on type if filterType is provided
-	const filteredNotifications = notifications?.filter((n) => {
-		if (filterType === "messages") return n.type === "message";
-		if (filterType === "general") return n.type !== "message";
-		return true;
-	});
+	const filteredNotifications =
+		notifications?.filter((n) => {
+			if (filterType === "messages") return n.type === "message";
+			if (filterType === "general") return n.type !== "message";
+			return true;
+		}) || [];
 
 	// Limit notifications to 5 items only in dropdown context
 	const displayNotifications = isDropdown
-		? filteredNotifications?.slice(0, 5)
+		? filteredNotifications.slice(0, 5)
 		: filteredNotifications;
-	const hasMore = isDropdown && filteredNotifications?.length > 5;
+	const hasMore = isDropdown && filteredNotifications.length > 5;
 
 	if (isLoading) {
 		return (
