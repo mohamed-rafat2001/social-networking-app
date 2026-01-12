@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import {
 	Avatar,
@@ -28,6 +28,7 @@ const PostDetailContent = ({
 	onComment,
 	user,
 }) => {
+	const navigate = useNavigate();
 	const isShare = post.type === "share";
 	const originalAuthor = post.originalPost?.userId || post.userId;
 	const originalDate = post.originalPost?.createdAt || post.createdAt;
@@ -44,9 +45,7 @@ const PostDetailContent = ({
 		<div className="p-4">
 			<div className="flex gap-4 mb-4">
 				<Link
-					to={`/profile/${
-						isShare ? post.sharedBy?._id : post.userId?._id
-					}`}
+					to={`/profile/${isShare ? post.sharedBy?._id : post.userId?._id}`}
 					className="shrink-0"
 				>
 					<Avatar
@@ -117,7 +116,13 @@ const PostDetailContent = ({
 
 			{/* Post Content / Original Post Content */}
 			{isShare ? (
-				<div className="mt-2 p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/20 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+				<div
+					className="mt-2 p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/20 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors cursor-pointer"
+					onClick={(e) => {
+						e.stopPropagation();
+						navigate(`/posts/${post.originalPostId}`);
+					}}
+				>
 					<div className="flex items-center gap-2 mb-2">
 						<Avatar
 							src={originalAuthor?.image?.secure_url}

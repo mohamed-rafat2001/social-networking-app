@@ -41,10 +41,126 @@ export const useLikePost = () => {
 
 	return useMutation({
 		mutationFn: postService.likePost,
-		onSuccess: (response, postId) => {
-			queryClient.invalidateQueries(["posts"]);
-			queryClient.invalidateQueries(["post", postId]);
+		onMutate: async (postId) => {
+			// Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+			await queryClient.cancelQueries({ queryKey: ["posts"] });
+			await queryClient.cancelQueries({ queryKey: ["post", postId] });
+			await queryClient.cancelQueries({ queryKey: ["userProfile"] });
 
+			// Snapshot the previous value
+			const previousPosts = queryClient.getQueryData(["posts"]);
+			const previousPost = queryClient.getQueryData(["post", postId]);
+			const previousProfiles = queryClient.getQueriesData({
+				queryKey: ["userProfile"],
+			});
+
+			// Optimistically update to the new value
+			const updatePostInList = (old) => {
+				if (!old || !old.data) return old;
+				return {
+					...old,
+					data: Array.isArray(old.data)
+						? old.data.map((p) => {
+								if (p._id === postId) {
+									const isLiked = p.likes?.some(
+										(like) => (like._id || like) === currentUser?._id
+									);
+									const newLikes = isLiked
+										? p.likes.filter(
+												(like) => (like._id || like) !== currentUser?._id
+										  )
+										: [...(p.likes || []), currentUser?._id];
+
+									return {
+										...p,
+										likes: newLikes,
+										likesNumber: isLiked
+											? Math.max(0, (p.likesNumber || 1) - 1)
+											: (p.likesNumber || 0) + 1,
+									};
+								}
+								return p;
+						  })
+						: old.data,
+				};
+			};
+
+			queryClient.setQueriesData({ queryKey: ["posts"] }, updatePostInList);
+
+			// Also update userProfile queries if they exist (they contain posts)
+			queryClient.setQueriesData({ queryKey: ["userProfile"] }, (old) => {
+				if (!old || !old.data || !old.data.posts) return old;
+				return {
+					...old,
+					data: {
+						...old.data,
+						posts: old.data.posts.map((p) => {
+							if (p._id === postId) {
+								const isLiked = p.likes?.some(
+									(like) => (like._id || like) === currentUser?._id
+								);
+								const newLikes = isLiked
+									? p.likes.filter(
+											(like) => (like._id || like) !== currentUser?._id
+									  )
+									: [...(p.likes || []), currentUser?._id];
+
+								return {
+									...p,
+									likes: newLikes,
+									likesNumber: isLiked
+										? Math.max(0, (p.likesNumber || 1) - 1)
+										: (p.likesNumber || 0) + 1,
+								};
+							}
+							return p;
+						}),
+					},
+				};
+			});
+
+			queryClient.setQueryData(["post", postId], (old) => {
+				if (!old || !old.data) return old;
+				const p = old.data;
+				const isLiked = p.likes?.some(
+					(like) => (like._id || like) === currentUser?._id
+				);
+				const newLikes = isLiked
+					? p.likes.filter((like) => (like._id || like) !== currentUser?._id)
+					: [...(p.likes || []), currentUser?._id];
+
+				return {
+					...old,
+					data: {
+						...p,
+						likes: newLikes,
+						likesNumber: isLiked
+							? Math.max(0, (p.likesNumber || 1) - 1)
+							: (p.likesNumber || 0) + 1,
+					},
+				};
+			});
+
+			return { previousPosts, previousPost, previousProfiles };
+		},
+		onError: (err, postId, context) => {
+			if (context?.previousPosts) {
+				queryClient.setQueriesData(
+					{ queryKey: ["posts"] },
+					context.previousPosts
+				);
+			}
+			if (context?.previousPost) {
+				queryClient.setQueryData(["post", postId], context.previousPost);
+			}
+			if (context?.previousProfiles) {
+				context.previousProfiles.forEach(([queryKey, previousData]) => {
+					queryClient.setQueryData(queryKey, previousData);
+				});
+			}
+			toast.error("Failed to update like");
+		},
+		onSuccess: (response, postId) => {
 			const post = response.data;
 			const postAuthorId = post.userId?._id || post.userId;
 
@@ -67,6 +183,11 @@ export const useLikePost = () => {
 					},
 				});
 			}
+		},
+		onSettled: (data, error, postId) => {
+			queryClient.invalidateQueries({ queryKey: ["posts"] });
+			queryClient.invalidateQueries({ queryKey: ["post", postId] });
+			queryClient.invalidateQueries({ queryKey: ["userProfile"] });
 		},
 	});
 };
@@ -109,17 +230,35 @@ export const useIncrementView = () => {
 		mutationFn: postService.incrementView,
 		onSuccess: (data, postId) => {
 			// Update the cache directly to avoid a refetch for just a view count
-			queryClient.setQueryData(["posts"], (old) => {
-				if (!old) return old;
+			const updateViewCount = (old) => {
+				if (!old || !old.data) return old;
 				return {
 					...old,
-					data: old.data.map((p) =>
-						p._id === postId ? { ...p, views: (p.views || 0) + 1 } : p
-					),
+					data: Array.isArray(old.data)
+						? old.data.map((p) =>
+								p._id === postId ? { ...p, views: (p.views || 0) + 1 } : p
+						  )
+						: old.data,
+				};
+			};
+
+			queryClient.setQueriesData({ queryKey: ["posts"] }, updateViewCount);
+
+			queryClient.setQueriesData({ queryKey: ["userProfile"] }, (old) => {
+				if (!old || !old.data || !old.data.posts) return old;
+				return {
+					...old,
+					data: {
+						...old.data,
+						posts: old.data.posts.map((p) =>
+							p._id === postId ? { ...p, views: (p.views || 0) + 1 } : p
+						),
+					},
 				};
 			});
+
 			queryClient.setQueryData(["post", postId], (old) => {
-				if (!old) return old;
+				if (!old || !old.data) return old;
 				return {
 					...old,
 					data: { ...old.data, views: (old.data.views || 0) + 1 },

@@ -1,5 +1,6 @@
 import React from "react";
 import { formatDistanceToNow } from "date-fns";
+import { useNavigate } from "react-router-dom";
 import { ImageGallery, Avatar, cn } from "../../../../shared/components/ui";
 
 const PostItemContent = ({
@@ -8,6 +9,7 @@ const PostItemContent = ({
 
 	user,
 }) => {
+	const navigate = useNavigate();
 	const originalAuthor = post.userId;
 	const originalDate = post.createdAt;
 	const originalPost = post.originalPost || post;
@@ -23,7 +25,13 @@ const PostItemContent = ({
 
 			{/* Original Post Content */}
 			{isShare ? (
-				<div className="mt-2 p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/20 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+				<div
+					className="mt-2 p-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/20 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors cursor-pointer"
+					onClick={(e) => {
+						e.stopPropagation();
+						navigate(`/posts/${post.originalPostId}`);
+					}}
+				>
 					<div className="flex items-center gap-2 mb-2">
 						<Avatar
 							src={originalAuthor?.image?.secure_url}
