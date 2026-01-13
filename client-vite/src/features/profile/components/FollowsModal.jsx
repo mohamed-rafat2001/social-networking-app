@@ -83,6 +83,3 @@ const FollowsModal = ({ isOpen, onClose, title, users = [], currentUser }) => {
 };
 
 export default FollowsModal;
-
-
-export default FollowsModal;
