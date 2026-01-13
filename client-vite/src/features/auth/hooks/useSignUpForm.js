@@ -25,12 +25,40 @@ const signUpSchema = z
 		phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
 		city: z.string().min(2, "City is required"),
 		country: z.string().min(2, "Country is required"),
-		major: z.string().min(2, "Major is required"),
+		major: z.enum(
+			[
+				"aerospace engineering",
+				"agricultural engineering",
+				"architectural engineering",
+				"biomedical engineering",
+				"chemical engineering",
+				"civil engineering",
+				"computer engineering",
+				"computer science",
+				"electrical engineering",
+				"environmental engineering",
+				"geological engineering",
+				"industrial engineering",
+				"marine engineering",
+				"materials science and engineering",
+				"mechanical engineering",
+				"mechatronics engineering",
+				"mining engineering",
+				"nuclear engineering",
+				"petroleum engineering",
+				"software engineering",
+				"systems engineering",
+				"other",
+			],
+			{
+				errorMap: () => ({ message: "Please select your major" }),
+			}
+		),
 		gender: z.enum(["male", "female"], {
 			errorMap: () => ({ message: "Please select your gender" }),
 		}),
 		userType: z.enum(
-			["engineering student", "engineering teacher", "engineer"],
+			["engineering student", "engineering teacher", "engineer", "other"],
 			{
 				errorMap: () => ({ message: "Please select your profession" }),
 			}

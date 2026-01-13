@@ -67,14 +67,37 @@ const SignUpStep2 = ({ register, errors, prevStep, isPending }) => {
 				error={errors.major?.message}
 			>
 				<option value="">Select your major</option>
-				<option value="computer science">Computer Science</option>
-				<option value="mechanical engineering">Mechanical Engineering</option>
-				<option value="electrical engineering">Electrical Engineering</option>
-				<option value="civil engineering">Civil Engineering</option>
-				<option value="chemical engineering">Chemical Engineering</option>
 				<option value="aerospace engineering">Aerospace Engineering</option>
+				<option value="agricultural engineering">
+					Agricultural Engineering
+				</option>
+				<option value="architectural engineering">
+					Architectural Engineering
+				</option>
 				<option value="biomedical engineering">Biomedical Engineering</option>
+				<option value="chemical engineering">Chemical Engineering</option>
+				<option value="civil engineering">Civil Engineering</option>
+				<option value="computer engineering">Computer Engineering</option>
+				<option value="computer science">Computer Science</option>
+				<option value="electrical engineering">Electrical Engineering</option>
+				<option value="environmental engineering">
+					Environmental Engineering
+				</option>
+				<option value="geological engineering">Geological Engineering</option>
 				<option value="industrial engineering">Industrial Engineering</option>
+				<option value="marine engineering">Marine Engineering</option>
+				<option value="materials science and engineering">
+					Materials Science & Engineering
+				</option>
+				<option value="mechanical engineering">Mechanical Engineering</option>
+				<option value="mechatronics engineering">
+					Mechatronics Engineering
+				</option>
+				<option value="mining engineering">Mining Engineering</option>
+				<option value="nuclear engineering">Nuclear Engineering</option>
+				<option value="petroleum engineering">Petroleum Engineering</option>
+				<option value="software engineering">Software Engineering</option>
+				<option value="systems engineering">Systems Engineering</option>
 				<option value="other">Other</option>
 			</Select>
 
@@ -88,6 +111,7 @@ const SignUpStep2 = ({ register, errors, prevStep, isPending }) => {
 				<option value="engineering student">Engineering Student</option>
 				<option value="engineering teacher">Engineering Teacher</option>
 				<option value="engineer">Engineer</option>
+				<option value="other">Other</option>
 			</Select>
 
 			<div className="grid grid-cols-2 gap-4 pt-2">
