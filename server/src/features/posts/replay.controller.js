@@ -21,14 +21,27 @@ const addReplay = catchAsync(async (req, res, next) => {
 
 	// Create notification
 	if (comment.userId && comment.userId._id.toString() !== userId.toString()) {
-		await createNotification({
+		const notificationData = {
 			recipient: comment.userId._id,
 			sender: userId,
-			type: "comment", // Using comment type for replies too as per NotificationList logic
-			post: comment.postId,
+			type: "comment",
 			comment: comment._id,
 			content: replay.commentBody || req.body.commentBody,
-		});
+		};
+
+		// Check if the comment belongs to a Share or a Post
+		// We need to check the postId of the comment
+		const parentPost = await Posts.findById(comment.postId);
+		if (parentPost) {
+			notificationData.post = parentPost._id;
+		} else {
+			const parentShare = await Share.findById(comment.postId);
+			if (parentShare) {
+				notificationData.share = parentShare._id;
+			}
+		}
+
+		await createNotification(notificationData);
 	}
 
 	res.status(200).json({ status: "success", data: replay });

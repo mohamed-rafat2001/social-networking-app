@@ -21,6 +21,10 @@ const notificationSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Posts",
 		},
+		share: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Share",
+		},
 		comment: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Comment",

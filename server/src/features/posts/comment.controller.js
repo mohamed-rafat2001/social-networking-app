@@ -65,13 +65,21 @@ const addComment = catchAsync(async (req, res, next) => {
 
 	// Create notification
 	if (post && post.userId && post.userId._id.toString() !== userId.toString()) {
-		await createNotification({
+		const notificationData = {
 			recipient: post.userId._id,
 			sender: userId,
 			type: "comment",
-			post: post._id,
 			content: addComment.commentBody,
-		});
+		};
+
+		// Check if it's a Share (has sharePost field) or a Post
+		if (post.sharePost) {
+			notificationData.share = post._id;
+		} else {
+			notificationData.post = post._id;
+		}
+
+		await createNotification(notificationData);
 	}
 
 	res.status(200).json({ status: "success", data: addComment });
@@ -112,6 +120,32 @@ const likeOnComm = catchAsync(async (req, res, next) => {
 		like.likeNum = like.like.length;
 		like.disLikeNum = like.disLike.length;
 		await like.save();
+
+		// Create notification for comment like
+		if (
+			comment.userId &&
+			comment.userId.toString() !== req.user._id.toString()
+		) {
+			const notificationData = {
+				recipient: comment.userId,
+				sender: req.user._id,
+				type: "like",
+				comment: comment._id,
+			};
+
+			// We need to find the parent post/share to provide context for navigation
+			const parentPost = await Posts.findById(comment.postId);
+			if (parentPost) {
+				notificationData.post = parentPost._id;
+			} else {
+				const parentShare = await Share.findById(comment.postId);
+				if (parentShare) {
+					notificationData.share = parentShare._id;
+				}
+			}
+
+			await createNotification(notificationData);
+		}
 
 		res.status(200).json({ status: "success", data: like });
 	} else {
@@ -213,5 +247,5 @@ export {
 	deleteComment,
 	likeOnComm,
 	disLikeComm,
-	postComments
+	postComments,
 };

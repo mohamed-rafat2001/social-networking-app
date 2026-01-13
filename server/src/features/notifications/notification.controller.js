@@ -8,7 +8,9 @@ const getNotifications = catchAsync(async (req, res, next) => {
 	const features = new ApiFeatures(
 		Notification.find({ recipient: req.user._id })
 			.populate("sender", "firstName lastName image")
-			.populate("post", "text"),
+			.populate("post", "text")
+			.populate("share", "note")
+			.populate("comment", "commentBody"),
 		req.query
 	)
 		.filter()

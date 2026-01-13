@@ -36,7 +36,7 @@ const NotificationItem = ({
 		}
 	};
 
-	const handleClick = () => {
+	const handleClick = (e) => {
 		// Mark as read
 		if (!notification.read) {
 			markAsRead(notification._id);
@@ -53,9 +53,27 @@ const NotificationItem = ({
 		} else if (notification.post) {
 			const postId = notification.post._id || notification.post;
 			navigate(`/posts/${postId}`);
+		} else if (notification.share) {
+			const shareId = notification.share._id || notification.share;
+			navigate(`/posts/${shareId}`);
+		} else if (notification.comment) {
+			// If it's a comment notification but post is missing for some reason,
+			// we can try to find the post via the comment if it was populated
+			const postId = notification.comment.postId || notification.comment.post;
+			if (postId) {
+				navigate(`/posts/${postId}`);
+			} else {
+				navigate(`/profile/${notification.sender._id}`);
+			}
 		} else {
 			navigate(`/profile/${notification.sender._id}`);
 		}
+	};
+
+	const handleProfileClick = (e) => {
+		e.stopPropagation();
+		if (onClose) onClose();
+		navigate(`/profile/${notification.sender._id}`);
 	};
 
 	return (
@@ -65,7 +83,7 @@ const NotificationItem = ({
 				!notification.read ? "bg-primary/5 dark:bg-primary/5" : ""
 			}`}
 		>
-			<div className="relative shrink-0">
+			<div className="relative shrink-0" onClick={handleProfileClick}>
 				<Avatar
 					src={notification.sender.image?.secure_url}
 					size="lg"
@@ -75,21 +93,28 @@ const NotificationItem = ({
 					)}
 				/>
 				<div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-slate-900 transform group-hover:scale-110 transition-transform duration-300">
-					<div className="text-[12px]">
-						{getIcon(notification.type)}
-					</div>
+					<div className="text-[12px]">{getIcon(notification.type)}</div>
 				</div>
 			</div>
 
 			<div className="flex-1 min-w-0 flex flex-col justify-center">
 				<div className="flex items-baseline justify-between gap-2">
 					<p className="text-[14px] text-slate-900 dark:text-slate-100 leading-tight">
-						<span className="font-black hover:text-primary transition-colors">
+						<span
+							className="font-black hover:text-primary transition-colors cursor-pointer"
+							onClick={handleProfileClick}
+						>
 							{notification.sender.firstName} {notification.sender.lastName}
 						</span>{" "}
 						<span className="text-slate-500 dark:text-slate-400 font-medium">
-							{notification.type === "like" && "liked your post"}
-							{notification.type === "comment" && "commented on your post"}
+							{notification.type === "like" &&
+								(notification.comment
+									? "liked your comment"
+									: "liked your post")}
+							{notification.type === "comment" &&
+								(notification.comment
+									? "replied to your comment"
+									: "commented on your post")}
 							{notification.type === "follow" && "started following you"}
 							{notification.type === "mention" && "mentioned you in a post"}
 							{notification.type === "share" && "shared your post"}

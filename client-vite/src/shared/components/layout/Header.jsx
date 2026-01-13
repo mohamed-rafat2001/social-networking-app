@@ -369,22 +369,24 @@ const Header = ({ onMenuClick }) => {
 						</>
 					) : (
 						<div className="flex items-center gap-2 sm:gap-4">
-							{!isLandingPage && (
-								<Button
-									variant="ghost"
-									size="sm"
-									onClick={() => navigate("/welcome")}
-									className="text-slate-600 dark:text-slate-400 font-bold"
-								>
-									Sign In
-								</Button>
-							)}
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={() =>
+									navigate("/welcome", { state: { mode: "login" } })
+								}
+								className="text-slate-600 dark:text-slate-400 font-bold"
+							>
+								Sign In
+							</Button>
 							<Button
 								size="sm"
-								onClick={() => navigate("/welcome?tab=signup")}
+								onClick={() =>
+									navigate("/welcome", { state: { mode: "signup" } })
+								}
 								className="rounded-full px-6 font-black tracking-tight shadow-lg shadow-primary/25"
 							>
-								GET STARTED
+								JOIN NOW
 							</Button>
 						</div>
 					)}

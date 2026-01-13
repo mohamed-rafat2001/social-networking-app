@@ -90,7 +90,7 @@ const sharePost = catchAsync(async (req, res, next) => {
 			recipient: postWithAuthor.userId._id,
 			sender: userId,
 			type: "share",
-			post: postWithAuthor._id,
+			post: postWithAuthor._id, // This is always a Post ID in this controller
 		});
 	}
 

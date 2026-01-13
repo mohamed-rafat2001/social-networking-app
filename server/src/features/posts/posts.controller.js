@@ -415,12 +415,20 @@ const likeOnPost = catchAsync(async (req, res, next) => {
 			updatedDoc.userId &&
 			updatedDoc.userId._id.toString() !== req.user._id.toString()
 		) {
-			await createNotification({
+			const notificationData = {
 				recipient: updatedDoc.userId._id,
 				sender: req.user._id,
 				type: "like",
-				post: updatedDoc._id,
-			});
+			};
+
+			// Check if it's a Share (has sharePost field) or a Post
+			if (updatedDoc.sharePost) {
+				notificationData.share = updatedDoc._id;
+			} else {
+				notificationData.post = updatedDoc._id;
+			}
+
+			await createNotification(notificationData);
 		}
 
 		return res.status(200).json({ status: "success", data: updatedDoc });
