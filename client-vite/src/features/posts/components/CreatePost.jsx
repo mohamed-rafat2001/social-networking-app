@@ -65,7 +65,7 @@ const CreatePost = ({ user }) => {
 										}
 										.post-input-container .react-input-emoji--button {
 											position: absolute !important;
-											bottom: 12px !important;
+											bottom: -54px !important;
 											left: 48px !important;
 											color: #3b82f6 !important;
 											padding: 8px !important;
@@ -85,7 +85,7 @@ const CreatePost = ({ user }) => {
 										.post-input-container .react-input-emoji--picker-wrapper {
 											z-index: 1000 !important;
 											position: absolute !important;
-											bottom: 60px !important;
+											bottom: 0px !important;
 											left: 0 !important;
 										}
 									`}
