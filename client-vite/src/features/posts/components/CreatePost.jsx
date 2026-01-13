@@ -65,14 +65,15 @@ const CreatePost = ({ user }) => {
 										}
 										.post-input-container .react-input-emoji--button {
 											position: absolute !important;
-											bottom: -54px !important;
+											bottom: -68px !important;
 											left: 48px !important;
 											color: #3b82f6 !important;
-											padding: 8px !important;
+											padding: 10px !important;
 											transition: all 0.2s !important;
 											border-radius: 9999px !important;
 											z-index: 50 !important;
 											background: transparent !important;
+											cursor: pointer !important;
 										}
 										.post-input-container .react-input-emoji--button:hover {
 											background-color: rgba(59, 130, 246, 0.1) !important;
