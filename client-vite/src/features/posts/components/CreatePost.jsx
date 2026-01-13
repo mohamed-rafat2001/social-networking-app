@@ -51,7 +51,7 @@ const CreatePost = ({ user }) => {
 											padding: 0 !important;
 										}
 										.post-input-container .react-input-emoji--input {
-											padding: 12px 0 !important;
+											padding: 4px 0 !important;
 											min-height: 120px !important;
 											font-size: 19px !important;
 											line-height: 1.6 !important;
@@ -59,7 +59,7 @@ const CreatePost = ({ user }) => {
 										}
 										.post-input-container .react-input-emoji--placeholder {
 											left: 0 !important;
-											top: 12px !important;
+											top: 4px !important;
 											padding: 0 !important;
 											font-size: 19px !important;
 											color: ${darkMode ? "#475569" : "#94a3b8"} !important;
