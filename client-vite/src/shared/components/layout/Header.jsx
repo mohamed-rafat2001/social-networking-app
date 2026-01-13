@@ -1,7 +1,7 @@
 import React from "react";
 import { HiMenu, HiSearch } from "react-icons/hi";
 import { Button } from "../ui";
-import { useHeaderLogic } from "../../hooks/useHeaderLogic";
+import { useHeaderLogic } from "../../../shared/hooks/useHeaderLogic";
 import Logo from "./header/Logo";
 import DesktopNav from "./header/DesktopNav";
 import SearchSection from "./header/SearchSection";

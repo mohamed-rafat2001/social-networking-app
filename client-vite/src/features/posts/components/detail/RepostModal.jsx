@@ -91,10 +91,10 @@ const RepostModal = ({
 					<p className="text-[14px] text-slate-700 dark:text-slate-300 leading-relaxed line-clamp-4 break-words whitespace-pre-wrap">
 						{post.text}
 					</p>
-					{post.images?.length > 0 && (
+					{post.fileUp?.length > 0 && (
 						<div className="mt-3 rounded-xl overflow-hidden border border-slate-200/50 dark:border-slate-800/50">
 							<img
-								src={post.images[0].secure_url}
+								src={post.fileUp[0].secure_url}
 								alt="Post preview"
 								className="w-full h-40 object-cover"
 							/>

@@ -1,12 +1,12 @@
 import { useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useUser } from "../../hooks/useUser";
-import { useSocket } from "../../hooks/useSocket";
-import { useNotifications } from "../../../features/notifications/hooks/useNotifications";
-import { useTheme } from "../../../providers/ThemeProvider";
-import { useClickOutside } from "../../hooks/useClickOutside";
-import * as userService from "../../../features/profile/services/userService";
+import { useUser } from "./useUser";
+import { useSocket } from "./useSocket";
+import { useNotifications } from "../../features/notifications/hooks/useNotifications";
+import { useTheme } from "../../providers/ThemeProvider";
+import { useClickOutside } from "./useClickOutside";
+import * as userService from "../../features/profile/services/userService";
 
 export const useHeaderLogic = () => {
 	const { user } = useUser();

@@ -9,7 +9,7 @@ import {
 	HiBookmark,
 	HiBell,
 } from "react-icons/hi";
-import { useUser } from "../../hooks/useUser";
+import { useUser } from "../../../shared/hooks/useUser";
 import { useNotifications } from "../../../features/notifications/hooks/useNotifications";
 import { useChats } from "../../../features/chat/hooks/useChatQueries";
 
