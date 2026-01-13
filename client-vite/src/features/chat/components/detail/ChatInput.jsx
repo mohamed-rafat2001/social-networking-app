@@ -54,6 +54,7 @@ const ChatInput = ({
 							.emoji-input-container .react-input-emoji--input {
 								padding: 10px 12px !important;
 								min-height: 44px !important;
+								color: ${darkMode ? "#ffffff" : "#1e293b"} !important;
 							}
 							.emoji-input-container .react-input-emoji--picker-wrapper {
 								z-index: 1000 !important;

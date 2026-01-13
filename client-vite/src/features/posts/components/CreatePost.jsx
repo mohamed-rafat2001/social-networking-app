@@ -52,21 +52,22 @@ const CreatePost = ({ user }) => {
 										}
 										.post-input-container .react-input-emoji--input {
 											padding: 12px 0 !important;
-											min-height: 100px !important;
-											font-size: 18px !important;
-											line-height: 1.5 !important;
+											min-height: 120px !important;
+											font-size: 19px !important;
+											line-height: 1.6 !important;
 											color: ${darkMode ? "#f8fafc" : "#0f172a"} !important;
 										}
 										.post-input-container .react-input-emoji--placeholder {
 											left: 0 !important;
-											padding: 12px 0 !important;
-											font-size: 18px !important;
+											top: 12px !important;
+											padding: 0 !important;
+											font-size: 19px !important;
 											color: ${darkMode ? "#475569" : "#94a3b8"} !important;
 										}
 										.post-input-container .react-input-emoji--button {
 											position: absolute !important;
-											bottom: -68px !important;
-											left: 48px !important;
+											bottom: -78px !important;
+											left: 42px !important;
 											color: #3b82f6 !important;
 											padding: 10px !important;
 											transition: all 0.2s !important;
@@ -101,7 +102,7 @@ const CreatePost = ({ user }) => {
 											placeholder="What's happening in engineering?"
 											theme={darkMode ? "dark" : "light"}
 											cleanOnEnter={false}
-											fontSize={18}
+											fontSize={19}
 											fontFamily="inherit"
 											background="transparent"
 											borderColor="transparent"
