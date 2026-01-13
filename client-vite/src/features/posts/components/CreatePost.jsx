@@ -51,22 +51,22 @@ const CreatePost = ({ user }) => {
 											padding: 0 !important;
 										}
 										.post-input-container .react-input-emoji--input {
-											padding: 12px 0 12px 44px !important;
+											padding: 12px 0 !important;
 											min-height: 100px !important;
 											font-size: 18px !important;
 											line-height: 1.5 !important;
 											color: ${darkMode ? "#f8fafc" : "#0f172a"} !important;
 										}
 										.post-input-container .react-input-emoji--placeholder {
-											left: 44px !important;
+											left: 0 !important;
 											padding: 12px 0 !important;
 											font-size: 18px !important;
 											color: ${darkMode ? "#475569" : "#94a3b8"} !important;
 										}
 										.post-input-container .react-input-emoji--button {
 											position: absolute !important;
-											top: 8px !important;
-											left: 0 !important;
+											bottom: 12px !important;
+											left: 48px !important;
 											color: #3b82f6 !important;
 											padding: 8px !important;
 											transition: all 0.2s !important;
@@ -78,14 +78,14 @@ const CreatePost = ({ user }) => {
 											background-color: rgba(59, 130, 246, 0.1) !important;
 										}
 										.post-input-container .react-input-emoji--button svg {
-											width: 24px !important;
-											height: 24px !important;
+											width: 22px !important;
+											height: 22px !important;
 											fill: #3b82f6 !important;
 										}
 										.post-input-container .react-input-emoji--picker-wrapper {
 											z-index: 1000 !important;
 											position: absolute !important;
-											top: 50px !important;
+											bottom: 60px !important;
 											left: 0 !important;
 										}
 									`}
