@@ -4,9 +4,6 @@ import {
 	HiOutlineArrowLeft,
 	HiOutlineDotsVertical,
 	HiOutlineTrash,
-	HiOutlineVideoCamera,
-	HiOutlinePhone,
-	HiOutlineInformationCircle,
 } from "react-icons/hi";
 import { motion } from "framer-motion";
 import {
@@ -64,19 +61,9 @@ const ChatHeader = ({ otherUser, isOnline, setIsDeleteChatModalOpen }) => {
 			</Link>
 
 			<div className="ml-auto flex items-center gap-1">
-				<button className="p-2.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-all hidden sm:flex">
-					<HiOutlinePhone size={20} />
-				</button>
-				<button className="p-2.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-all hidden sm:flex">
-					<HiOutlineVideoCamera size={20} />
-				</button>
-				<button className="p-2.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full transition-all">
-					<HiOutlineInformationCircle size={20} />
-				</button>
-
 				<Dropdown
 					trigger={
-						<button className="p-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all">
+						<button className="p-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all cursor-pointer">
 							<HiOutlineDotsVertical size={20} />
 						</button>
 					}

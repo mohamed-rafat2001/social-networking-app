@@ -35,78 +35,89 @@ const CreatePost = ({ user }) => {
 						size="md"
 						className="shrink-0"
 					/>
-					<div className="flex-1 min-w-0">
-						<div className="post-input-container relative z-20">
-							<style>
-								{`
-									.post-input-container .react-input-emoji--container {
-										margin: 0 !important;
-										border: none !important;
-										background: transparent !important;
-									}
-									.post-input-container .react-input-emoji--wrapper {
-										background: transparent !important;
-										border: none !important;
-										padding: 0 !important;
-									}
-									.post-input-container .react-input-emoji--input {
-										padding: 8px 0 !important;
-										min-height: 80px !important;
-										font-size: 20px !important;
-										color: ${darkMode ? "#f8fafc" : "#0f172a"} !important;
-									}
-									.post-input-container .react-input-emoji--placeholder {
-										left: 0 !important;
-										padding: 8px 0 !important;
-										font-size: 20px !important;
-									}
-									.post-input-container .react-input-emoji--button {
-										position: absolute !important;
-										bottom: -45px !important;
-										left: 40px !important;
-										color: #3b82f6 !important;
-										padding: 10px !important;
-									}
-									.post-input-container .react-input-emoji--picker-wrapper {
-										z-index: 1000 !important;
-									}
-								`}
-							</style>
-							<Controller
-								name="text"
-								control={control}
-								render={({ field: { value, onChange } }) => (
-									<InputEmoji
-										value={value}
-										onChange={onChange}
-										placeholder="What's happening in engineering?"
-										theme={darkMode ? "dark" : "light"}
-										cleanOnEnter={false}
-										fontSize={20}
-										fontFamily="inherit"
-										background="transparent"
-										borderColor="transparent"
-										color={darkMode ? "#f8fafc" : "#0f172a"}
-										placeholderColor={darkMode ? "#475569" : "#94a3b8"}
-									/>
-								)}
+					<div className="flex-1 min-w-0 relative">
+						<div className="post-content-wrapper relative pb-12">
+							<div className="post-input-container z-10">
+								<style>
+									{`
+										.post-input-container .react-input-emoji--container {
+											margin: 0 !important;
+											border: none !important;
+											background: transparent !important;
+										}
+										.post-input-container .react-input-emoji--wrapper {
+											background: transparent !important;
+											border: none !important;
+											padding: 0 !important;
+										}
+										.post-input-container .react-input-emoji--input {
+											padding: 8px 0 !important;
+											min-height: 80px !important;
+											font-size: 20px !important;
+											color: ${darkMode ? "#f8fafc" : "#0f172a"} !important;
+										}
+										.post-input-container .react-input-emoji--placeholder {
+											left: 0 !important;
+											padding: 8px 0 !important;
+											font-size: 20px !important;
+										}
+										.post-input-container .react-input-emoji--button {
+											position: absolute !important;
+											bottom: 10px !important;
+											left: 44px !important;
+											color: #3b82f6 !important;
+											padding: 8px !important;
+											transition: all 0.2s !important;
+											border-radius: 9999px !important;
+											z-index: 60 !important;
+										}
+										.post-input-container .react-input-emoji--button:hover {
+											background-color: rgba(59, 130, 246, 0.1) !important;
+										}
+										.post-input-container .react-input-emoji--picker-wrapper {
+											z-index: 1000 !important;
+											position: absolute !important;
+											bottom: 50px !important;
+											left: 0 !important;
+										}
+									`}
+								</style>
+								<Controller
+									name="text"
+									control={control}
+									render={({ field: { value, onChange } }) => (
+										<InputEmoji
+											value={value}
+											onChange={onChange}
+											placeholder="What's happening in engineering?"
+											theme={darkMode ? "dark" : "light"}
+											cleanOnEnter={false}
+											fontSize={20}
+											fontFamily="inherit"
+											background="transparent"
+											borderColor="transparent"
+											color={darkMode ? "#f8fafc" : "#0f172a"}
+											placeholderColor={darkMode ? "#475569" : "#94a3b8"}
+										/>
+									)}
+								/>
+							</div>
+
+							{/* Image Previews */}
+							<PostImagePreviews
+								previewUrls={previewUrls}
+								removeFile={removeFile}
+								setSelectedPreviewIndex={setSelectedPreviewIndex}
+								setIsPreviewModalOpen={setIsPreviewModalOpen}
+							/>
+
+							<PostActions
+								fileInputRef={fileInputRef}
+								text={text}
+								files={files}
+								isUploading={isUploading}
 							/>
 						</div>
-
-						{/* Image Previews */}
-						<PostImagePreviews
-							previewUrls={previewUrls}
-							removeFile={removeFile}
-							setSelectedPreviewIndex={setSelectedPreviewIndex}
-							setIsPreviewModalOpen={setIsPreviewModalOpen}
-						/>
-
-						<PostActions
-							fileInputRef={fileInputRef}
-							text={text}
-							files={files}
-							isUploading={isUploading}
-						/>
 					</div>
 				</div>
 				<input
