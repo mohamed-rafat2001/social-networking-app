@@ -6,11 +6,7 @@ import {
 	HiOutlineTrash,
 	HiCheck,
 } from "react-icons/hi";
-import {
-	Dropdown,
-	DropdownItem,
-	cn,
-} from "../../../../shared/components/ui";
+import { Dropdown, DropdownItem, cn } from "../../../../shared/components/ui";
 
 export const MessageActions = ({
 	msg,
@@ -56,32 +52,39 @@ export const MessageActions = ({
 					</Dropdown>
 				</div>
 			)}
-
-			<div
-				className={cn(
-					"flex items-center gap-1.5 px-1 mt-0.5",
-					isMe ? "flex-row-reverse" : "flex-row"
-				)}
-			>
-				<span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-tight">
-					{formatMessageTime(msg.createdAt)}
-				</span>
-				{isMe && (
-					<div className="flex items-center">
-						{msg.read ? (
-							<div className="flex -space-x-1">
-								<HiCheck className="text-primary" size={12} />
-								<HiCheck className="text-primary" size={12} />
-							</div>
-						) : (
-							<HiCheck
-								className="text-slate-300 dark:text-slate-600"
-								size={12}
-							/>
-						)}
-					</div>
-				)}
-			</div>
 		</>
+	);
+};
+
+export const MessageStatus = ({ msg, isMe }) => {
+	const formatMessageTime = (date) => {
+		if (!date) return "";
+		const d = new Date(date);
+		return isToday(d) ? format(d, "HH:mm") : format(d, "MMM d, HH:mm");
+	};
+
+	return (
+		<div
+			className={cn(
+				"flex items-center gap-1.5 px-1 mt-1",
+				isMe ? "justify-end" : "justify-start"
+			)}
+		>
+			<span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-tight">
+				{formatMessageTime(msg.createdAt)}
+			</span>
+			{isMe && (
+				<div className="flex items-center">
+					{msg.read ? (
+						<div className="flex -space-x-1">
+							<HiCheck className="text-primary" size={12} />
+							<HiCheck className="text-primary" size={12} />
+						</div>
+					) : (
+						<HiCheck className="text-slate-300 dark:text-slate-600" size={12} />
+					)}
+				</div>
+			)}
+		</div>
 	);
 };

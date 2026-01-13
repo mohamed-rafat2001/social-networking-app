@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { cn } from "../../../../shared/components/ui";
 import { MessageContent } from "./MessageContent";
-import { MessageActions } from "./MessageActions";
+import { MessageActions, MessageStatus } from "./MessageActions";
 
 const MessageItem = ({
 	msg,
@@ -47,6 +47,8 @@ const MessageItem = ({
 							setMessageToDelete={setMessageToDelete}
 						/>
 					</div>
+
+					<MessageStatus msg={msg} isMe={isMe} />
 				</div>
 			</div>
 		</motion.div>
