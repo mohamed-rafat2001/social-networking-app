@@ -1,6 +1,6 @@
 import React from "react";
 import { HiOutlinePhotograph, HiOutlineX } from "react-icons/hi";
-import { ProgressBar, cn } from "../../../shared/components/ui";
+import { ProgressBar, cn } from "../../../../shared/components/ui";
 
 const UploadArea = ({
 	previewUrl,

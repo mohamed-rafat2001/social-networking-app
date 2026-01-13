@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../../shared/components/ui";
+import { Button } from "../../../../shared/components/ui";
 
 const HeroContent = () => {
 	const navigate = useNavigate();
@@ -28,9 +28,10 @@ const HeroContent = () => {
 					</span>
 				</h1>
 				<p className="text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-lg mx-auto md:mx-0 leading-relaxed">
-					The premier social platform designed to make all engineers connected with together. 
-					Share experiences, collaborate on projects, and grow your professional network 
-					with engineering majors from around the globe.
+					The premier social platform designed to make all engineers connected
+					with together. Share experiences, collaborate on projects, and grow
+					your professional network with engineering majors from around the
+					globe.
 				</p>
 				<div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
 					<motion.div

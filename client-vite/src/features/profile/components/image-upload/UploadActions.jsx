@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "../../../shared/components/ui";
+import { Button } from "../../../../shared/components/ui";
 
 const UploadActions = ({ onCancel, onUpload, isLoading, hasFile }) => {
 	return (

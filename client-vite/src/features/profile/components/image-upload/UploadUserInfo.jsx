@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar } from "../../../shared/components/ui";
+import { Avatar } from "../../../../shared/components/ui";
 
 const UploadUserInfo = ({ user }) => {
 	return (
