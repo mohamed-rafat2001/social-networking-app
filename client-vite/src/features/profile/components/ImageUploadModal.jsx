@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal } from "../../../shared/components/ui";
 import { useTheme } from "../../../providers/ThemeProvider";
-import { useImageUpload } from "../../hooks/useImageUpload";
+import { useImageUpload } from "../hooks/useImageUpload";
 import UploadUserInfo from "./image-upload/UploadUserInfo";
 import BioInput from "./image-upload/BioInput";
 import UploadArea from "./image-upload/UploadArea";
@@ -38,11 +38,7 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 			<div className="space-y-4">
 				<UploadUserInfo user={user} />
 
-				<BioInput
-					value={postText}
-					onChange={setPostText}
-					darkMode={darkMode}
-				/>
+				<BioInput value={postText} onChange={setPostText} darkMode={darkMode} />
 
 				<UploadArea
 					previewUrl={previewUrl}
