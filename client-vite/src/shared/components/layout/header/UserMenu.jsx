@@ -19,15 +19,9 @@ const UserMenu = ({
 			>
 				<Avatar src={user?.image?.secure_url} size="sm" />
 				<div className="hidden lg:block text-left">
-					<p className="text-xs font-black text-slate-900 dark:text-white leading-none mb-0.5">
+					<p className="text-xs font-black text-slate-900 dark:text-white leading-none">
 						{user?.firstName}
 					</p>
-					<div className="flex items-center gap-1">
-						<span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-						<span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-							{user?.userType || "User"}
-						</span>
-					</div>
 				</div>
 			</button>
 
@@ -47,10 +41,6 @@ const UserMenu = ({
 							<HiUserCircle size={20} />
 							<span className="flex-1">Profile</span>
 						</Link>
-						<div className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400">
-							{user?.major &&
-								`${user.major.charAt(0).toUpperCase() + user.major.slice(1)}`}
-						</div>
 						<button
 							onClick={handleLogout}
 							className="w-full flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors border-t border-slate-50 dark:border-gray-800"

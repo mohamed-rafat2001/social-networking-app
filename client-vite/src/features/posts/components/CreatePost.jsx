@@ -36,7 +36,7 @@ const CreatePost = ({ user }) => {
 						className="shrink-0"
 					/>
 					<div className="flex-1 min-w-0 relative">
-						<div className="post-content-wrapper relative pb-12">
+						<div className="post-content-wrapper relative">
 							<div className="post-input-container z-10">
 								<style>
 									{`
@@ -51,7 +51,7 @@ const CreatePost = ({ user }) => {
 											padding: 0 !important;
 										}
 										.post-input-container .react-input-emoji--input {
-											padding: 8px 0 !important;
+											padding: 8px 0 40px 0 !important;
 											min-height: 80px !important;
 											font-size: 20px !important;
 											color: ${darkMode ? "#f8fafc" : "#0f172a"} !important;
@@ -63,8 +63,8 @@ const CreatePost = ({ user }) => {
 										}
 										.post-input-container .react-input-emoji--button {
 											position: absolute !important;
-											bottom: 10px !important;
-											left: 44px !important;
+											bottom: 8px !important;
+											left: 0 !important;
 											color: #3b82f6 !important;
 											padding: 8px !important;
 											transition: all 0.2s !important;
