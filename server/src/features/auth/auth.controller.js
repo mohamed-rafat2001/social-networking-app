@@ -363,6 +363,22 @@ const user = catchAsync(async (req, res, next) => {
 	}
 
 	// Fetch followers, following, posts, and shared posts
+	const postsFeatures = new apiFeatures(
+		Posts.find({ userId: userData._id }),
+		req.query
+	)
+		.filter()
+		.sort()
+		.paginate();
+
+	const sharesFeatures = new apiFeatures(
+		Share.find({ userId: userData._id }),
+		req.query
+	)
+		.filter()
+		.sort()
+		.paginate();
+
 	const [followers, following, posts, sharedPosts] = await Promise.all([
 		Follow.find({ following: userId }).populate(
 			"follower",
@@ -372,12 +388,17 @@ const user = catchAsync(async (req, res, next) => {
 			"following",
 			"firstName lastName username image"
 		),
-		Posts.find({ userId: userData._id }).populate("userId"),
-		Share.find({ userId: userData._id }).populate({
+		postsFeatures.query.populate("userId"),
+		sharesFeatures.query.populate({
 			path: "sharePost",
 			populate: { path: "userId" },
 		}),
 	]);
+
+	// Get total count for pagination info (optional but good for client)
+	const totalPosts = await Posts.countDocuments({ userId: userData._id });
+	const totalShares = await Share.countDocuments({ userId: userData._id });
+	const results = totalPosts + totalShares;
 
 	// Combine posts and shared posts
 	const allUserPosts = [
@@ -403,6 +424,7 @@ const user = catchAsync(async (req, res, next) => {
 	userObj.followers = followers.map((f) => f.follower);
 	userObj.following = following.map((f) => f.following);
 	userObj.posts = allUserPosts;
+	userObj.results = results; // Add results count for pagination support
 
 	userObj.isFollowing = followers.some(
 		(f) => f.follower && f.follower._id.toString() === req.user?._id.toString()

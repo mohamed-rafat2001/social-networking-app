@@ -1,14 +1,26 @@
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import {
+	useMutation,
+	useQueryClient,
+	useQuery,
+	useInfiniteQuery,
+} from "@tanstack/react-query";
 import * as postService from "../services/postService";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useUser } from "../../../shared/hooks/useUser";
 
 export const usePosts = (feedType = "for-you") => {
-	return useQuery({
+	return useInfiniteQuery({
 		queryKey: ["posts", feedType],
-		queryFn: () => postService.getPosts(feedType),
+		queryFn: ({ pageParam = 1 }) => postService.getPosts(feedType, pageParam),
+		getNextPageParam: (lastPage, allPages) => {
+			const totalFetched = allPages.flatMap((page) => page.data).length;
+			if (totalFetched < lastPage.totalResults) {
+				return allPages.length + 1;
+			}
+			return undefined;
+		},
 		refetchInterval: 10000,
-		enabled: true, // Always allow fetching posts, server handles auth if needed
+		enabled: true,
 	});
 };
 

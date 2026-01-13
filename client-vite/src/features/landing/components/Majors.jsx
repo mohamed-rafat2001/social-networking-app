@@ -66,7 +66,7 @@ const Majors = () => {
 						transition={{ delay: 0.1 }}
 						className="text-4xl font-extrabold text-gray-900 dark:text-white mb-6"
 					>
-						Connect with peers in your major
+						Specialized Groups for All Engineering Majors
 					</motion.p>
 					<motion.p
 						initial={{ opacity: 0, y: 10 }}
@@ -75,8 +75,8 @@ const Majors = () => {
 						transition={{ delay: 0.2 }}
 						className="text-lg text-gray-600 dark:text-gray-400"
 					>
-						Join thousands of students across all engineering departments
-						already sharing insights and collaborating in groups.
+						EngiConnect brings together professionals and students from every discipline. 
+						Share experiences and collaborate in dedicated major-specific hubs.
 					</motion.p>
 				</div>
 

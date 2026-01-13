@@ -1,4 +1,8 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+	useInfiniteQuery,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
 import {
 	getNotifications,
 	markAsRead,
@@ -11,27 +15,23 @@ export const useNotifications = () => {
 	const queryClient = useQueryClient();
 	const { user } = useUser();
 
-	const { 
-		data, 
-		isLoading, 
-		fetchNextPage, 
-		hasNextPage, 
-		isFetchingNextPage 
-	} = useInfiniteQuery({
-		queryKey: ["notifications"],
-		queryFn: ({ pageParam = 1 }) => getNotifications(pageParam),
-		getNextPageParam: (lastPage, allPages) => {
-			if (lastPage.data.length < lastPage.results) {
-				return allPages.length + 1;
-			}
-			return undefined;
-		},
-		enabled: !!user,
-	});
+	const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+		useInfiniteQuery({
+			queryKey: ["notifications"],
+			queryFn: ({ pageParam = 1 }) => getNotifications(pageParam),
+			getNextPageParam: (lastPage, allPages) => {
+				const totalFetched = allPages.flatMap((page) => page.data).length;
+				if (totalFetched < lastPage.totalResults) {
+					return allPages.length + 1;
+				}
+				return undefined;
+			},
+			enabled: !!user,
+		});
 
 	// Flatten all notifications from all pages
-	const notifications = data?.pages.flatMap(page => page.data) || [];
-	const totalResults = data?.pages[0]?.results || 0;
+	const notifications = data?.pages.flatMap((page) => page.data) || [];
+	const totalResults = data?.pages[0]?.totalResults || 0;
 
 	const markAsReadMutation = useMutation({
 		mutationFn: markAsRead,
@@ -40,12 +40,12 @@ export const useNotifications = () => {
 				if (!old) return old;
 				return {
 					...old,
-					pages: old.pages.map(page => ({
+					pages: old.pages.map((page) => ({
 						...page,
 						data: page.data.map((n) =>
 							n._id === updatedNotification._id ? { ...n, read: true } : n
-						)
-					}))
+						),
+					})),
 				};
 			});
 		},
@@ -85,6 +85,6 @@ export const useNotifications = () => {
 		isFetchingNextPage,
 		markAsRead: markAsReadMutation.mutate,
 		markAllAsRead: markAllAsReadMutation.mutate,
-		totalResults
+		totalResults,
 	};
 };

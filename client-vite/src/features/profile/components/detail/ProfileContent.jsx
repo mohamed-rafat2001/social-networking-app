@@ -3,7 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { PostItem } from "../../../posts";
 
-const ProfileContent = ({ activeTab, userPosts, isCurrentUser }) => {
+const ProfileContent = ({
+	activeTab,
+	userPosts,
+	isCurrentUser,
+	scrollRef,
+	hasNextPage,
+	isFetchingNextPage,
+}) => {
 	return (
 		<div className="bg-white dark:bg-slate-950 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm transition-colors duration-300 mb-8">
 			<AnimatePresence mode="wait">
@@ -16,7 +23,34 @@ const ProfileContent = ({ activeTab, userPosts, isCurrentUser }) => {
 						className="divide-y divide-slate-100 dark:divide-slate-800/50"
 					>
 						{userPosts?.length > 0 ? (
-							userPosts.map((post) => <PostItem key={post._id} post={post} />)
+							<>
+								{userPosts.map((post) => (
+									<PostItem key={post._id} post={post} />
+								))}
+
+								{/* Infinite Scroll Trigger */}
+								<div
+									ref={scrollRef}
+									className="py-8 flex justify-center items-center"
+								>
+									{isFetchingNextPage ? (
+										<div className="flex flex-col items-center gap-2">
+											<div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+											<span className="text-xs font-medium text-slate-400">
+												Loading more posts...
+											</span>
+										</div>
+									) : hasNextPage ? (
+										<div className="w-1 h-1 bg-slate-200 dark:bg-slate-800 rounded-full" />
+									) : (
+										<div className="py-4 text-center">
+											<p className="text-sm font-medium text-slate-400">
+												You've reached the end
+											</p>
+										</div>
+									)}
+								</div>
+							</>
 						) : (
 							<div className="py-24 text-center px-6">
 								<div className="bg-primary/5 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">

@@ -41,13 +41,12 @@ const About = () => {
 								About Us
 							</h2>
 							<h3 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight">
-								Empowering the next generation of engineers
+								Empowering Every Engineer to Succeed
 							</h3>
 							<p className="text-lg text-gray-600 dark:text-gray-400 mb-10 leading-relaxed">
-								EngiConnect was founded with a simple mission: to break down the
-								silos between engineering disciplines and create a unified space
-								for collaboration. We believe that the best engineering
-								solutions come from diverse perspectives and shared knowledge.
+								EngiConnect was founded with a simple mission: to make all engineers connected with together. 
+								We bridge the gap between students and professionals, creating a unified space 
+								for sharing experiences and expertise across all engineering disciplines.
 							</p>
 
 							<div className="space-y-8">
@@ -57,11 +56,10 @@ const About = () => {
 									</div>
 									<div>
 										<h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-											Innovative Learning
+											Experience Sharing
 										</h4>
 										<p className="text-gray-600 dark:text-gray-400">
-											Access peer-reviewed resources and innovative study
-											methods shared by top-performing students.
+											Learn from the journeys of senior engineers and share your own technical milestones.
 										</p>
 									</div>
 								</div>
@@ -72,11 +70,10 @@ const About = () => {
 									</div>
 									<div>
 										<h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-											Diverse Community
+											Global Network
 										</h4>
 										<p className="text-gray-600 dark:text-gray-400">
-											Connect with students from all 10+ engineering majors,
-											fostering interdisciplinary project teams.
+											Connect with engineers worldwide, fostering cross-border collaboration and innovation.
 										</p>
 									</div>
 								</div>
@@ -87,11 +84,10 @@ const About = () => {
 									</div>
 									<div>
 										<h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-											Academic Excellence
+											Professional Growth
 										</h4>
 										<p className="text-gray-600 dark:text-gray-400">
-											Designed to support your academic journey from freshman
-											year all the way to your senior capstone project.
+											Dedicated to supporting your professional journey from your first day in college to industry leadership.
 										</p>
 									</div>
 								</div>

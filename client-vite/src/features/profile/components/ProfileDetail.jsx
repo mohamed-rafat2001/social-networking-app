@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useInView } from "react-intersection-observer";
 import {
 	useUserProfile,
 	useDeleteProfileImage,
@@ -27,7 +28,13 @@ const ProfileDetail = () => {
 	const navigate = useNavigate();
 	const { user: currentUser } = useUser();
 	const { onlineUsers } = useSocket();
-	const { data: profile, isLoading: profileLoading } = useUserProfile(userId);
+	const {
+		data: profileData,
+		isLoading: profileLoading,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useUserProfile(userId);
 	const { mutate: followUser } = useFollowUser();
 	const { mutate: unfollowUser } = useUnfollowUser();
 	const { mutate: blockUser } = useBlockUser();
@@ -41,6 +48,17 @@ const ProfileDetail = () => {
 	const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [modalType, setModalType] = useState("followers");
+
+	const { ref, inView } = useInView({
+		threshold: 0,
+		rootMargin: "100px",
+	});
+
+	useEffect(() => {
+		if (inView && hasNextPage && !isFetchingNextPage) {
+			fetchNextPage();
+		}
+	}, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 	useEffect(() => {
 		window.scrollTo({ top: 0, behavior: "smooth" });
@@ -57,7 +75,7 @@ const ProfileDetail = () => {
 		);
 	}
 
-	if (!profile) {
+	if (!profileData || !profileData.pages[0]) {
 		return (
 			<div className="text-center py-20">
 				<h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -67,7 +85,7 @@ const ProfileDetail = () => {
 		);
 	}
 
-	const user = profile.data;
+	const user = profileData.pages[0].data;
 	const isFollowing = user.followers?.some(
 		(f) => String(f._id || f) === String(currentUser?._id)
 	);
@@ -76,7 +94,7 @@ const ProfileDetail = () => {
 		(u) => String(u._id || u) === String(user._id)
 	);
 
-	const userPosts = user.posts || [];
+	const userPosts = profileData.pages.flatMap((page) => page.data.posts) || [];
 
 	const handleFollowToggle = () => {
 		if (isFollowing) {
@@ -163,6 +181,9 @@ const ProfileDetail = () => {
 					activeTab={activeTab}
 					userPosts={userPosts}
 					isCurrentUser={isCurrentUser}
+					scrollRef={ref}
+					hasNextPage={hasNextPage}
+					isFetchingNextPage={isFetchingNextPage}
 				/>
 			</div>
 		</div>

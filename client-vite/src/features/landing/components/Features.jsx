@@ -12,49 +12,49 @@ import { motion } from "framer-motion";
 const Features = () => {
 	const features = [
 		{
-			name: "Student Networking",
+			name: "Engineer Networking",
 			description:
-				"Connect with peers from your major and other engineering departments across the campus.",
+				"Connect with professional engineers and students from all majors to build lasting professional relationships.",
 			icon: HiUsers,
 			color: "bg-blue-500",
 			shadow: "shadow-blue-500/20",
 		},
 		{
-			name: "Real-time Collaboration",
+			name: "Experience Sharing",
 			description:
-				"Chat and share ideas instantly with prefered groups and project partners in real-time.",
+				"Share your engineering experiences, career journey, and technical insights with a global community.",
 			icon: HiChatAlt2,
 			color: "bg-purple-500",
 			shadow: "shadow-purple-500/20",
 		},
 		{
-			name: "Resource Sharing",
+			name: "Major-Specific Groups",
 			description:
-				"Upload and download lecture notes, previous exams, and helpful engineering tools.",
+				"Join dedicated groups for all engineering majors to discuss specialized topics and share expertise.",
 			icon: HiShare,
 			color: "bg-indigo-500",
 			shadow: "shadow-indigo-500/20",
 		},
 		{
-			name: "Group Showcase",
+			name: "Project Collaboration",
 			description:
-				"Display your engineering groups and portfolios to get feedback and attract teammates.",
+				"Find teammates for your next big engineering project and showcase your work to the world.",
 			icon: HiCloudUpload,
 			color: "bg-green-500",
 			shadow: "shadow-green-500/20",
 		},
 		{
-			name: "Verified Community",
+			name: "Global Community",
 			description:
-				"A secure environment exclusive to students with verified university ID numbers.",
+				"A professional environment designed to bridge the gap between all engineering disciplines.",
 			icon: HiShieldCheck,
 			color: "bg-red-500",
 			shadow: "shadow-red-500/20",
 		},
 		{
-			name: "Fast & Efficient",
+			name: "Instant Connectivity",
 			description:
-				"Built for speed with modern technology, ensuring you get the information you need instantly.",
+				"Connect with any engineer instantly, breaking down barriers between different engineering fields.",
 			icon: HiLightningBolt,
 			color: "bg-yellow-500",
 			shadow: "shadow-yellow-500/20",

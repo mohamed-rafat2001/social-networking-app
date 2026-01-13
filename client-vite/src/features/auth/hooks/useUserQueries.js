@@ -1,5 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+	useQuery,
+	useMutation,
+	useQueryClient,
+	useInfiniteQuery,
+} from "@tanstack/react-query";
 import * as userService from "../../profile/services/userService";
+
 export const useCurrentUser = () => {
 	return useQuery({
 		queryKey: ["currentUser"],
@@ -50,9 +56,17 @@ export const useResetPassword = () => {
 };
 
 export const useUserProfile = (userId) => {
-	return useQuery({
+	return useInfiniteQuery({
 		queryKey: ["userProfile", userId],
-		queryFn: () => userService.getUserProfile(userId),
+		queryFn: ({ pageParam = 1 }) => userService.getUserProfile(userId, pageParam),
+		getNextPageParam: (lastPage, allPages) => {
+			if (!lastPage || !lastPage.data) return undefined;
+			const totalFetched = allPages.flatMap((page) => page.data.posts).length;
+			if (totalFetched < lastPage.data.results) {
+				return allPages.length + 1;
+			}
+			return undefined;
+		},
 		enabled: !!userId,
 	});
 };

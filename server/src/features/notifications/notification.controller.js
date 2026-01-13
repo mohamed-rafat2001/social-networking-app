@@ -20,8 +20,14 @@ const getNotifications = catchAsync(async (req, res, next) => {
 
 	const notifications = await features.query;
 
+	// Get total count for pagination
+	const totalResults = await Notification.countDocuments({
+		recipient: req.user._id,
+	});
+
 	res.status(200).json({
 		status: "success",
+		totalResults,
 		results: notifications.length,
 		data: notifications,
 	});

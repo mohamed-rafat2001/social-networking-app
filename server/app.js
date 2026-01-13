@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 import hpp from "hpp";
+import rateLimit from "express-rate-limit";
 
 // Features
 import { userRouter } from "./src/features/auth/auth.routes.js";
@@ -38,7 +39,6 @@ app.use(
 const allowedOrigins = [
 	"http://localhost:5173",
 	"http://localhost:3000",
-	"https://social-networking-app.netlify.app",
 	process.env.CLIENT_URL,
 ].filter(Boolean);
 
@@ -88,6 +88,18 @@ app.options("*", cors());
 // Body parser
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
+
+// Rate limiting
+const limiter = rateLimit({
+	max: 100, // Limit each IP to 100 requests per windowMs
+	windowMs: 60 * 60 * 1000, // 1 hour
+	message: "Too many requests from this IP, please try again in an hour!",
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+// Apply rate limiter to all API routes
+app.use("/api", limiter);
 
 // Data sanitization
 app.use(mongoSanitize());

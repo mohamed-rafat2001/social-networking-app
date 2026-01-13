@@ -36,15 +36,15 @@ const Hero = () => {
 								Engineering Student Network
 							</motion.span>
 							<h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 dark:text-white leading-[1.1] mb-6">
-								Connecting the Future of{" "}
+								Connecting All Engineers{" "}
 								<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-500 to-indigo-600 dark:from-primary dark:via-blue-400 dark:to-indigo-400">
-									Engineering
+									Worldwide
 								</span>
 							</h1>
 							<p className="text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-lg mx-auto md:mx-0 leading-relaxed">
-								The exclusive social platform for engineering students to
-								collaborate, share resources, and build a professional network
-								within the college community.
+								The premier social platform designed to make all engineers connected with together. 
+								Share experiences, collaborate on projects, and grow your professional network 
+								with engineering majors from around the globe.
 							</p>
 							<div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
 								<motion.div

@@ -289,7 +289,7 @@ const allPosts = catchAsync(async (req, res, next) => {
 		.limitFields()
 		.paginate();
 
-	const [posts, sharedPosts] = await Promise.all([
+	const [posts, sharedPosts, totalPosts, totalShares] = await Promise.all([
 		postsFeatures.query.populate("userId"),
 		sharesFeatures.query
 			.populate({
@@ -297,7 +297,11 @@ const allPosts = catchAsync(async (req, res, next) => {
 				populate: { path: "userId" },
 			})
 			.populate("userId"),
+		Posts.countDocuments(queryFilter),
+		Share.countDocuments(queryFilter),
 	]);
+
+	const totalResults = totalPosts + totalShares;
 
 	// Combine posts and shared posts with defensive mapping
 	const combinedPosts = [
@@ -357,6 +361,7 @@ const allPosts = catchAsync(async (req, res, next) => {
 
 	res.status(200).json({
 		status: "success",
+		totalResults,
 		results: combinedPosts.length,
 		data: combinedPosts,
 	});

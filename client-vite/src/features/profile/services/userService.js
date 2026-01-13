@@ -30,9 +30,11 @@ export const logout = async () => {
 	return response.data;
 };
 
-export const getUserProfile = async (userId) => {
+export const getUserProfile = async (userId, page = 1, limit = 10) => {
 	if (!userId) return null;
-	const response = await apiApp.get(`/user/${userId}`);
+	const response = await apiApp.get(`/user/${userId}`, {
+		params: { page, limit },
+	});
 	return response.data;
 };
 

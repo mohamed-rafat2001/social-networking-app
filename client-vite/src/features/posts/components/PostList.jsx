@@ -1,7 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useInView } from "react-intersection-observer";
 import { toast } from "react-hot-toast";
 import { useUser } from "../../../shared/hooks/useUser.js";
 import { useTheme } from "../../../providers/ThemeProvider";
@@ -43,18 +44,28 @@ function PostList() {
 		data: postsData,
 		isLoading: isPostsLoading,
 		error: postsError,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
 	} = usePosts(feedType);
+
+	const { ref, inView } = useInView({
+		threshold: 0,
+		rootMargin: "100px",
+	});
+
+	useEffect(() => {
+		if (inView && hasNextPage && !isFetchingNextPage) {
+			fetchNextPage();
+		}
+	}, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 	if (postsError) {
 		console.error(`PostList [${feedType}] fetch error:`, postsError);
 	}
 
-	console.log(`PostList [${feedType}]:`, {
-		count: postsData?.results,
-		hasData: !!postsData?.data,
-		dataLength: postsData?.data?.length,
-		error: postsError?.message,
-	});
+	const posts = postsData?.pages.flatMap((page) => page.data) || [];
+
 	const { mutate: addPostMutation } = useAddPost();
 
 	const {
@@ -72,8 +83,6 @@ function PostList() {
 	});
 
 	const text = watch("text");
-
-	const posts = postsData?.data || [];
 
 	const handleFileChange = (e) => {
 		const selectedFiles = Array.from(e.target.files);
@@ -332,7 +341,26 @@ function PostList() {
 							<Spinner size="lg" />
 						</div>
 					) : posts.length > 0 ? (
-						posts.map((post) => <PostItem key={post._id} post={post} />)
+						<>
+							{posts.map((post) => (
+								<PostItem key={post._id} post={post} />
+							))}
+							{/* Infinite Scroll Trigger */}
+							<div
+								ref={ref}
+								className="h-20 flex items-center justify-center p-4"
+							>
+								{isFetchingNextPage ? (
+									<Spinner size="md" />
+								) : hasNextPage ? (
+									<div className="h-1" />
+								) : (
+									<p className="text-sm text-slate-500 font-medium">
+										No more posts to show
+									</p>
+								)}
+							</div>
+						</>
 					) : (
 						<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
 							<div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">

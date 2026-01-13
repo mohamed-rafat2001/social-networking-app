@@ -1,7 +1,11 @@
 import apiApp from "../../../shared/api/apiApp";
 
-export const getPosts = async (feedType = "for-you") => {
-	const params = feedType === "following" ? { feed: "following" } : {};
+export const getPosts = async (feedType = "for-you", page = 1, limit = 10) => {
+	const params = {
+		page,
+		limit,
+		...(feedType === "following" ? { feed: "following" } : {}),
+	};
 	const response = await apiApp.get("/posts", { params });
 	return response.data;
 };
