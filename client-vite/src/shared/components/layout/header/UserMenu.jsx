@@ -19,9 +19,15 @@ const UserMenu = ({
 			>
 				<Avatar src={user?.image?.secure_url} size="sm" />
 				<div className="hidden lg:block text-left">
-					<p className="text-xs font-black text-slate-900 dark:text-white leading-none">
+					<p className="text-xs font-black text-slate-900 dark:text-white leading-none mb-0.5">
 						{user?.firstName}
 					</p>
+					<div className="flex items-center gap-1">
+						<span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+						<span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+							{user?.userType || "User"}
+						</span>
+					</div>
 				</div>
 			</button>
 
