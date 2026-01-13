@@ -10,8 +10,10 @@ export const markAsRead = async (id) => {
 	return response.data.data;
 };
 
-export const markAllAsRead = async () => {
-	const response = await apiApp.patch("/notifications/mark-all-read");
+export const markAllAsRead = async (type) => {
+	const response = await apiApp.patch("/notifications/mark-all-read", null, {
+		params: { type },
+	});
 	return response.data.data;
 };
 

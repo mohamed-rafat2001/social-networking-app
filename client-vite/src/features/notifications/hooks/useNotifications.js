@@ -55,16 +55,23 @@ export const useNotifications = () => {
 	});
 
 	const markAllAsReadMutation = useMutation({
-		mutationFn: markAllAsRead,
-		onSuccess: () => {
+		mutationFn: (type) => markAllAsRead(type),
+		onSuccess: (_, type) => {
 			queryClient.setQueryData(["notifications"], (old) => {
 				if (!old) return old;
 				return {
 					...old,
-					pages: old.pages.map(page => ({
+					pages: old.pages.map((page) => ({
 						...page,
-						data: page.data.map((n) => ({ ...n, read: true }))
-					}))
+						data: page.data.map((n) => {
+							if (!type) return { ...n, read: true };
+							if (type === "messages" && n.type === "message")
+								return { ...n, read: true };
+							if (type === "general" && n.type !== "message")
+								return { ...n, read: true };
+							return n;
+						}),
+					})),
 				};
 			});
 		},

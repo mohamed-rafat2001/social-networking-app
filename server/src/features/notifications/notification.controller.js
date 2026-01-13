@@ -41,14 +41,20 @@ const markAsRead = catchAsync(async (req, res, next) => {
 const deleteNotification = factory.deleteOne(Notification);
 
 const markAllAsRead = catchAsync(async (req, res, next) => {
-	await Notification.updateMany(
-		{ recipient: req.user._id, read: false },
-		{ read: true }
-	);
+	const filter = { recipient: req.user._id, read: false };
+	if (req.query.type) {
+		if (req.query.type === "messages") {
+			filter.type = "message";
+		} else if (req.query.type === "general") {
+			filter.type = { $ne: "message" };
+		}
+	}
+
+	await Notification.updateMany(filter, { read: true });
 
 	res.status(200).json({
 		status: "success",
-		message: "All notifications marked as read",
+		message: `All ${req.query.type || ""} notifications marked as read`,
 	});
 });
 

@@ -128,7 +128,7 @@ const ProfileHeader = ({
 								<Dropdown
 									align="right"
 									trigger={
-										<button className="h-11 px-3 rounded-full border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300 text-slate-600 dark:text-slate-300 shadow-sm hover:shadow-md flex items-center justify-center cursor-pointer">
+										<button className="w-11 h-11 rounded-full border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300 text-slate-600 dark:text-slate-300 shadow-sm hover:shadow-md flex items-center justify-center cursor-pointer shrink-0">
 											<HiDotsHorizontal size={22} />
 										</button>
 									}

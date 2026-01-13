@@ -19,7 +19,7 @@ const commentSchema = z.object({
 		.max(1000, "Comment cannot exceed 1000 characters"),
 });
 
-function CommentList({ comments, postId, recipientId }) {
+function CommentList({ comments = [], postId, recipientId }) {
 	const { user } = useUser();
 	const { darkMode } = useTheme();
 	useSocket();

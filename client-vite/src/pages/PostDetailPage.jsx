@@ -177,7 +177,11 @@ function PostDetailPage() {
 						/>
 					</div>
 
-					<CommentList postId={postId} />
+					<CommentList 
+						postId={postId} 
+						comments={post.comments} 
+						recipientId={post.userId?._id}
+					/>
 				</article>
 			</div>
 

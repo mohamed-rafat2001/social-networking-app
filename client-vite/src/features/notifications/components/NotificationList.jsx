@@ -94,23 +94,29 @@ const NotificationList = ({
 	const unreadCount = filteredNotifications?.filter((n) => !n.read).length || 0;
 
 	return (
-		<div className="flex flex-col h-full">
+		<div className="flex flex-col max-h-[550px] w-full overflow-hidden bg-white dark:bg-slate-900">
 			{!hideHeader && (
-				<div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
-					<h2 className="text-lg font-bold text-slate-900 dark:text-white">
-						{filterType === "messages" ? "Messages" : "Notifications"}
-					</h2>
-					{unreadCount > 0 && (
-						<button
-							onClick={() => markAllAsRead?.()}
-							className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-						>
-							Mark all as read
-						</button>
-					)}
+				<div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-10">
+					<div>
+						<h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight leading-none mb-1">
+							{filterType === "messages" ? "Messages" : "Notifications"}
+						</h2>
+						<div className="flex items-center gap-2">
+							<span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+							<p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+								{unreadCount} UNREAD
+							</p>
+						</div>
+					</div>
+					<button
+						onClick={() => markAllAsRead?.(filterType)}
+						className="text-[11px] font-black text-primary hover:text-white dark:text-primary dark:hover:text-white transition-all duration-300 active:scale-95 bg-primary/10 hover:bg-primary px-4 py-2 rounded-full border border-primary/20 hover:border-primary shadow-sm shadow-primary/10"
+					>
+						Mark all as read
+					</button>
 				</div>
 			)}
-			<div className="flex-1 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-800">
+			<div className="flex-1 overflow-y-auto custom-scrollbar">
 				{displayNotifications.map((notification, index) => {
 					if (index === displayNotifications.length - 1 && !isDropdown) {
 						return (

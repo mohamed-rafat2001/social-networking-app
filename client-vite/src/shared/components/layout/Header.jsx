@@ -67,13 +67,13 @@ const Header = ({ onMenuClick }) => {
 		try {
 			await userService.logout();
 			queryClient.clear();
-			// Force a full page reload to ensure all state is cleared
-			window.location.href = "/welcome";
+			// Force a full page reload to ensure all state is cleared and redirect to landing page
+			window.location.href = "/";
 		} catch (error) {
 			console.error("Logout failed:", error);
-			// Fallback: Clear all cached data and redirect
+			// Fallback: Clear all cached data and redirect to landing page
 			queryClient.clear();
-			window.location.href = "/welcome";
+			window.location.href = "/";
 		}
 	};
 
