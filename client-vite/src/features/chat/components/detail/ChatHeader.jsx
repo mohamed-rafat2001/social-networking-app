@@ -43,20 +43,6 @@ const ChatHeader = ({ otherUser, isOnline, setIsDeleteChatModalOpen }) => {
 					<h3 className="font-bold text-slate-900 dark:text-white leading-tight group-hover:text-primary transition-colors">
 						{otherUser?.firstName} {otherUser?.lastName}
 					</h3>
-					<div className="flex items-center gap-1.5">
-						{isOnline ? (
-							<>
-								<span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-								<p className="text-[11px] font-medium text-green-500 uppercase tracking-wider">
-									Active Now
-								</p>
-							</>
-						) : (
-							<p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-								Offline
-							</p>
-						)}
-					</div>
 				</div>
 			</Link>
 
