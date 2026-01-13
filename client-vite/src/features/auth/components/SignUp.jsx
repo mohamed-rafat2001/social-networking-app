@@ -9,6 +9,7 @@ import { AnimatePresence } from "framer-motion";
 import SignUpProgressBar from "./detail/SignUpProgressBar";
 import SignUpStep1 from "./detail/SignUpStep1";
 import SignUpStep2 from "./detail/SignUpStep2";
+import WelcomeLoading from "./detail/WelcomeLoading";
 
 const signUpSchema = z
 	.object({
@@ -48,6 +49,8 @@ const signUpSchema = z
 const SignUp = () => {
 	const navigate = useNavigate();
 	const [step, setStep] = useState(1);
+	const [showWelcome, setShowWelcome] = useState(false);
+	const [signedUpName, setSignedUpName] = useState("");
 	const { mutate: signUpMutation, isPending } = useSignUp();
 
 	const {
@@ -77,10 +80,11 @@ const SignUp = () => {
 		const { confirmPassword, ...userData } = data;
 		signUpMutation(userData, {
 			onSuccess: () => {
-				toast.success("Account created successfully!");
+				setSignedUpName(data.firstName);
+				setShowWelcome(true);
 				setTimeout(() => {
 					navigate("/feed");
-				}, 100);
+				}, 3500); // Increased delay to show the animation
 			},
 			onError: (error) => {
 				const serverErrors = error?.response?.data?.validation;
@@ -104,6 +108,10 @@ const SignUp = () => {
 
 	return (
 		<div className="relative">
+			<AnimatePresence>
+				{showWelcome && <WelcomeLoading firstName={signedUpName} />}
+			</AnimatePresence>
+
 			<SignUpProgressBar step={step} />
 
 			<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

@@ -12,6 +12,7 @@ import {
 	Input,
 	Select,
 	Button,
+	Spinner,
 } from "../../../../shared/components/ui";
 
 const SignUpStep2 = ({ register, errors, prevStep, isPending }) => {
