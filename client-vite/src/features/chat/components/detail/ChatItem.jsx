@@ -1,14 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
-import { HiDotsVertical, HiOutlineTrash, HiCheck, HiCheckCircle } from "react-icons/hi";
+import { HiDotsVertical, HiOutlineTrash } from "react-icons/hi";
 import {
 	Avatar,
 	Dropdown,
 	DropdownItem,
 	cn,
 } from "../../../../shared/components/ui";
+import { useChatItemLogic } from "../../hooks/useChatItemLogic";
+import ChatItemStatus from "./ChatItemStatus";
 
 const ChatItem = ({
 	chat,
@@ -17,16 +18,16 @@ const ChatItem = ({
 	onlineUsers,
 	setChatToDelete,
 }) => {
-	const otherUser = chat.users.find((u) => u._id !== currentUser?._id);
-	const lastMessage = chat.latestMessage;
-	const isActive = chat._id === activeChatId;
-	const isOnline = onlineUsers?.some(
-		(u) => String(u.userId) === String(otherUser?._id)
-	);
+	const {
+		otherUser,
+		lastMessage,
+		isOnline,
+		isLastMessageFromMe,
+		timeAgo,
+		messagePreview,
+	} = useChatItemLogic(chat, currentUser, onlineUsers);
 
-	const isLastMessageFromMe =
-		lastMessage &&
-		String(lastMessage.sender || lastMessage.senderId) === String(currentUser?._id);
+	const isActive = chat._id === activeChatId;
 
 	return (
 		<Link
@@ -73,12 +74,7 @@ const ChatItem = ({
 					<div className="flex items-center gap-2 shrink-0">
 						{lastMessage && (
 							<span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider">
-								{lastMessage.createdAt &&
-								!isNaN(new Date(lastMessage.createdAt).getTime())
-									? formatDistanceToNow(new Date(lastMessage.createdAt), {
-											addSuffix: false,
-									  })
-									: "now"}
+								{timeAgo}
 							</span>
 						)}
 						<div
@@ -107,51 +103,12 @@ const ChatItem = ({
 					</div>
 				</div>
 
-				<div className="flex items-center justify-between gap-2">
-					<div className="flex items-center gap-1.5 flex-1 min-w-0">
-						{isLastMessageFromMe && (
-							<div className="shrink-0">
-								{lastMessage.read ? (
-									<div className="flex -space-x-1">
-										<HiCheck className="text-primary" size={12} />
-										<HiCheck className="text-primary" size={12} />
-									</div>
-								) : (
-									<HiCheck className="text-slate-300 dark:text-slate-600" size={12} />
-								)}
-							</div>
-						)}
-						<p
-							className={cn(
-								"text-[13px] truncate",
-								chat.unreadCount > 0
-									? "text-slate-900 dark:text-white font-bold"
-									: "text-slate-500 dark:text-slate-400 font-medium"
-							)}
-						>
-							{lastMessage ? (
-								<>
-									{lastMessage.content ||
-										(lastMessage.file?.length > 0
-											? "Shared images"
-											: "No messages yet")}
-								</>
-							) : (
-								"No messages yet"
-							)}
-						</p>
-					</div>
-
-					{chat.unreadCount > 0 && (
-						<motion.div
-							initial={{ scale: 0.5, opacity: 0 }}
-							animate={{ scale: 1, opacity: 1 }}
-							className="min-w-[18px] h-[18px] bg-primary text-white text-[10px] font-black rounded-full flex items-center justify-center px-1.5 shadow-lg shadow-primary/30"
-						>
-							{chat.unreadCount}
-						</motion.div>
-					)}
-				</div>
+				<ChatItemStatus
+					chat={chat}
+					lastMessage={lastMessage}
+					isLastMessageFromMe={isLastMessageFromMe}
+					messagePreview={messagePreview}
+				/>
 			</div>
 		</Link>
 	);

@@ -1,17 +1,10 @@
-import React, { useRef, useEffect, useState } from "react";
+import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTheme } from "../../../providers/ThemeProvider";
 import { Avatar } from "../../../shared/components/ui";
 import { useUser } from "../../../shared/hooks/useUser";
-import {
-	useLikePost,
-	useSharePost,
-	useIncrementView,
-	useDeletePost,
-	useUpdatePost,
-} from "../hooks/usePostQueries";
-import { toast } from "react-hot-toast";
+import { usePostActions } from "../hooks/usePostActions";
 import PostItemHeader from "./detail/PostItemHeader";
 import PostItemContent from "./detail/PostItemContent";
 import PostItemActions from "./detail/PostItemActions";
@@ -21,93 +14,30 @@ function PostItem({ post }) {
 	const navigate = useNavigate();
 	const { user } = useUser();
 	const { darkMode } = useTheme();
-	const { mutate: likePost } = useLikePost();
-	const { mutate: sharePost } = useSharePost();
-	const { mutate: incrementView } = useIncrementView();
-	const { mutate: deletePost } = useDeletePost();
-	const { mutate: updatePost } = useUpdatePost();
 
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-	const [isRepostModalOpen, setIsRepostModalOpen] = useState(false);
-	const [repostNote, setRepostNote] = useState("");
-	const [editContent, setEditContent] = useState(post.text || "");
-
-	const isShare = post.type === "share";
-	const isOwner =
-		user?._id === (isShare ? post.sharedBy?._id : post.userId?._id);
-
-	const postRef = useRef(null);
-	const viewIncremented = useRef(false);
-
-	const handleDelete = () => {
-		deletePost(post._id);
-	};
-
-	const handleUpdate = (e) => {
-		e.stopPropagation();
-		if (!editContent.trim()) return;
-		updatePost(
-			{ postId: post._id, postData: { text: editContent } },
-			{
-				onSuccess: () => setIsEditModalOpen(false),
-			}
-		);
-	};
-
-	const handleRepostWithNote = () => {
-		const originalPostId = post.originalPostId || post._id;
-		const recipientId = post.userId?._id || post.userId;
-		sharePost(
-			{ postId: originalPostId, note: repostNote, recipientId },
-			{
-				onSuccess: () => {
-					setIsRepostModalOpen(false);
-					setRepostNote("");
-					toast.success(
-						repostNote.trim() ? "Reposted with note" : "Reposted successfully"
-					);
-				},
-				onError: (error) => {
-					toast.error(error.response?.data?.message || "Failed to repost");
-				},
-			}
-		);
-	};
-
-	const closeRepostModal = () => {
-		setIsRepostModalOpen(false);
-		setRepostNote("");
-	};
-
-	useEffect(() => {
-		const observer = new IntersectionObserver(
-			(entries) => {
-				if (entries[0].isIntersecting && !viewIncremented.current) {
-					incrementView(post._id);
-					viewIncremented.current = true;
-				}
-			},
-			{ threshold: 0.5 }
-		);
-
-		if (postRef.current) {
-			observer.observe(postRef.current);
-		}
-
-		return () => observer.disconnect();
-	}, [post._id, post.originalPostId, incrementView]);
-
-	const handleLike = (e) => {
-		e.stopPropagation();
-		likePost(post._id);
-	};
-
-	const goToDetail = () => {
-		navigate(`/posts/${post._id}`);
-	};
-
-	const displayUser = isShare ? post.sharedBy : post.userId;
+	const {
+		postRef,
+		isOwner,
+		isShare,
+		displayUser,
+		isEditModalOpen,
+		setIsEditModalOpen,
+		isDeleteModalOpen,
+		setIsDeleteModalOpen,
+		isRepostModalOpen,
+		setIsRepostModalOpen,
+		repostNote,
+		setRepostNote,
+		editContent,
+		setEditContent,
+		handleDelete,
+		handleUpdate,
+		handleRepost,
+		handleRepostWithNote,
+		closeRepostModal,
+		handleLike,
+		goToDetail,
+	} = usePostActions(post, user);
 
 	return (
 		<motion.article
@@ -152,6 +82,7 @@ function PostItem({ post }) {
 						post={post}
 						user={user}
 						handleLike={handleLike}
+						handleRepost={handleRepost}
 						setIsRepostModalOpen={setIsRepostModalOpen}
 						goToDetail={goToDetail}
 					/>

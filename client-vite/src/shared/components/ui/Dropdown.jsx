@@ -1,16 +1,9 @@
-import React, {
-	useState,
-	createContext,
-	useContext,
-	useRef,
-	useEffect,
-	useLayoutEffect,
-} from "react";
+import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "./utils";
-
-const DropdownContext = createContext(null);
+import { useDropdown } from "./useDropdown";
+import { DropdownContext } from "./DropdownContext";
 
 /**
  * Dropdown Component
@@ -22,46 +15,7 @@ export const Dropdown = ({
 	position = "bottom",
 	className,
 }) => {
-	const [isOpen, setIsOpen] = useState(false);
-	const triggerRef = useRef(null);
-	const [coords, setCoords] = useState({
-		top: 0,
-		bottom: 0,
-		left: 0,
-		right: 0,
-	});
-
-	const close = () => setIsOpen(false);
-
-	const updateCoords = () => {
-		if (triggerRef.current) {
-			const rect = triggerRef.current.getBoundingClientRect();
-			setCoords({
-				top: rect.top,
-				bottom: rect.bottom,
-				left: rect.left,
-				right: window.innerWidth - rect.right,
-			});
-		}
-	};
-
-	const toggle = (e) => {
-		e.preventDefault();
-		e.stopPropagation();
-		updateCoords();
-		setIsOpen(!isOpen);
-	};
-
-	useEffect(() => {
-		if (isOpen) {
-			window.addEventListener("scroll", updateCoords, true);
-			window.addEventListener("resize", updateCoords);
-			return () => {
-				window.removeEventListener("scroll", updateCoords, true);
-				window.removeEventListener("resize", updateCoords);
-			};
-		}
-	}, [isOpen]);
+	const { isOpen, triggerRef, coords, close, toggle } = useDropdown();
 
 	return (
 		<DropdownContext.Provider value={{ close }}>
@@ -134,35 +88,5 @@ const DropdownPortal = ({ children }) => {
 	return mounted ? createPortal(children, document.body) : null;
 };
 
-export const DropdownItem = ({
-	children,
-	onClick,
-	variant = "default",
-	icon: Icon,
-	className,
-}) => {
-	const { close } = useContext(DropdownContext);
-	const variants = {
-		default:
-			"text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-primary dark:hover:text-primary",
-		danger: "text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10",
-	};
+export { DropdownItem } from "./DropdownItem";
 
-	return (
-		<button
-			onClick={(e) => {
-				e.stopPropagation();
-				if (onClick) onClick(e);
-				close();
-			}}
-			className={cn(
-				"flex w-full items-center gap-3 px-4 py-2.5 text-[14px] font-semibold transition-all duration-200",
-				variants[variant],
-				className
-			)}
-		>
-			{Icon && <Icon size={20} className="shrink-0 opacity-80" />}
-			{children}
-		</button>
-	);
-};

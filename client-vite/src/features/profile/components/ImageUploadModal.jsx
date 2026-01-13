@@ -1,92 +1,32 @@
-import React, { useState, useRef, useEffect } from "react";
-import InputEmoji from "react-input-emoji";
+import React from "react";
+import { Modal } from "../../../shared/components/ui";
 import { useTheme } from "../../../providers/ThemeProvider";
-import {
-	Modal,
-	Button,
-	ProgressBar,
-	cn,
-	Avatar,
-} from "../../../shared/components/ui";
-import { HiOutlinePhotograph, HiOutlineX } from "react-icons/hi";
-import { useUpdateProfileImage } from "../../auth/hooks/useUserQueries";
+import { useImageUpload } from "../../hooks/useImageUpload";
+import UploadUserInfo from "./image-upload/UploadUserInfo";
+import BioInput from "./image-upload/BioInput";
+import UploadArea from "./image-upload/UploadArea";
+import UploadActions from "./image-upload/UploadActions";
 
 const ImageUploadModal = ({ isOpen, onClose, user }) => {
-	const [selectedFile, setSelectedFile] = useState(null);
-	const [previewUrl, setPreviewUrl] = useState(null);
-	const [uploadProgress, setUploadProgress] = useState(0);
-	const [isDragging, setIsDragging] = useState(false);
-	const [postText, setPostText] = useState("");
-	const fileInputRef = useRef(null);
 	const { darkMode } = useTheme();
-	const { mutate: updateImage, isPending: isLoading } = useUpdateProfileImage();
-
-	useEffect(() => {
-		if (!isOpen) {
-			setPostText("");
-		}
-	}, [isOpen]);
-
-	const handleFileSelect = (e) => {
-		const file = e.target.files?.[0] || e.dataTransfer?.files?.[0];
-		if (file) {
-			if (!file.type.startsWith("image/")) {
-				alert("Please select an image file");
-				return;
-			}
-			setSelectedFile(file);
-			setPreviewUrl(URL.createObjectURL(file));
-			setUploadProgress(0);
-		}
-	};
-
-	const onDragOver = (e) => {
-		e.preventDefault();
-		setIsDragging(true);
-	};
-
-	const onDragLeave = (e) => {
-		e.preventDefault();
-		setIsDragging(false);
-	};
-
-	const onDrop = (e) => {
-		e.preventDefault();
-		setIsDragging(false);
-		handleFileSelect(e);
-	};
-
-	const handleUpload = () => {
-		const formData = new FormData();
-		if (selectedFile) {
-			formData.append("avatar", selectedFile);
-		}
-		const textToSubmit = typeof postText === "string" ? postText : "";
-		formData.append("bio", textToSubmit);
-
-		updateImage(
-			{
-				formData,
-				onProgress: (progress) => setUploadProgress(progress),
-			},
-			{
-				onSuccess: () => {
-					onClose();
-					setSelectedFile(null);
-					setPreviewUrl(null);
-					setUploadProgress(0);
-				},
-			}
-		);
-	};
-
-	const handleCancel = () => {
-		if (isLoading) return;
-		setSelectedFile(null);
-		setPreviewUrl(null);
-		setUploadProgress(0);
-		onClose();
-	};
+	const {
+		selectedFile,
+		previewUrl,
+		setPreviewUrl,
+		setSelectedFile,
+		uploadProgress,
+		isDragging,
+		postText,
+		setPostText,
+		fileInputRef,
+		isLoading,
+		handleFileSelect,
+		onDragOver,
+		onDragLeave,
+		onDrop,
+		handleUpload,
+		handleCancel,
+	} = useImageUpload(onClose);
 
 	return (
 		<Modal
@@ -96,173 +36,36 @@ const ImageUploadModal = ({ isOpen, onClose, user }) => {
 			size="lg"
 		>
 			<div className="space-y-4">
-				{/* User Info Header - Post Style */}
-				<div className="flex items-center gap-3 px-1">
-					<Avatar src={user?.image?.secure_url} size="md" />
-					<div>
-						<h3 className="font-bold text-slate-900 dark:text-white leading-tight">
-							{user?.firstName} {user?.lastName}
-						</h3>
-						<p className="text-xs text-slate-500 dark:text-slate-400">
-							Updating profile...
-						</p>
-					</div>
-				</div>
+				<UploadUserInfo user={user} />
 
-				{/* Post Text Input - Post Style with Emoji */}
-				<div className="px-1 profile-emoji-input emoji-input-container relative z-[60]">
-					<style>
-						{`
-							.profile-emoji-input .react-input-emoji--container {
-								background: transparent !important;
-								border: none !important;
-								margin-bottom: 0 !important;
-							}
-							.profile-emoji-input .react-input-emoji--wrapper {
-								background: transparent !important;
-								border: none !important;
-								padding: 0 !important;
-							}
-							.profile-emoji-input .react-input-emoji--input {
-								background: transparent !important;
-								padding: 8px 0 !important;
-								color: ${darkMode ? "white" : "#334155"} !important;
-								min-height: 40px !important;
-								max-height: 120px !important;
-								overflow-y: auto !important;
-							}
-							.profile-emoji-input .react-input-emoji--button {
-								padding: 8px !important;
-								z-index: 100 !important;
-							}
-							.profile-emoji-input .react-input-emoji--picker-wrapper {
-								z-index: 1000 !important;
-								position: absolute !important;
-								bottom: 100% !important;
-								right: 0 !important;
-							}
-						`}
-					</style>
-					<InputEmoji
-						value={postText}
-						onChange={setPostText}
-						cleanOnEnter={false}
-						placeholder={`Say something about your new profile picture...`}
-						theme={darkMode ? "dark" : "light"}
-						fontSize={15}
-						fontFamily="inherit"
-						borderColor="transparent"
-						background="transparent"
-						placeholderColor={darkMode ? "#94a3b8" : "#64748b"}
-						color={darkMode ? "#ffffff" : "#334155"}
-					/>
-				</div>
+				<BioInput
+					value={postText}
+					onChange={setPostText}
+					darkMode={darkMode}
+				/>
 
-				{/* Image Preview / Upload Area */}
-				<div className="px-1">
-					{!previewUrl ? (
-						<div
-							onClick={() => fileInputRef.current?.click()}
-							onDragOver={onDragOver}
-							onDragLeave={onDragLeave}
-							onDrop={onDrop}
-							className={cn(
-								"border-2 border-dashed rounded-[2rem] p-8 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all group bg-slate-50/50 dark:bg-slate-800/30",
-								isDragging
-									? "border-primary bg-primary/10 scale-[1.01]"
-									: "border-slate-200 dark:border-slate-700 hover:border-primary/50 hover:bg-primary/5"
-							)}
-						>
-							<div
-								className={cn(
-									"w-12 h-12 rounded-full flex items-center justify-center transition-colors",
-									isDragging
-										? "bg-primary text-white"
-										: "bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:text-primary"
-								)}
-							>
-								<HiOutlinePhotograph size={24} />
-							</div>
-							<div className="text-center">
-								<p className="text-sm font-bold text-slate-900 dark:text-white">
-									{isDragging ? "Drop photo here" : "Add Profile Photo"}
-								</p>
-								<p className="text-xs text-slate-500 dark:text-slate-400">
-									or drag and drop
-								</p>
-							</div>
-						</div>
-					) : (
-						<div className="relative rounded-[2rem] overflow-hidden group border border-slate-100 dark:border-slate-800 shadow-sm bg-slate-50 dark:bg-slate-950">
-							<div className="flex items-center justify-center bg-slate-100 dark:bg-slate-800 max-h-[400px]">
-								<img
-									src={previewUrl}
-									alt="Preview"
-									className={cn(
-										"max-w-full max-h-[400px] object-contain transition-all duration-500",
-										isLoading && "blur-sm scale-105 brightness-75"
-									)}
-								/>
-							</div>
+				<UploadArea
+					previewUrl={previewUrl}
+					isDragging={isDragging}
+					isLoading={isLoading}
+					uploadProgress={uploadProgress}
+					onDragOver={onDragOver}
+					onDragLeave={onDragLeave}
+					onDrop={onDrop}
+					onClick={() => fileInputRef.current?.click()}
+					onRemove={(e) => {
+						e.stopPropagation();
+						setSelectedFile(null);
+						setPreviewUrl(null);
+					}}
+				/>
 
-							{isLoading && (
-								<div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/20 backdrop-blur-[2px]">
-									<div className="w-full max-w-xs space-y-4">
-										<div className="flex justify-between items-end text-white">
-											<span className="text-xs font-black uppercase tracking-widest drop-shadow-md">
-												Uploading
-											</span>
-											<span className="text-lg font-black drop-shadow-md">
-												{uploadProgress}%
-											</span>
-										</div>
-										<ProgressBar
-											progress={uploadProgress}
-											className="h-2 shadow-xl ring-1 ring-white/20"
-										/>
-									</div>
-								</div>
-							)}
-
-							{!isLoading && (
-								<button
-									onClick={(e) => {
-										e.stopPropagation();
-										setSelectedFile(null);
-										setPreviewUrl(null);
-									}}
-									className="absolute top-3 right-3 bg-black/60 hover:bg-black/80 p-1.5 rounded-full text-white transition-colors backdrop-blur-sm"
-								>
-									<HiOutlineX size={18} />
-								</button>
-							)}
-						</div>
-					)}
-				</div>
-
-				{/* Bottom Bar / Actions */}
-				<div className="flex items-center justify-end pt-2 border-t border-slate-100 dark:border-slate-800">
-					<div className="flex gap-2">
-						<Button
-							variant="secondary"
-							size="sm"
-							className="rounded-xl px-4 font-bold"
-							onClick={handleCancel}
-							disabled={isLoading}
-						>
-							Cancel
-						</Button>
-						<Button
-							variant="primary"
-							size="sm"
-							className="rounded-xl px-6 font-bold shadow-md shadow-primary/20"
-							onClick={handleUpload}
-							disabled={!selectedFile || isLoading}
-						>
-							{isLoading ? "Saving..." : "Post Update"}
-						</Button>
-					</div>
-				</div>
+				<UploadActions
+					onCancel={handleCancel}
+					onUpload={handleUpload}
+					isLoading={isLoading}
+					hasFile={!!selectedFile}
+				/>
 
 				<input
 					type="file"

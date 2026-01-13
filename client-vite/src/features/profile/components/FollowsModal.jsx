@@ -1,38 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-	HiOutlineSearch,
-	HiOutlineX,
-	HiUserAdd,
-	HiUserRemove,
-} from "react-icons/hi";
-import { Avatar, Button, cn } from "../../../shared/components/ui";
-import { useNavigate } from "react-router-dom";
-import {
-	useFollowUser,
-	useUnfollowUser,
-} from "../../auth/hooks/useSocialQueries";
+import { HiOutlineSearch, HiOutlineX } from "react-icons/hi";
+import FollowsUserItem from "./FollowsUserItem";
+import { useFollowsModalLogic } from "../hooks/useFollowsModalLogic";
 
 const FollowsModal = ({ isOpen, onClose, title, users = [], currentUser }) => {
-	const [searchTerm, setSearchTerm] = useState("");
-	const navigate = useNavigate();
-	const { mutate: followUser } = useFollowUser();
-	const { mutate: unfollowUser } = useUnfollowUser();
-
-	const isFollowing = (userId) => {
-		return currentUser?.following?.some(
-			(u) => String(u._id || u) === String(userId)
-		);
-	};
-
-	const filteredUsers = users.filter((user) => {
-		const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-		const username = user.username?.toLowerCase() || "";
-		return (
-			fullName.includes(searchTerm.toLowerCase()) ||
-			username.includes(searchTerm.toLowerCase())
-		);
-	});
+	const {
+		searchTerm,
+		setSearchTerm,
+		filteredUsers,
+		isFollowing,
+		handleUserClick,
+		handleFollowToggle,
+	} = useFollowsModalLogic(users, currentUser, onClose);
 
 	if (!isOpen) return null;
 
@@ -78,68 +58,16 @@ const FollowsModal = ({ isOpen, onClose, title, users = [], currentUser }) => {
 					{/* User List */}
 					<div className="max-h-[400px] overflow-y-auto p-2 space-y-1">
 						{filteredUsers.length > 0 ? (
-							filteredUsers.map((user) => {
-								const following = isFollowing(user._id);
-								const isMe = currentUser?._id === user._id;
-
-								return (
-									<div
-										key={user._id}
-										className="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition-all group"
-									>
-										<div
-											className="flex items-center gap-3 cursor-pointer flex-1"
-											onClick={() => {
-												navigate(`/profile/${user._id}`);
-												onClose();
-											}}
-										>
-											<Avatar src={user.image?.secure_url} size="md" />
-											<div className="min-w-0">
-												<p className="font-bold text-slate-900 dark:text-white truncate group-hover:text-primary transition-colors">
-													{user.firstName} {user.lastName}
-												</p>
-												<p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-													@{user.username}
-												</p>
-											</div>
-										</div>
-										{!isMe && (
-											<div className="flex items-center gap-2">
-												<Button
-													variant={following ? "outline" : "primary"}
-													size="sm"
-													className={cn(
-														"rounded-xl h-9 px-4 font-bold transition-all",
-														following
-															? "bg-red-50 text-red-600 hover:bg-red-100 border-red-100 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/20"
-															: ""
-													)}
-													onClick={() => {
-														if (following) {
-															unfollowUser(user._id);
-														} else {
-															followUser(user._id);
-														}
-													}}
-												>
-													{following ? (
-														<span className="flex items-center gap-1">
-															<HiUserRemove size={16} />
-															Unfollow
-														</span>
-													) : (
-														<span className="flex items-center gap-1">
-															<HiUserAdd size={16} />
-															Follow
-														</span>
-													)}
-												</Button>
-											</div>
-										)}
-									</div>
-								);
-							})
+							filteredUsers.map((user) => (
+								<FollowsUserItem
+									key={user._id}
+									user={user}
+									isMe={currentUser?._id === user._id}
+									following={isFollowing(user._id)}
+									onUserClick={handleUserClick}
+									onFollowToggle={handleFollowToggle}
+								/>
+							))
 						) : (
 							<div className="py-12 text-center">
 								<p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
@@ -153,5 +81,8 @@ const FollowsModal = ({ isOpen, onClose, title, users = [], currentUser }) => {
 		</AnimatePresence>
 	);
 };
+
+export default FollowsModal;
+
 
 export default FollowsModal;

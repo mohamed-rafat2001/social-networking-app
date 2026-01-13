@@ -37,7 +37,7 @@ const PostDetailContent = ({
 			{/* Post Content / Original Post Content */}
 			{isShare ? (
 				<div
-					className="mt-2 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer group"
+					className="mt-2 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-all cursor-pointer group/quoted shadow-sm"
 					onClick={(e) => {
 						e.stopPropagation();
 						navigate(`/posts/${post.originalPostId}`);
@@ -48,18 +48,19 @@ const PostDetailContent = ({
 							src={originalAuthor?.image?.secure_url}
 							alt={originalAuthor?.firstName}
 							size="xs"
+							className="group-hover/quoted:ring-2 group-hover/quoted:ring-primary/20 transition-all"
 						/>
 						<div className="flex items-center gap-1.5 flex-wrap min-w-0">
-							<span className="font-bold text-[15px] text-slate-900 dark:text-white group-hover:text-primary transition-colors truncate">
+							<span className="font-bold text-[15px] text-slate-900 dark:text-white leading-tight truncate">
 								{originalAuthor?.firstName} {originalAuthor?.lastName}
 							</span>
-							<span className="text-slate-500 dark:text-slate-400 text-[14px] truncate">
+							<span className="text-slate-500 dark:text-slate-500 text-[14px] truncate">
 								@
 								{originalAuthor?.username ||
 									originalAuthor?.firstName?.toLowerCase()}
 							</span>
-							<span className="text-slate-400">·</span>
-							<span className="text-slate-500 dark:text-slate-400 text-[14px]">
+							<span className="text-slate-400 dark:text-slate-600">·</span>
+							<span className="text-slate-500 dark:text-slate-500 text-[14px] whitespace-nowrap">
 								{originalDate && !isNaN(new Date(originalDate).getTime())
 									? formatDistanceToNow(new Date(originalDate), {
 											addSuffix: true,
@@ -76,10 +77,12 @@ const PostDetailContent = ({
 					)}
 
 					{post.fileUp && post.fileUp.length > 0 && (
-						<ImageGallery
-							images={post.fileUp}
-							className="rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800"
-						/>
+						<div className="rounded-xl overflow-hidden border border-slate-200/50 dark:border-slate-700/50">
+							<ImageGallery
+								images={post.fileUp}
+								className="w-full"
+							/>
+						</div>
 					)}
 				</div>
 			) : (

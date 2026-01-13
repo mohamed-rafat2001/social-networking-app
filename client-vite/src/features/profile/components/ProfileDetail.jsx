@@ -1,31 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
-import {
-	useUserProfile,
-	useDeleteProfileImage,
-} from "../../auth/hooks/useUserQueries";
-import {
-	useFollowUser,
-	useUnfollowUser,
-	useBlockUser,
-	useUnblockUser,
-	useBlockedUsers,
-} from "../../auth/hooks/useSocialQueries";
+import { useUserProfile } from "../../auth/hooks/useUserQueries";
 import { useSocket } from "../../../shared/hooks/useSocket";
 import { useUser } from "../../../shared/hooks/useUser";
-import { useCreateChat } from "../../chat/hooks/useChatQueries";
-import { Spinner, ConfirmModal } from "../../../shared/components/ui";
-import FollowsModal from "./FollowsModal";
-import ImageUploadModal from "./ImageUploadModal";
+import { Spinner } from "../../../shared/components/ui";
 import ProfileHeader from "./detail/ProfileHeader";
 import ProfileBio from "./detail/ProfileBio";
 import ProfileTabs from "./detail/ProfileTabs";
 import ProfileContent from "./detail/ProfileContent";
+import ProfileModals from "./ProfileModals";
+import { useProfileActions } from "../hooks/useProfileActions";
 
 const ProfileDetail = () => {
 	const { userId } = useParams();
-	const navigate = useNavigate();
 	const { user: currentUser } = useUser();
 	const { onlineUsers } = useSocket();
 	const {
@@ -35,19 +23,28 @@ const ProfileDetail = () => {
 		hasNextPage,
 		isFetchingNextPage,
 	} = useUserProfile(userId);
-	const { mutate: followUser } = useFollowUser();
-	const { mutate: unfollowUser } = useUnfollowUser();
-	const { mutate: blockUser } = useBlockUser();
-	const { mutate: unblockUser } = useUnblockUser();
-	const { data: blockedUsersResponse } = useBlockedUsers();
-	const { mutate: createChat, isLoading: isCreatingChat } = useCreateChat();
-	const { mutate: deleteImage } = useDeleteProfileImage();
 
-	const [activeTab, setActiveTab] = useState("posts");
-	const [isFollowsModalOpen, setIsFollowsModalOpen] = useState(false);
-	const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-	const [modalType, setModalType] = useState("followers");
+	const user = profileData?.pages?.[0]?.data;
+
+	const {
+		activeTab,
+		setActiveTab,
+		isFollowsModalOpen,
+		setIsFollowsModalOpen,
+		isUploadModalOpen,
+		setIsUploadModalOpen,
+		isDeleteModalOpen,
+		setIsDeleteModalOpen,
+		modalType,
+		isFollowing,
+		isBlocked,
+		isCreatingChat,
+		handleFollowToggle,
+		handleBlockToggle,
+		handleMessage,
+		handleFollowsClick,
+		deleteImage,
+	} = useProfileActions(userId, user, currentUser);
 
 	const { ref, inView } = useInView({
 		threshold: 0,
@@ -85,70 +82,21 @@ const ProfileDetail = () => {
 		);
 	}
 
-	const user = profileData.pages[0].data;
-	const isFollowing = user.followers?.some(
-		(f) => String(f._id || f) === String(currentUser?._id)
-	);
-
-	const isBlocked = blockedUsersResponse?.data?.some(
-		(u) => String(u._id || u) === String(user._id)
-	);
-
 	const userPosts = profileData.pages.flatMap((page) => page.data.posts) || [];
-
-	const handleFollowToggle = () => {
-		if (isFollowing) {
-			unfollowUser(user._id);
-		} else {
-			followUser(user._id);
-		}
-	};
-
-	const handleBlockToggle = () => {
-		if (isBlocked) {
-			unblockUser(user._id);
-		} else {
-			blockUser(user._id);
-		}
-	};
-
-	const handleMessage = () => {
-		if (user?._id) {
-			createChat(user._id);
-		}
-	};
-
-	const handleFollowsClick = (type) => {
-		setModalType(type);
-		setIsFollowsModalOpen(true);
-	};
 
 	return (
 		<div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
-			<FollowsModal
-				isOpen={isFollowsModalOpen}
-				onClose={() => setIsFollowsModalOpen(false)}
-				title={modalType === "followers" ? "Followers" : "Following"}
-				users={modalType === "followers" ? user.followers : user.following}
-				currentUser={currentUser}
-			/>
-			<ImageUploadModal
-				isOpen={isUploadModalOpen}
-				onClose={() => setIsUploadModalOpen(false)}
+			<ProfileModals
 				user={user}
-			/>
-
-			<ConfirmModal
-				isOpen={isDeleteModalOpen}
-				onClose={() => setIsDeleteModalOpen(false)}
-				onConfirm={() => {
-					deleteImage();
-					setIsDeleteModalOpen(false);
-				}}
-				title="Delete Profile Photo"
-				message="Are you sure you want to remove your profile photo? This action cannot be undone."
-				confirmText="Remove Photo"
-				variant="danger"
+				currentUser={currentUser}
+				isFollowsModalOpen={isFollowsModalOpen}
+				setIsFollowsModalOpen={setIsFollowsModalOpen}
+				modalType={modalType}
+				isUploadModalOpen={isUploadModalOpen}
+				setIsUploadModalOpen={setIsUploadModalOpen}
+				isDeleteModalOpen={isDeleteModalOpen}
+				setIsDeleteModalOpen={setIsDeleteModalOpen}
+				deleteImage={deleteImage}
 			/>
 
 			<div className="bg-white dark:bg-slate-950 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm mb-6 transition-colors duration-300">

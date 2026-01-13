@@ -1,14 +1,7 @@
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import { formatDistanceToNow } from "date-fns";
 import { Avatar } from "../../../../shared/components/ui";
-import {
-	HiOutlineBell,
-	HiOutlineChatAlt2,
-	HiOutlineUserAdd,
-	HiOutlineThumbUp,
-	HiOutlineShare,
-	HiOutlineAtSymbol,
-} from "react-icons/hi";
+import { useNotificationItemLogic } from "../../hooks/useNotificationItemLogic";
 
 const NotificationItem = ({
 	notification,
@@ -16,65 +9,12 @@ const NotificationItem = ({
 	onlineUsers,
 	onClose,
 }) => {
-	const navigate = useNavigate();
-	const getIcon = (type) => {
-		switch (type) {
-			case "like":
-				return <HiOutlineThumbUp className="text-blue-500" />;
-			case "comment":
-				return <HiOutlineChatAlt2 className="text-purple-500" />;
-			case "follow":
-				return <HiOutlineUserAdd className="text-green-500" />;
-			case "share":
-				return <HiOutlineShare className="text-pink-500" />;
-			case "mention":
-				return <HiOutlineAtSymbol className="text-yellow-500" />;
-			case "message":
-				return <HiOutlineChatAlt2 className="text-blue-500" />;
-			default:
-				return <HiOutlineBell className="text-gray-500" />;
-		}
-	};
+	const { getIcon, handleClick, handleProfileClick, getNotificationText } =
+		useNotificationItemLogic(notification, markAsRead, onClose);
 
-	const handleClick = (e) => {
-		// Mark as read
-		if (!notification.read) {
-			markAsRead(notification._id);
-		}
-
-		// Close dropdown if onClose prop is provided
-		if (onClose) onClose();
-
-		// Navigate based on type
-		if (notification.type === "follow") {
-			navigate(`/profile/${notification.sender._id}`);
-		} else if (notification.type === "message") {
-			navigate(`/messages`);
-		} else if (notification.post) {
-			const postId = notification.post._id || notification.post;
-			navigate(`/posts/${postId}`);
-		} else if (notification.share) {
-			const shareId = notification.share._id || notification.share;
-			navigate(`/posts/${shareId}`);
-		} else if (notification.comment) {
-			// If it's a comment notification but post is missing for some reason,
-			// we can try to find the post via the comment if it was populated
-			const postId = notification.comment.postId || notification.comment.post;
-			if (postId) {
-				navigate(`/posts/${postId}`);
-			} else {
-				navigate(`/profile/${notification.sender._id}`);
-			}
-		} else {
-			navigate(`/profile/${notification.sender._id}`);
-		}
-	};
-
-	const handleProfileClick = (e) => {
-		e.stopPropagation();
-		if (onClose) onClose();
-		navigate(`/profile/${notification.sender._id}`);
-	};
+	const isOnline = onlineUsers?.some(
+		(u) => String(u.userId) === String(notification.sender._id)
+	);
 
 	return (
 		<div
@@ -88,9 +28,7 @@ const NotificationItem = ({
 					src={notification.sender.image?.secure_url}
 					size="lg"
 					className="ring-2 ring-transparent group-hover:ring-primary/20 transition-all duration-300"
-					isActive={onlineUsers?.some(
-						(u) => String(u.userId) === String(notification.sender._id)
-					)}
+					isActive={isOnline}
 				/>
 				<div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-slate-900 transform group-hover:scale-110 transition-transform duration-300">
 					<div className="text-[12px]">{getIcon(notification.type)}</div>
@@ -107,18 +45,7 @@ const NotificationItem = ({
 							{notification.sender.firstName} {notification.sender.lastName}
 						</span>{" "}
 						<span className="text-slate-500 dark:text-slate-400 font-medium">
-							{notification.type === "like" &&
-								(notification.comment
-									? "liked your comment"
-									: "liked your post")}
-							{notification.type === "comment" &&
-								(notification.comment
-									? "replied to your comment"
-									: "commented on your post")}
-							{notification.type === "follow" && "started following you"}
-							{notification.type === "mention" && "mentioned you in a post"}
-							{notification.type === "share" && "shared your post"}
-							{notification.type === "message" && "sent you a message"}
+							{getNotificationText()}
 						</span>
 					</p>
 					{!notification.read && (

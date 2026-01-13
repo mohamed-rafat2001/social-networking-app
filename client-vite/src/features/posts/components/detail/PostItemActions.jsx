@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { HiChatAlt2, HiRefresh, HiHeart, HiChartBar } from "react-icons/hi";
-import { cn } from "../../../../shared/components/ui";
+import { HiChatAlt2, HiRefresh, HiHeart, HiChartBar, HiOutlinePencilAlt } from "react-icons/hi";
+import { cn, Dropdown, DropdownItem } from "../../../../shared/components/ui";
 
 const PostItemActions = ({
 	post,
@@ -9,6 +9,7 @@ const PostItemActions = ({
 	handleLike,
 	setIsRepostModalOpen,
 	goToDetail,
+	handleRepost, // I need to pass this or use a hook
 }) => {
 	const isLiked = post.likes?.some((like) => (like._id || like) === user?._id);
 	const isShared = post.shares?.some(
@@ -33,29 +34,52 @@ const PostItemActions = ({
 				</span>
 			</motion.button>
 
-			<motion.button
-				className={cn(
-					"flex items-center gap-1 transition-all duration-200 hover:text-emerald-500 group",
-					isShared && "text-emerald-500"
-				)}
-				whileHover={{ scale: 1.02 }}
-				onClick={(e) => {
-					e.stopPropagation();
-					setIsRepostModalOpen(true);
-				}}
-			>
-				<div className="p-2 rounded-full group-hover:bg-emerald-500/10 transition-colors">
-					<HiRefresh
-						size={18}
+			<Dropdown
+				trigger={
+					<motion.button
 						className={cn(
-							isShared && "rotate-180 transition-transform duration-500"
+							"flex items-center gap-1 transition-all duration-200 hover:text-emerald-500 group",
+							isShared && "text-emerald-500"
 						)}
-					/>
-				</div>
-				<span className="text-[13px] font-medium">
-					{post.shares?.length || 0}
-				</span>
-			</motion.button>
+						whileHover={{ scale: 1.02 }}
+						onClick={(e) => e.stopPropagation()}
+					>
+						<div className="p-2 rounded-full group-hover:bg-emerald-500/10 transition-colors">
+							<HiRefresh
+								size={18}
+								className={cn(
+									isShared && "rotate-180 transition-transform duration-500"
+								)}
+							/>
+						</div>
+						<span className="text-[13px] font-medium">
+							{post.shares?.length || 0}
+						</span>
+					</motion.button>
+				}
+				align="left"
+			>
+				<DropdownItem
+					icon={HiRefresh}
+					onClick={(e) => {
+						e.stopPropagation();
+						if (handleRepost) {
+							handleRepost();
+						}
+					}}
+				>
+					Repost
+				</DropdownItem>
+				<DropdownItem
+					icon={HiOutlinePencilAlt}
+					onClick={(e) => {
+						e.stopPropagation();
+						setIsRepostModalOpen(true);
+					}}
+				>
+					Quote
+				</DropdownItem>
+			</Dropdown>
 
 			<motion.button
 				className={cn(

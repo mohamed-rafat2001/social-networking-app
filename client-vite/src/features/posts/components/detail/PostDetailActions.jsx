@@ -1,12 +1,19 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { HiHeart, HiChatAlt2, HiRefresh, HiChartBar } from "react-icons/hi";
-import { cn } from "../../../../shared/components/ui";
+import {
+	HiHeart,
+	HiChatAlt2,
+	HiRefresh,
+	HiChartBar,
+	HiOutlinePencilAlt,
+} from "react-icons/hi";
+import { cn, Dropdown, DropdownItem } from "../../../../shared/components/ui";
 
 const PostDetailActions = ({
 	post,
 	user,
 	handleLike,
+	handleRepost,
 	setIsRepostModalOpen,
 }) => {
 	// showStats is true for everything now because the backend handles which stats to send
@@ -32,27 +39,50 @@ const PostDetailActions = ({
 				)}
 			</motion.button>
 
-			{/* Share button */}
-			<motion.button
-				className={cn(
-					"flex items-center gap-2 transition-all duration-200 hover:text-green-500 group",
-					isShared ? "text-green-500" : "text-slate-500"
-				)}
-				whileHover={{ scale: 1.05 }}
-				onClick={(e) => {
-					e.stopPropagation();
-					setIsRepostModalOpen(true);
-				}}
+			{/* Share button with dropdown */}
+			<Dropdown
+				trigger={
+					<motion.button
+						className={cn(
+							"flex items-center gap-2 transition-all duration-200 hover:text-green-500 group",
+							isShared ? "text-green-500" : "text-slate-500"
+						)}
+						whileHover={{ scale: 1.05 }}
+						onClick={(e) => e.stopPropagation()}
+					>
+						<div className="p-2.5 rounded-full group-hover:bg-green-500/5 transition-colors">
+							<HiRefresh size={22} />
+						</div>
+						{showStats && (
+							<span className="text-[14px] font-bold">
+								{post.shares?.length || 0}
+							</span>
+						)}
+					</motion.button>
+				}
+				align="left"
 			>
-				<div className="p-2.5 rounded-full group-hover:bg-green-500/5 transition-colors">
-					<HiRefresh size={22} />
-				</div>
-				{showStats && (
-					<span className="text-[14px] font-bold">
-						{post.shares?.length || 0}
-					</span>
-				)}
-			</motion.button>
+				<DropdownItem
+					icon={HiRefresh}
+					onClick={(e) => {
+						e.stopPropagation();
+						if (handleRepost) {
+							handleRepost();
+						}
+					}}
+				>
+					Repost
+				</DropdownItem>
+				<DropdownItem
+					icon={HiOutlinePencilAlt}
+					onClick={(e) => {
+						e.stopPropagation();
+						setIsRepostModalOpen(true);
+					}}
+				>
+					Quote
+				</DropdownItem>
+			</Dropdown>
 
 			<motion.button
 				className={cn(
