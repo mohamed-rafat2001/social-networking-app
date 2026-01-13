@@ -18,7 +18,13 @@ import {
 	ImageModal,
 } from "../../../shared/components/ui";
 
-import { HiPhotograph, HiFilm, HiEmojiHappy, HiX } from "react-icons/hi";
+import {
+	HiPhotograph,
+	HiFilm,
+	HiEmojiHappy,
+	HiX,
+	HiArrowUp,
+} from "react-icons/hi";
 
 import PostItem from "./PostItem";
 
@@ -34,6 +40,9 @@ function PostList() {
 	const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 	const [selectedPreviewIndex, setSelectedPreviewIndex] = useState(0);
 	const [feedType, setFeedType] = useState("for-you");
+	const [showScrollTop, setShowScrollTop] = useState(false);
+	const [hasNewContent, setHasNewContent] = useState(false);
+	const lastPostIdRef = useRef(null);
 	const fileInputRef = useRef(null);
 
 	const { user } = useUser();
@@ -49,6 +58,41 @@ function PostList() {
 		isFetchingNextPage,
 	} = usePosts(feedType);
 
+	const posts = postsData?.pages.flatMap((page) => page.data) || [];
+
+	// Track scroll position for "Back to Top" button
+	useEffect(() => {
+		const handleScroll = () => {
+			if (window.scrollY > 500) {
+				setShowScrollTop(true);
+			} else {
+				setShowScrollTop(false);
+				setHasNewContent(false); // Reset when user reaches top
+			}
+		};
+
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
+
+	// Detect new posts at the top
+	useEffect(() => {
+		if (posts.length > 0) {
+			const newestPostId = posts[0]._id;
+			if (lastPostIdRef.current && lastPostIdRef.current !== newestPostId) {
+				if (window.scrollY > 300) {
+					setHasNewContent(true);
+				}
+			}
+			lastPostIdRef.current = newestPostId;
+		}
+	}, [posts]);
+
+	const scrollToTop = () => {
+		window.scrollTo({ top: 0, behavior: "smooth" });
+		setHasNewContent(false);
+	};
+
 	const { ref, inView } = useInView({
 		threshold: 0,
 		rootMargin: "100px",
@@ -63,8 +107,6 @@ function PostList() {
 	if (postsError) {
 		console.error(`PostList [${feedType}] fetch error:`, postsError);
 	}
-
-	const posts = postsData?.pages.flatMap((page) => page.data) || [];
 
 	const { mutate: addPostMutation } = useAddPost();
 
@@ -251,7 +293,7 @@ function PostList() {
 										animate={{ opacity: 1, scale: 1 }}
 										exit={{ opacity: 0, scale: 0.95 }}
 										className={cn(
-											"grid gap-2 mt-4 rounded-2xl overflow-hidden",
+											"grid gap-2 mt-4 rounded-2xl overflow-hidden relative z-30",
 											previewUrls.length === 1 ? "grid-cols-1" : "grid-cols-2"
 										)}
 									>
@@ -269,7 +311,7 @@ function PostList() {
 												<button
 													type="button"
 													onClick={() => removeFile(index)}
-													className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-sm transition-colors"
+													className="absolute top-2 right-2 z-40 p-1.5 bg-black/50 hover:bg-black/70 text-white rounded-full backdrop-blur-sm transition-colors"
 												>
 													<HiX size={18} />
 												</button>
@@ -346,18 +388,22 @@ function PostList() {
 								<PostItem key={post._id} post={post} />
 							))}
 							{/* Infinite Scroll Trigger */}
-							<div
-								ref={ref}
-								className="h-20 flex items-center justify-center p-4"
-							>
+							<div ref={ref} className="py-8 flex justify-center items-center">
 								{isFetchingNextPage ? (
-									<Spinner size="md" />
+									<div className="flex flex-col items-center gap-2">
+										<div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+										<span className="text-xs font-medium text-slate-400">
+											Loading more posts...
+										</span>
+									</div>
 								) : hasNextPage ? (
-									<div className="h-1" />
+									<div className="w-1 h-1 bg-slate-200 dark:bg-slate-800 rounded-full" />
 								) : (
-									<p className="text-sm text-slate-500 font-medium">
-										No more posts to show
-									</p>
+									<div className="py-4 text-center">
+										<p className="text-sm font-medium text-slate-400">
+											No more posts to show
+										</p>
+									</div>
 								)}
 							</div>
 						</>
@@ -392,6 +438,36 @@ function PostList() {
 					)}
 				</AnimatePresence>
 			</div>
+
+			{/* Scroll to Top / New Posts Button */}
+			<AnimatePresence>
+				{showScrollTop && (
+					<motion.button
+						initial={{ opacity: 0, y: 20, scale: 0.8 }}
+						animate={{ opacity: 1, y: 0, scale: 1 }}
+						exit={{ opacity: 0, y: 20, scale: 0.8 }}
+						onClick={scrollToTop}
+						className={cn(
+							"fixed bottom-20 right-6 z-50 flex items-center gap-2 p-3 rounded-full shadow-2xl transition-all duration-300 group",
+							hasNewContent
+								? "bg-primary text-white px-5"
+								: "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+						)}
+					>
+						{hasNewContent && (
+							<span className="text-sm font-bold whitespace-nowrap">
+								New Posts
+							</span>
+						)}
+						<HiArrowUp
+							className={cn(
+								"w-5 h-5 transition-transform group-hover:-translate-y-0.5",
+								hasNewContent ? "animate-bounce" : ""
+							)}
+						/>
+					</motion.button>
+				)}
+			</AnimatePresence>
 		</div>
 	);
 }
