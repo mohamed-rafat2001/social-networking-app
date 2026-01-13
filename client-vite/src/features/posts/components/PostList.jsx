@@ -8,7 +8,6 @@ import { useUser } from "../../../shared/hooks/useUser.js";
 import { useTheme } from "../../../providers/ThemeProvider";
 import { usePosts, useAddPost } from "../hooks/usePostQueries.js";
 import { useSocket } from "../../../shared/hooks/useSocket";
-import InputEmoji from "react-input-emoji";
 import { motion, AnimatePresence } from "framer-motion";
 import {
 	Avatar,
@@ -16,15 +15,10 @@ import {
 	Spinner,
 	cn,
 	ImageModal,
+	Textarea,
 } from "../../../shared/components/ui";
 
-import {
-	HiPhotograph,
-	HiFilm,
-	HiEmojiHappy,
-	HiX,
-	HiArrowUp,
-} from "react-icons/hi";
+import { HiPhotograph, HiX, HiArrowUp } from "react-icons/hi";
 
 import PostItem from "./PostItem";
 
@@ -237,49 +231,15 @@ function PostList() {
 							className="shrink-0"
 						/>
 						<div className="flex-1 min-w-0">
-							<div className="post-input-container emoji-input-container relative z-20">
-								<style>
-									{`
-										.post-input-container .react-input-emoji--container {
-											background: transparent !important;
-											border: none !important;
-											margin-bottom: 0 !important;
-										}
-										.post-input-container .react-input-emoji--wrapper {
-											background: transparent !important;
-											border: none !important;
-											padding: 0 !important;
-										}
-										.post-input-container .react-input-emoji--input {
-											background: transparent !important;
-											padding: 12px 0 !important;
-											color: ${darkMode ? "white" : "#0f172a"} !important;
-											font-size: 19px !important;
-											min-height: 50px !important;
-										}
-										.post-input-container .react-input-emoji--placeholder {
-											left: 0 !important;
-											font-size: 19px !important;
-											color: ${darkMode ? "#64748b" : "#94a3b8"} !important;
-										}
-										.post-input-container .react-input-emoji--button {
-											padding: 8px !important;
-										}
-									`}
-								</style>
+							<div className="post-input-container relative z-20">
 								<Controller
 									name="text"
 									control={control}
 									render={({ field }) => (
-										<InputEmoji
-											value={field.value}
-											onChange={field.onChange}
+										<Textarea
+											{...field}
 											placeholder="What's happening in engineering?"
-											theme={darkMode ? "dark" : "light"}
-											fontSize={19}
-											fontFamily="inherit"
-											borderColor="transparent"
-											background="transparent"
+											className="border-none bg-transparent dark:bg-transparent p-0 text-xl focus-visible:ring-0 min-h-[50px] shadow-none"
 										/>
 									)}
 								/>
@@ -330,13 +290,6 @@ function PostList() {
 										title="Add Media"
 									>
 										<HiPhotograph size={22} />
-									</button>
-									<button
-										type="button"
-										className="p-2.5 text-primary hover:bg-primary/10 rounded-full transition-all active:scale-95"
-										title="Add Emoji"
-									>
-										<HiEmojiHappy size={22} />
 									</button>
 								</div>
 

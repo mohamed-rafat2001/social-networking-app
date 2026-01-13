@@ -2,7 +2,7 @@ import React from "react";
 import { HiOutlinePaperClip, HiOutlinePaperAirplane } from "react-icons/hi";
 import InputEmoji from "react-input-emoji";
 import { motion } from "framer-motion";
-import { Button, Spinner } from "../../../../shared/components/ui";
+import { Button, Spinner, cn } from "../../../../shared/components/ui";
 
 const ChatInput = ({
 	text,
@@ -97,8 +97,8 @@ const ChatInput = ({
 						disabled={isDisabled}
 						className={cn(
 							"p-3 rounded-2xl h-[46px] w-[46px] flex items-center justify-center transition-all duration-300",
-							!isDisabled 
-								? "bg-gradient-to-r from-primary to-blue-600 shadow-lg shadow-primary/20 hover:shadow-primary/30" 
+							!isDisabled
+								? "bg-gradient-to-r from-primary to-blue-600 shadow-lg shadow-primary/20 hover:shadow-primary/30"
 								: "bg-slate-200 dark:bg-slate-800 text-slate-400"
 						)}
 					>
